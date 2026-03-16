@@ -5,16 +5,6 @@ import jwt from "jsonwebtoken";
 const authService = {
     async register(userData) {
         const { username, email, password } = userData;
-        if(!username || !email || !password) {
-            throw new Error("All fields are required");
-        }
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            throw new Error("Email already in use");
-        }
-        if(password.length < 6) {
-            throw new Error("Password must be at least 6 characters");
-        }
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({
             username,
@@ -28,9 +18,6 @@ const authService = {
     },
     async login(userData){
         const { email, password } = userData;
-        if(!email || !password) {
-            throw new Error("All fields are required");
-        }
         const user = await User.findOne({ email });
         if (!user) {
             throw new Error("User not found");
