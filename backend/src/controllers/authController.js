@@ -24,23 +24,57 @@ const authController = {
     async getProfile(req, res, next) {
         try{
             const user = await User.findById(req.user.userId);
-            if(!user) {
-                return res.status(404).json({ 
-                    success: false,
-                    message: "User not found"
-                 });
-            }
-            const { password, ...userWithoutPassword } = user.toObject();
-            res.json({
+            
+            res.status(200).json({
                 success: true,
-                message: "User profile retrieved successfully",
-                user: userWithoutPassword
+                message: "Lấy thông tin người dùng thành công",
+                data: user
             });
-        }   
+        }
         catch (error) {
             next(error);
         }
-    }
+    },
+    async createCourse(req, res, next) {
+        try {
+            // Logic to create a course
+            res.status(201).json({
+                success: true,
+                message: "Course created successfully",
+                data: {
+                    courseName: "New Course",
+                    createBy: req.user.userId
+                }
+            });
+        } catch (error) {
+            next(error);
+        }  
+    },
+    async deleteUser(req, res, next) {
+        try {
+            // Logic to delete a course
+            res.json({
+                success: true,
+                message: "Course deleted successfully",
+                data: {
+                    deletedUserID: req.params.id,
+                    deletedBy: req.user.userId
+                }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+    async updateProfile(req, res, next) {
+        try{
+            const userId = req.user.userId;
+            const user = await User.find
+        }
+        catch (error) {
+            next(error);
+        }
+    },
+    async changePassword(req, res, next) {}
 }
 
 export default authController;
