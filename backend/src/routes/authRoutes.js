@@ -12,8 +12,6 @@ router.post('/login', validators.loginValidationRules, validators.validate, auth
 // Protected route 
 router.get('/profile', authMiddleware, authController.getProfile);
 router.put('/profile', authMiddleware, authController.updateProfile);
-router.post('/change-password', authMiddleware, authController.changePassword);
+router.put('/change-password', authMiddleware, authController.changePassword);
 
-router.post('/courses', authMiddleware, authorizeMiddleware('teacher', 'admin'), authController.createCourse);
-router.delete('/users/:id', authMiddleware, authorizeMiddleware('admin'), authController.deleteUser);
 export default router;

@@ -23,8 +23,8 @@ const authController = {
     // users/profile
     async getProfile(req, res, next) {
         try{
-            const user = await User.findById(req.user.userId);
-            
+            const userId = req.user.userId;
+            const user = await authService.getUserProfile(userId);
             res.status(200).json({
                 success: true,
                 message: "Lấy thông tin người dùng thành công",
@@ -35,46 +35,34 @@ const authController = {
             next(error);
         }
     },
-    async createCourse(req, res, next) {
-        try {
-            // Logic to create a course
-            res.status(201).json({
-                success: true,
-                message: "Course created successfully",
-                data: {
-                    courseName: "New Course",
-                    createBy: req.user.userId
-                }
-            });
-        } catch (error) {
-            next(error);
-        }  
-    },
-    async deleteUser(req, res, next) {
-        try {
-            // Logic to delete a course
-            res.json({
-                success: true,
-                message: "Course deleted successfully",
-                data: {
-                    deletedUserID: req.params.id,
-                    deletedBy: req.user.userId
-                }
-            });
-        } catch (error) {
-            next(error);
-        }
-    },
-    async updateProfile(req, res, next) {
+   async updateProfile(req, res, next) {
         try{
             const userId = req.user.userId;
-            const user = await User.find
+            const result = await authService.updateUserProfile(userId, req.body);
+            res.status(200).json({
+                success: true,
+                message: "Cập nhật thông tin người dùng thành công",
+                data: result.user
+            });
         }
         catch (error) {
             next(error);
         }
     },
-    async changePassword(req, res, next) {}
+    async changePassword(req, res, next) {
+        try{
+            const userId = req.user.userId;
+            const { currentPassword, newPassword } = req.body;
+            await authService.changeUserPassword(userId, currentPassword, newPassword);
+            res.status(200).json({
+                success: true,
+                message: "Đổi mật khẩu thành công"
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    },
 }
 
 export default authController;

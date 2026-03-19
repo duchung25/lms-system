@@ -51,7 +51,7 @@ const authService = {
     async updateUserProfile(userId, updateData) {
         const user = await User.findByIdAndUpdate(
             userId, 
-            {updateData},
+            updateData,
             { new: true, runValidators: true }
         ).select("-password");
         if(!user){

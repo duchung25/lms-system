@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongooseDelete from "mongoose-delete";
 
 const userSchema = new mongoose.Schema(
     {
@@ -18,6 +19,10 @@ const userSchema = new mongoose.Schema(
             required: true,
             minLength: 6,
         },
+        active: {
+            type: Boolean,
+            default: true,
+        },
         role: {
             type: String,
             enum: ["student", "teacher", "admin"],
@@ -28,5 +33,10 @@ const userSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
+userSchema.plugin(mongooseDelete, { 
+    deletedAt: true, 
+    overrideMethods: "all"
+});
+
 const User = mongoose.model("User", userSchema);
 export default User;
