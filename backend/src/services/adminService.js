@@ -1,10 +1,10 @@
 import User from '../models/User.js';
-import brcypt from 'bcrypt';
+import brcyptjs from 'bcryptjs';
 
 const adminService = {
     async getAllUsers() {
         const users = await User.find().select("-password");
-        if(!users){
+        if(!users||users.length === 0){
             throw new Error("Không có người dùng nào");
         }
         return users;
@@ -24,21 +24,22 @@ const adminService = {
         return user;
     },
     async deleteUser(userId){
-        const user = await User.findByIdAndDelete(userId);
+        const user = await User.findById(userId);
         if(!user){
             throw new Error("Người dùng không tồn tại");
         }
+        await User.delete({ _id: userId });
         return {
             message: "Xóa người dùng thành công",
             deletedUserId: userId
         };
     },
     async restoreUser(userId){
-        const user = await User.findWithDeleted({_id: userId});
+        const user = await User.findWithDeleted({ _id: userId });
         if(!user){
             throw new Error("Người dùng không tồn tại");
         }
-        await user.restore({_id: userId});
+        await User.restore({_id: userId});
         return {
             message: "Khôi phục người dùng thành công",
             restoredUserId: userId
@@ -47,7 +48,7 @@ const adminService = {
     async deactivateUser(userId){
         const user = await User.findByIdAndUpdate(
             userId, 
-            { active: false },
+            { status: "inactive" },
             { new: true, runValidators: true }
         ).select("-password");
         if(!user){
@@ -63,7 +64,7 @@ const adminService = {
         if(!user){
             throw new Error("Người dùng không tồn tại");
         }
-        const hashedPassword = await brcypt.hash(newPassword, 10);
+        const hashedPassword = await brcyptjs.hash(newPassword, 10);
         user.password = hashedPassword;
         await user.save();
         return{

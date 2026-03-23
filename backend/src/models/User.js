@@ -20,7 +20,8 @@ const userSchema = new mongoose.Schema(
             minLength: 6,
         },
         active: {
-            type: Boolean,
+            type: String,
+            enum: ["active", "inactive"],
             default: true,
         },
         role: {

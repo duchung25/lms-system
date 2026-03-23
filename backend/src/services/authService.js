@@ -1,11 +1,11 @@
 import User from "../models/User.js";
-import bcrypt from 'bcryptjs';
+import bcryptjs from 'bcryptjs';
 import jwt from "jsonwebtoken";
 
 const authService = {
     async register(userData) {
         const { username, email, password, role } = userData;
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcryptjs.hash(password, 10);
         const user = await User.create({
             username,
             email,
@@ -23,7 +23,7 @@ const authService = {
         if (!user) {
             throw new Error("User not found");
         }
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcryptjs.compare(password, user.password);
         if(!isMatch){
             throw new Error("Invalid credentials");
         }
@@ -64,11 +64,11 @@ const authService = {
         if(!user){
             throw new Error("User not found");
         }
-        const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        const isPasswordValid = await bcryptjs.compare(currentPassword, user.password);
         if(!isPasswordValid){
             throw new Error("Current password is incorrect");
         }
-        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        const hashedNewPassword = await bcryptjs.hash(newPassword, 10);
         user.password = hashedNewPassword;
         await user.save();
         return user;
