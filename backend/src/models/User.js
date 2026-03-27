@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema(
             unique: true,
             lowercase: true,
         },
+        avatar: {
+            type: String,
+            default: ""
+        },
         password: {
             type: String,
             required: true,
@@ -22,7 +26,7 @@ const userSchema = new mongoose.Schema(
         active: {
             type: String,
             enum: ["active", "inactive"],
-            default: true,
+            default: "active",
         },
         role: {
             type: String,

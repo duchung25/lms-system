@@ -1,6 +1,8 @@
+import adminService from "../services/adminService.js";
+
 const adminController = {
-    // Get list admin
-    async getAllAdmin(req, res, next){
+    // Get list user
+    async getAllUser(req, res, next){
         try{
             const userList = await adminService.getAllUsers();
             res.status(200).json({
@@ -57,57 +59,46 @@ const adminController = {
     },
     async restoreUser(req, res, next){
         try{
-            cons
+            const {id} = req.params;
+            const result = await adminService.restoreUser(id);
+            res.status(200).json({
+                success: true,
+                message: result.message,
+                data: { restoredUserId: result.restoredUserId }
+            })
         }
         catch(error){
             next(error);
         }
     },
-    // Update user byId
-    async updateUserById(req, res, next){
+    async deactivateUser(req, res, next){
         try{
-            const { id } = req.params;
-            const { username, email, role} = req.body;
+            const {id} = req.params;
+            const result = await adminService.deactivateUser(id);
             res.status(200).json({
                 success: true,
-                message: "Cập nhật thông tin thành công",
-                data: {}
-            })
-        } catch (error) {
+                message: result.message,
+                data: { user: result.user }
+            });
+        }
+        catch(error){
             next(error);
         }
     },
-    // Delete user byId
-    async deleteUserById(req, res, next){
+    async resetPassword(req, res, next){
         try{
             const { id } = req.params;
-            success: true,
+            const { newPassword } = req.body;
+            const result = await adminService.resetPassword(id, newPassword);
             res.status(200).json({
                 success: true,
-                message: "Xóa người dùng thành công",
-                data: { deletedUserId: id }
+                message: result.message
             });
-        }catch (error) {
+        }
+        catch(error){
             next(error);
         }
     },
-    // Count total user
-    async getState(req, res, next){
-        try{
-            res.status(200).json({
-                success: true,
-                message: "Lấy thông tin thống kê thành công",
-                data: {
-                    totalUsers: 0,
-                    totalTeachers: 0,
-                    totalStudents: 0,
-                    totalAdmins: 0
-                }
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
 }
 
 export default adminController;

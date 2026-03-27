@@ -1,5 +1,5 @@
 import User from '../models/User.js';
-import brcyptjs from 'bcryptjs';
+import bcryptjs from 'bcryptjs';
 
 const adminService = {
     async getAllUsers() {
@@ -48,7 +48,7 @@ const adminService = {
     async deactivateUser(userId){
         const user = await User.findByIdAndUpdate(
             userId, 
-            { status: "inactive" },
+            { active: "inactive" },
             { new: true, runValidators: true }
         ).select("-password");
         if(!user){
@@ -64,7 +64,7 @@ const adminService = {
         if(!user){
             throw new Error("Người dùng không tồn tại");
         }
-        const hashedPassword = await brcyptjs.hash(newPassword, 10);
+        const hashedPassword = await bcryptjs.hash(newPassword, 10);
         user.password = hashedPassword;
         await user.save();
         return{
