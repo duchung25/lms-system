@@ -39,17 +39,19 @@ const courseService = {
             throw new Error("Failed to get course: " + error.message);  
         }
     },
-    async updateCourse(courseId, updateData){
+    async updateCourse(courseId, updateData, currentUser){
         try{
-            const course = await Course.findByIdAndUpdate(
-                courseId,
-                updateData,
-                { new: true, runValidators: true }
-            ).populate("teacherId", "username email");
+            const course = await Course.findById(courseId);
             if(!course){
                 throw new Error("Course not found");
             }
-            return course;
+            if(currentUser.role === "teacher"){
+                if(currentUser.userId.toString() !== course.teacherId.toString()){
+                    throw new Error("You are not the owner of this course");
+                }
+            }
+            Object.assign(course, updateData);
+            return await course.save().populate("teacherId", "username email avatar");
         }
         catch(error){
             throw new Error("Failed to update course: " + error.message);

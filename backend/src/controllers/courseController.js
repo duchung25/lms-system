@@ -46,8 +46,9 @@ const courseController = {
     async updateCourse(req, res, next) {
         try{
             const {id} = req.params;
+            const currentUser = req.user;
             const updateData = req.body;
-            const course = await courseService.updateCourse(id, updateData);
+            const course = await courseService.updateCourse(id, updateData, currentUser);
             res.status(200).json({
                 success: true,
                 message: "Course updated successfully",

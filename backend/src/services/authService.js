@@ -9,8 +9,7 @@ const authService = {
         const user = await User.create({
             username,
             email,
-            password: hashedPassword,
-            role
+            password: hashedPassword
         });   
         return {
             message: "Created user successfully",
