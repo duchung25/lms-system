@@ -4,7 +4,11 @@ const authController = {
     async register(req, res, next) {
         try{
             const result = await authService.register(req.body);
-            res.status(201).json(result);
+            res.status(201).json({
+                success: true,
+                message: result.message,
+                data: { user: result.user }
+            });
         }
         catch (error) {
             next(error);
@@ -13,7 +17,14 @@ const authController = {
     async login(req, res, next) {
         try{
             const result = await authService.login(req.body);
-            res.status(200).json(result);
+            res.status(200).json({
+                success: true,
+                message: result.message,
+                data: {
+                    token: result.token,
+                    user: result.user
+                }
+            });
         }
         catch (error) {
             next(error);
@@ -27,7 +38,7 @@ const authController = {
             res.status(200).json({
                 success: true,
                 message: "Lấy thông tin người dùng thành công",
-                data: user
+                data: { user: user }
             });
         }
         catch (error) {
@@ -37,11 +48,11 @@ const authController = {
    async updateProfile(req, res, next) {
         try{
             const userId = req.user.userId;
-            const result = await authService.updateUserProfile(userId, req.body);
+            const user = await authService.updateUserProfile(userId, req.body);
             res.status(200).json({
                 success: true,
                 message: "Cập nhật thông tin người dùng thành công",
-                data: result.user
+                data: { user: user }
             });
         }
         catch (error) {

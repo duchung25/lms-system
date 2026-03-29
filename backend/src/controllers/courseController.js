@@ -9,7 +9,7 @@ const courseController = {
             res.status(201).json({
                 success: true,
                 message: "Course created successfully",
-                data: course
+                data: { course }
             });
         }
         catch (error) {
@@ -22,7 +22,7 @@ const courseController = {
             res.status(200).json({
                 success: true,
                 message: "Courses retrieved successfully",
-                data: courses
+                data: { courses }
             });
         }
         catch (error) {
@@ -36,7 +36,7 @@ const courseController = {
             res.status(200).json({
                 success: true,
                 message: "Course retrieved successfully",
-                data: course
+                data: { course }
             })
         }
         catch(error){
@@ -52,7 +52,7 @@ const courseController = {
             res.status(200).json({
                 success: true,
                 message: "Course updated successfully",
-                data: course
+                data: { course }
             });
         }
         catch(error){
@@ -65,7 +65,8 @@ const courseController = {
             await courseService.deleteCourse(id);
             res.status(200).json({
                 success: true,
-                message: "Course deleted successfully"
+                message: "Course deleted successfully",
+                data: {}
             });
         }
         catch(error){
@@ -78,7 +79,8 @@ const courseController = {
             await courseService.restoreCourse(id);
             res.status(200).json({
                 success: true,
-                message: "Course restored successfully"
+                message: "Course restored successfully",
+                data: {}
             });
         }
         catch(error){
@@ -92,43 +94,13 @@ const courseController = {
             res.status(200).json({
                 success: true,
                 message: "Courses retrieved successfully",
-                data: courses
+                data: { courses }
             });
         }
         catch(error){
             next(error);
         }
     },
-    async enrollStudent(req, res, next) {
-        try{
-            const studentId = req.user.userId;
-            const {id} = req.params;
-            const course = await courseService.enrollStudent(id, studentId);
-            res.status(200).json({
-                success: true,
-                message: "Enrolled in course successfully",
-                data: course
-            });
-        }
-        catch(error){
-            next(error);
-        }
-    },
-    async unenrollStudent(req, res, next) {
-        try{
-            const studentId = req.user.userId;
-            const {id} = req.params;
-            const course = await courseService.unenrollStudent(id, studentId);
-            res.status(200).json({
-                success: true,
-                message: "Unenrolled from course successfully",
-                data: course
-            });
-        }
-        catch(error){
-            next(error);
-        }
-    }
 }
 
 export default courseController;

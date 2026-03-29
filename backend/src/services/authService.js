@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 const authService = {
     async register(userData) {
-        const { username, email, password, role } = userData;
+        const { username, email, password } = userData;
         const hashedPassword = await bcryptjs.hash(password, 10);
         const user = await User.create({
             username,

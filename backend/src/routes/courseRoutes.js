@@ -8,8 +8,6 @@ const router = express.Router();
 
 //Specific router 
 router.get('/by-teacher/:id', courseController.getCoursesByTeacher);
-router.post('/:id/enrollments', authMiddleware, authorizeMiddleware('student'), courseController.enrollStudent);
-router.delete('/enrollments/:id', authMiddleware, authorizeMiddleware('student'), courseController.unenrollStudent);
 
 router.post('/', authMiddleware, authorizeMiddleware('teacher'), courseValidator.createCourseValidationRules, courseValidator.validate, courseController.createCourse);
 router.get('/', courseController.getAllCourse);

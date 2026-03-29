@@ -5,10 +5,12 @@ const teacherRequestSchema = new mongoose.Schema(
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
+            required: true
         },
         status: {
             type: String,
             enum: ["Pending", "Approved", "Rejected"],
+            default: "Pending"
         },
         message: {
             type: String,
