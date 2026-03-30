@@ -65,8 +65,7 @@ const courseController = {
             await courseService.deleteCourse(id);
             res.status(200).json({
                 success: true,
-                message: "Course deleted successfully",
-                data: {}
+                message: "Course deleted successfully"
             });
         }
         catch(error){
@@ -79,8 +78,7 @@ const courseController = {
             await courseService.restoreCourse(id);
             res.status(200).json({
                 success: true,
-                message: "Course restored successfully",
-                data: {}
+                message: "Course restored successfully"
             });
         }
         catch(error){

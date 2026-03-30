@@ -8,7 +8,7 @@ const adminController = {
             res.status(200).json({
                 success: true,
                 message: "Lấy danh sách thành công",
-                data: userList
+                data: { userList }
             });
         } catch (error) {
             next(error);
@@ -23,7 +23,7 @@ const adminController = {
             res.status(200).json({
                 success: true,
                 message: "Lấy thông tin chi tiết thành công",
-                data: user
+                data: { user }
             })
         } catch (error) {
             next(error);
@@ -37,7 +37,7 @@ const adminController = {
             res.status(200).json({
                 success: true,
                 message: "Lấy thông tin chi tiết thành công",
-                data: user
+                data: { user }
             })
         }
         catch (error) {

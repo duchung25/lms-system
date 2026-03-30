@@ -58,7 +58,7 @@ const courseService = {
             if(!course) {
                 throw new Error("Course not found")
             }
-            await course.delete();
+            await course.delete({ _id: courseId });
             return {
                 message: "Course deleted successfully",
                 deletedCourseId: courseId

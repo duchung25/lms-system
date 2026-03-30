@@ -4,7 +4,7 @@ const enrollmentController = {
     async enrollInCourse(req, res, next) {
         try{
             const studentId = req.user.userId;
-            const { courseId } = req.params;
+            const { courseId } = req.body;
             const enrollment = await enrollmentService.enrollInCourse(courseId, studentId);
             res.status(200).json({
                 success: true,

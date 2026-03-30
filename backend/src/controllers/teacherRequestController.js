@@ -53,7 +53,7 @@ const teacherRequestController = {
             res.status(200).json({
                 success: true,
                 message: "Teacher request approved successfully",
-                data: result,
+                data: { result }
             });
         }
         catch(error){
@@ -69,7 +69,7 @@ const teacherRequestController = {
             res.status(200).json({
                 success: true,
                 message: "Teacher request rejected successfully",
-                data: result
+                data: { result }
             });
         }
         catch(error){

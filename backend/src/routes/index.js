@@ -13,6 +13,6 @@ router.use('/users', userRoutes);
 router.use('/admin', adminRoutes);
 router.use('/courses', courseRoutes);
 router.use('/teacher-requests', teacherRequestRoutes);
-router.use('/', enrollmentRoutes);
+router.use('/enrollments', enrollmentRoutes);
 
 export default router;
