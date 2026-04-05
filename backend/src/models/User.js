@@ -22,11 +22,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             minLength: 6,
+            select: false,
         },
         active: {
-            type: String,
-            enum: ["active", "inactive"],
-            default: "active",
+            type: Boolean,
+            default: true,
         },
         role: {
             type: String,

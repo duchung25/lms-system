@@ -16,6 +16,10 @@ const teacherRequestSchema = new mongoose.Schema(
             type: String,
             default: ""
         },
+        adminMessage: {
+            type: String,
+            default: ""
+        },
         reviewerId:{
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

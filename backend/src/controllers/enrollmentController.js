@@ -6,7 +6,7 @@ const enrollmentController = {
             const studentId = req.user.userId;
             const { courseId } = req.body;
             const enrollment = await enrollmentService.enrollInCourse(courseId, studentId);
-            res.status(200).json({
+            res.status(201).json({
                 success: true,
                 message: "Enrolled in course successfully",
                 data: { enrollment }

@@ -38,7 +38,7 @@ const authController = {
             res.status(200).json({
                 success: true,
                 message: "Lấy thông tin người dùng thành công",
-                data: { user: user }
+                data: { user }
             });
         }
         catch (error) {
@@ -52,7 +52,7 @@ const authController = {
             res.status(200).json({
                 success: true,
                 message: "Cập nhật thông tin người dùng thành công",
-                data: { user: user }
+                data: { user }
             });
         }
         catch (error) {
@@ -66,7 +66,8 @@ const authController = {
             await authService.changeUserPassword(userId, currentPassword, newPassword);
             res.status(200).json({
                 success: true,
-                message: "Đổi mật khẩu thành công"
+                message: "Đổi mật khẩu thành công",
+                data: null
             });
         }
         catch (error) {

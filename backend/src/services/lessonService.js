@@ -1,96 +1,106 @@
 import Lesson from "../models/Lesson.js";
 import Course from "../models/Course.js";
-import Enrollment from "../models/Enrollment.js";
+import AppError from "../utils/AppError.js";
 
 const LessonService = {
     async createLesson(courseid, data, user ){
         const course = await Course.findById(courseid);
         if(!course){
-            throw new Error("Course not found");
-        }
-        const isOwner = course.teacherId.toString() === user.userId;
-        const isAdmin = user.role === "admin";
-        if(!isOwner && !isAdmin){
-            throw new Error("You are not the owner of this course");
+            throw new AppError("Course not found", 404);
         }
         const lastLesson = await Lesson.findOne({ courseId: courseid }).sort({ order: -1 });
         const nextorder = lastLesson ? lastLesson.order + 1 : 1;
         const lesson = await Lesson.create({ ...data, courseId: courseid, order: nextorder, createdBy: user.userId });
         return lesson;
     },
-    async getLessonsByCourse(courseId, user){
+    async getLessonsByCourse(courseId){
         const course = await Course.findById(courseId);
         if(!course){
-            throw new Error("Course not found");
+            throw new AppError("Course not found", 404);
         }
         if(!course.isPublished){
-            throw new Error("Course is not published yet");
+            throw new AppError("Course is not published yet", 400);
         }
         return await Lesson.find({ courseId })
         .select(" title order duration ")
         .sort({ order: 1 })
         .lean();
     },
-    async getLessonById(id, user){
-        const lesson = await Lesson.findById(id);
+    async getPublishedLessonsByCourse(courseId){
+        const course = await Course.findById(courseId);
+        if(!course){
+            throw new AppError("Course not found", 404);
+        }
+        if(!course.isPublished){
+            throw new AppError("Course is not published yet", 400);
+        }
+        return await Lesson.find({ courseId, isPublished: true })
+        .select(" title order duration ")
+        .sort({ order: 1 })
+        .lean();
+    },
+    async getLessonById(courseId, lessonId){
+        const lesson = await Lesson.findById(lessonId);
         if(!lesson){
-            throw new Error("Lesson not found");
+            throw new AppError("Lesson not found", 404);
+        }
+        if(!lesson.courseId.equals(courseId)){
+            throw new AppError("Lesson does not belong to the specified course", 400);
         }
         const course = await Course.findById(lesson.courseId);
         if(!course.isPublished){
-            throw new Error("Course is not published yet");
+            throw new AppError("Course is not published yet", 400);
         }
         return lesson;
     },
-    async updateLesson(id, data, user){
-        const lesson = await Lesson.findById(id);
+    async updateLesson(lessonId, data, user){
+        const lesson = await Lesson.findById(lessonId);
         if(!lesson){
-            throw new Error("Lesson not found");
-        }
-        const course = await Course.findById(lesson.courseId);
-        const isOwner = course.teacherId.toString() === user.userId;
-        const isAdmin = user.role === "admin";
-        if(!isOwner && !isAdmin){
-            throw new Error("You are not the owner of this course");
+            throw new AppError("Lesson not found", 404);
         }
         delete data.order;
         Object.assign(lesson, data);
         return await lesson.save();
     },
-    async deleteLesson(id, user){
-        const lesson = await Lesson.findById(id);
+    async deleteLesson(lessonId, user){
+        const lesson = await Lesson.findById(lessonId);
         if(!lesson){
-            throw new Error("Lesson not found");
+            throw new AppError("Lesson not found", 404);
         }
-        const course = await Course.findById(lesson.courseId);
-        const isOwner = course.teacherId.toString() === user.userId;
-        const isAdmin = user.role === "admin";
-        if(!isOwner && !isAdmin){
-            throw new Error("You are not the owner of this course");
-        }
-        await Lesson.delete({ _id: id });
+        await Lesson.delete({ _id: lessonId });
         return {
             message: "Lesson deleted successfully",
-            deletedLessonId: id
+            deletedLessonId: lessonId
         }
     },
-    async restoreLesson(id, user){
-        const lesson = await Lesson.findById(id);
+    async restoreLesson(lessonId, user){
+        const lesson = await Lesson.findById(lessonId);
         if(!lesson){
-            throw new Error("Lesson not found");
+            throw new AppError("Lesson not found", 404);
         }
-        const course = await Course.findById(lesson.courseId);
-        const isOwner = course.teacherId.toString() === user.userId;
-        const isAdmin = user.role === "admin";
-        if(!isOwner && !isAdmin){
-            throw new Error("You are not the owner of this course");
-        }
-        await Lesson.restore({ _id: id });
+        await Lesson.restore({ _id: lessonId });
         return {
             message: "Lesson restored successfully",
-            restoredLessonId: id
+            restoredLessonId: lessonId
         }
+    },
+    async publishLesson(lessonId){
+        const lesson = await Lesson.findById(lessonId);
+        if(!lesson){
+            throw new AppError("Lesson not found", 404);
+        }
+        lesson.isPublished = true;
+        return await lesson.save();
+    },
+    async unpublishLesson(lessonId){
+        const lesson = await Lesson.findById(lessonId);
+        if(!lesson){
+            throw new AppError("Lesson not found", 404);
+        }
+        lesson.isPublished = false;
+        return await lesson.save();
     }
+
 };
 
 export default LessonService;

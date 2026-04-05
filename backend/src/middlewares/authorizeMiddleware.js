@@ -1,14 +1,11 @@
+import AppError from "../utils/AppError.js";
+
 const authorizeMiddleware = (...allowedRoles) => {
     return (req, res, next) => {
         try{
-            // Lấy role của người dùng 
             const userRole = req.user.role;
-            // check role 
             if(!allowedRoles.includes(userRole)) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Access denied: insufficient permissions'
-                });
+                return next(new AppError("Access denied: insufficient permissions", 403));
             }
             next();
         } catch (error) {

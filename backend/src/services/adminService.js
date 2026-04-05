@@ -1,34 +1,31 @@
 import User from '../models/User.js';
 import bcryptjs from 'bcryptjs';
+import AppError from '../utils/AppError.js';
 
 const adminService = {
     async getAllUsers() {
-        const users = await User.find().select("-password");
-        if(!users||users.length === 0){
-            throw new Error("Không có người dùng nào");
-        }
-        return users;
+        return await User.find().lean();
     },
     async getUserById(userId) {
-        const user = await User.findById(userId).select("-password");
+        const user = await User.findById(userId);
         if(!user){
-        throw new Error("Người dùng không tồn tại");
+        throw new AppError("Người dùng không tồn tại", 404);
         }
         return user;
     },
     async getUserByEmail(email) {
-        const user = await User.findOne({ email }).select("-password");
+        const user = await User.findOne({ email });
         if(!user){
-            throw new Error("Người dùng không tồn tại");
+            throw new AppError("Người dùng không tồn tại", 404);
         }
         return user;
     },
     async deleteUser(userId){
         const user = await User.findById(userId);
         if(!user){
-            throw new Error("Người dùng không tồn tại");
+            throw new AppError("Người dùng không tồn tại", 404);
         }
-        await User.delete({ _id: userId });
+        await user.delete();
         return {
             message: "Xóa người dùng thành công",
             deletedUserId: userId
@@ -36,8 +33,8 @@ const adminService = {
     },
     async restoreUser(userId){
         const user = await User.findWithDeleted({ _id: userId });
-        if(!user){
-            throw new Error("Người dùng không tồn tại");
+        if(!user || user.length === 0 ){
+            throw new AppError("Người dùng không tồn tại", 404);
         }
         await User.restore({_id: userId});
         return {
@@ -48,11 +45,11 @@ const adminService = {
     async deactivateUser(userId){
         const user = await User.findByIdAndUpdate(
             userId, 
-            { active: "inactive" },
+            { active: false, deleted: false },
             { new: true, runValidators: true }
-        ).select("-password");
+        );
         if(!user){
-            throw new Error("Người dùng không tồn tại");
+            throw new AppError("Người dùng không tồn tại", 404);
         }
         return {
             message: "Vô hiệu hóa người dùng thành công",
@@ -62,7 +59,7 @@ const adminService = {
     async resetPassword(userId, newPassword) {
         const user = await User.findById(userId);
         if(!user){
-            throw new Error("Người dùng không tồn tại");
+            throw new AppError("Người dùng không tồn tại", 404);
         }
         const hashedPassword = await bcryptjs.hash(newPassword, 10);
         user.password = hashedPassword;

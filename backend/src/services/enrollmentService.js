@@ -1,60 +1,41 @@
 import Enrollment from "../models/Enrollment.js";
 import Course from "../models/Course.js";
+import AppError from "../utils/AppError.js";
 
 const enrollmentService = {
     async enrollInCourse(courseId, studentId){
-        try{
-            const course = await Course.findById(courseId);
-            if(!course){
-                throw new Error("Course not found");
-            }
-            const existing = await Enrollment.findOne({ courseId, studentId });
-            if(existing){
-                if(existing.status === "active"){
-                    throw new Error("Already enrolled in this course");
-                }
-                existing.status = "active";
-                existing.cancelledAt = null;
-                await existing.save();
-                return existing;
-            }
-            const enrollment = await Enrollment.create({ courseId, studentId });
-            return enrollment;
+        const course = await Course.findById(courseId);
+        if(!course || !course.active){
+            throw new AppError("Course not found", 404);
         }
-        catch(error){
-            throw new Error("Failed to enroll in course: " + error.message);
+        const existing = await Enrollment.findOne({ courseId, studentId });
+        if(existing){
+            if(existing.status === "active"){
+                throw new AppError("Already enrolled in this course", 400);
+            }
+            existing.status = "active";
+            existing.cancelledAt = null;
+            await existing.save();
+            return existing;
         }
+        const enrollment = await Enrollment.create({ courseId, studentId });
+        return enrollment;
     },
     async unenrollFromCourse(courseId, studentId){
-        try{
-            const enrollment = await Enrollment.findOne({ courseId, studentId, status: "active" });
-            if(!enrollment){
-                throw new Error("Enrollment not found");
-            }
-            enrollment.status = "cancelled";
-            enrollment.cancelledAt = new Date();
-            await enrollment.save();
-            return enrollment;
+        const enrollment = await Enrollment.findOne({ courseId, studentId, status: "active" });
+        if(!enrollment){
+            throw new AppError("Enrollment not found", 404);
         }
-        catch(error){
-            throw new Error("Failed to unenroll from course: " + error.message);
-        }
+        enrollment.status = "cancelled";
+        enrollment.cancelledAt = new Date();
+        await enrollment.save();
+        return enrollment;
     },
     async getMyEnrollments(studentId){
-        try{
-            return Enrollment.find({ studentId, status: "active"}).populate("courseId", "title description teacherId").lean();
-        }
-        catch(error){
-            throw new Error("Failed to get enrolled courses: " + error.message);
-        }
+        return Enrollment.find({ studentId, status: "active"}).populate("courseId", "title description teacherId").lean();
     },
     async getCourseEnrollments(courseId){
-        try{
-            return Enrollment.find({ courseId, status: "active" }).populate("studentId", "username email avatar").lean();
-        }
-        catch(error){
-            throw new Error("Failed to get course enrollments: " + error.message);
-        }
+        return Enrollment.find({ courseId, status: "active" }).populate("studentId", "username email avatar").lean();
     }
 };
 

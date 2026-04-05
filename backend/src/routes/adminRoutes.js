@@ -7,7 +7,7 @@ const router = express.Router();
 // các router đều yêu cầu xác thực và phải có role admin
 router.use(authMiddleware, authorizeMiddleware('admin'));
 // CRUD USERS
-router.get('/users', adminController.getAllUser);
+router.get('/users', adminController.getAllUsers);
 router.get('/users/email', adminController.getUserByEmail);
 router.get('/users/:id', adminController.getUserById);
 router.delete('/users/:id', adminController.deleteUser);

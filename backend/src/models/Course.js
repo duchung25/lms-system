@@ -26,6 +26,10 @@ const courseSchema = new mongoose.Schema(
             enum: ["Beginner", "Intermediate", "Advanced"],
             required: true
         },
+        isPublished: {
+            type: Boolean,
+            default: false
+        },
         category: {
             type: String,
             enum: ["Programming", "Design", "Marketing", "Business", "Other"],

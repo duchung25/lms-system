@@ -1,21 +1,19 @@
 import adminService from "../services/adminService.js";
 
 const adminController = {
-    // Get list user
-    async getAllUser(req, res, next){
+    async getAllUsers(req, res, next){
         try{
             const userList = await adminService.getAllUsers();
             res.status(200).json({
                 success: true,
-                message: "Lấy danh sách thành công",
-                data: { userList }
+                message: userList.length > 0 ? "Lấy danh sách người dùng thành công" : "Không có người dùng nào",
+                data: { users: userList }
             });
         } catch (error) {
             next(error);
 
         }
     },
-    // Get user byId
     async getUserById(req, res, next){
         try{
             const { id } = req.params;
@@ -29,7 +27,6 @@ const adminController = {
             next(error);
         }
     },
-    // Get user by email
     async getUserByEmail(req, res, next){
         try{
             const {email} = req.query;
@@ -92,7 +89,8 @@ const adminController = {
             const result = await adminService.resetPassword(id, newPassword);
             res.status(200).json({
                 success: true,
-                message: result.message
+                message: result.message,
+                data: null
             });
         }
         catch(error){

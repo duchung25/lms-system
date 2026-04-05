@@ -3,13 +3,13 @@ import teacherRequestService from "../services/teacherRequestService.js";
 const teacherRequestController = {
     async createTeacherRequest(req, res, next) {
         try{
-            const userId = req.user.userId;
+            const { userId } = req.user;
             const { message } = req.body;
             const teacherRequest = await teacherRequestService.createTeacherRequest(userId, message);
             res.status(201).json({
                 success: true,
                 message: "Teacher request created successfully",
-                data: teacherRequest
+                data: { teacherRequest }
             });
         }
         catch(error){
@@ -18,12 +18,12 @@ const teacherRequestController = {
     },
     async getMyRequest(req, res, next) {
         try{
-            const userId = req.user.userId;
+            const { userId } = req.user;
             const teacherRequest = await teacherRequestService.getMyRequest(userId);
             res.status(200).json({
                 success: true,
                 message: "Teacher request retrieved successfully",
-                data: teacherRequest
+                data: { teacherRequest }
             });
         }
         catch(error){
@@ -37,7 +37,7 @@ const teacherRequestController = {
             res.status(200).json({
                 success: true,
                 message: "Teacher requests retrieved successfully",
-                data: teacherRequests
+                data: { teacherRequests }
             });
         }
         catch(error){
