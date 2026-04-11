@@ -7,6 +7,9 @@ import writeAccessMiddleware from '../middlewares/writeAccessMiddleware.js';
 const router = express.Router();
 
 router.get('/by-teacher/:teacherId', courseController.getCoursesByTeacher);
+router.get('/my-courses', authMiddleware, writeAccessMiddleware, courseController.getTeachingCourses);
+router.post('/:courseId/publish', authMiddleware, writeAccessMiddleware, courseController.publishCourse);
+router.post('/:courseId/unpublish', authMiddleware, writeAccessMiddleware, courseController.unpublishCourse);
 
 router.post('/', authMiddleware, writeAccessMiddleware, courseValidator.createCourseValidationRules, courseValidator.validate, courseController.createCourse);
 router.get('/', courseController.getAllCourse);

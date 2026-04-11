@@ -113,6 +113,20 @@ const courseController = {
             next(error);
         }
     },
+    async getTeachingCourses(req, res, next) {
+        try{
+            const teacherId = req.user.userId;
+            const courses = await courseService.getCourseByTeacherId(teacherId);
+            res.status(200).json({
+                success: true,
+                message: "Teaching courses retrieved successfully",
+                data: { courses }
+            });
+        }
+        catch(error){
+            next(error);
+        }
+    },
     async publishCourse(req, res, next) {
         const courseId = req.params.courseId;
         try{
