@@ -1,0 +1,67 @@
+.auth__header{
+    position: relative;
+}
+.login-image{
+    width: 420px;
+    object-fit: cover;
+}
+.login__note{
+    color: var(--color-text-main);
+    font-size: 20px;
+    font-weight: 500;
+}
+.login__py{
+    padding: 12px
+}
+.auth-card{
+  max-width: 480px;
+}
+
+.auth-title{
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.login__btn{
+  padding: 12px 0;
+}
+
+.divider{
+  position: relative;
+  text-align: center;
+  color: var(--color-text-main);
+}
+.divider::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+  background: #e6e6e6;
+}
+.divider span{
+  position: relative;
+  background: #fff;
+  padding: 0 12px;
+}
+
+.social-icon--google{
+  color: #ea4335;
+  border: 2px solid #eee;
+}
+
+.social-icon--facebook{
+  background: #1877f2;
+  color: #fff;
+}
+
+.auth-submit{
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+}
+.auth-submit:hover{
+  background: var(--color-primary-hover);
+  color: #fff;
+}
