@@ -8,7 +8,6 @@ const router = express.Router();
 router.use(authMiddleware);
 
 // Student
-router.get("/me", authorizeMiddleware("student"), enrollmentController.getMyEnrollments);
 router.post("/", authorizeMiddleware("student"), enrollmentController.enrollInCourse);
 router.delete("/:courseId", authorizeMiddleware("student"), enrollmentController.unenrollFromCourse);
 

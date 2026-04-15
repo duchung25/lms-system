@@ -31,20 +31,6 @@ const enrollmentController = {
             next(error);   
         }
     },
-    async getMyEnrollments(req, res, next) {
-        try{
-            const studentId = req.user.userId;
-            const enrollments = await enrollmentService.getMyEnrollments(studentId);
-            res.status(200).json({
-                success: true,
-                message: "Enrolled courses retrieved successfully",
-                data: { enrollments }
-            });
-        }
-        catch(error){
-            next(error);
-        }
-    },
     async getCourseEnrollments(req, res, next) {
         try{
             const { courseId } = req.params;

@@ -14,7 +14,7 @@ const adminService = {
         return user;
     },
     async getUserByEmail(email) {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }.lean());
         if(!user){
             throw new AppError("Người dùng không tồn tại", 404);
         }

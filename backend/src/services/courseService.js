@@ -1,6 +1,8 @@
-import { get } from 'mongoose';
+
 import Course from '../models/Course.js';
+import Lesson from '../models/Lesson.js';
 import AppError from '../utils/AppError.js';
+
 
 const courseService = {
     async createCourse(courseData) {
@@ -8,23 +10,51 @@ const courseService = {
         const course = await Course.create(courseData);
         return await course.populate("teacherId", "username email avatar");
     },
-    async getAllCourse(){
-        return await Course.find()
-        .populate("teacherId", "username email avatar")
-        .lean();
+    async getAllCourse(options = {}) {
+        const {
+            q, category, published, level,
+            page = 1,
+            limit = 10,
+            sort
+        } = options;
+
+        const filter = {};
+        if (q) filter.title = { $regex: q, $options: 'i' };
+        if (category) filter.category = category;
+        if (typeof published !== 'undefined') filter.isPublished = published;
+        if (level) filter.level = level;
+
+        const sortOpt = {};
+        if (sort) {
+            if (sort.startsWith('-')) sortOpt[sort.slice(1)] = -1;
+            else sortOpt[sort] = 1;
+        }
+
+        const skip = (page - 1) * limit;
+
+        const [list, total] = await Promise.all([
+            Course.find(filter).sort(sortOpt).skip(skip).limit(limit),
+            Course.countDocuments(filter)
+        ]);
+        const totalPages = Math.ceil(total / limit);
+
+        return { list, page, limit, total, totalPages };
     },
-    async getPublishedCourses(){
-        return await Course.find({ isPublished: true })
-        .populate("teacherId", "username email avatar")
-        .lean();
-    },
-    async getCourseById(courseId){
-        const course = await Course.findById(courseId)
-        .populate("teacherId", "username email avatar");
+    async getCourseDetail(courseId){
+        const [course, lessons] = await Promise.all([
+            Course.findById(courseId)
+            .populate("teacherId", "username email avatar")
+            .lean(),
+
+            Lesson.find({ courseId })
+            .select("title order duration")
+            .sort({ order: 1 })
+            .lean()
+        ]);
         if(!course){
             throw new AppError("Course not found", 404);
         }
-        return course;
+        return { ...course, lessons };
     },
     async updateCourse(courseId, updateData, currentUser){
         const course = await Course.findById(courseId);

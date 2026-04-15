@@ -1,5 +1,6 @@
 import courseService from "../services/courseService.js";
-
+import enrollmentService from "../services/enrollmentService.js";
+    
 const courseController = {
     async createCourse(req, res, next) {
         try{
@@ -17,40 +18,45 @@ const courseController = {
         }
     },
     async getAllCourse(req, res, next) {
-        try{
-            const courses = await courseService.getAllCourse();
-            res.status(200).json({
-                success: true,
-                message: "Courses retrieved successfully",
-                data: { courses }
+        try {
+            const userRole = req.user.role;
+            const {
+            q, category, published, level, page, limit, sort
+            } = req.query;
+            let filterPublished;
+            if(userRole.toLowerCase() === "admin") {
+                filterPublished = typeof published !== 'undefined' ? published === 'true' : undefined;
+            } else {
+                filterPublished = true;
+            }  
+            const courses = await courseService.getAllCourse({
+            q,
+            category,
+            level,
+            published: filterPublished,
+            page: page ? parseInt(page, 10) : undefined,
+            limit: limit ? parseInt(limit, 10) : undefined,
+            sort
             });
-        }
-        catch (error) {
-            next(error);
-        }
-    },
-    async getPublishedCourses(req, res, next) {
-        try{
-            const courses = await courseService.getPublishedCourses();
-            res.status(200).json({
-                success: true,
-                message: "Published courses retrieved successfully",
-                data: { courses }
-            });
-        }
-        catch (error) {
-            next(error);
 
+            res.status(200).json({
+            success: true,
+            message: 'Courses retrieved successfully',
+            data: courses
+            });
+        } catch (error) {
+            next(error);
         }
     },
-    async getCourseById(req, res, next) {
+    async getCourseDetail(req, res, next) {
         try{
             const { courseId } = req.params;
-            const course = await courseService.getCourseById(courseId);
+            const course = await courseService.getCourseDetail(courseId);
+
             res.status(200).json({
                 success: true,
                 message: "Course retrieved successfully",
-                data: { course }
+                data: { course  }
             })
         }
         catch(error){
@@ -113,13 +119,18 @@ const courseController = {
             next(error);
         }
     },
-    async getTeachingCourses(req, res, next) {
+    async getMyCourses(req, res, next) {
         try{
-            const teacherId = req.user.userId;
-            const courses = await courseService.getCourseByTeacherId(teacherId);
+            const user = req.user.userId;
+            let courses;
+            if(req.user.role.toLowerCase() === "student"){
+                courses = await enrollmentService.getMyEnrollments(user);
+            } else if(req.user.role.toLowerCase() === "teacher"){
+                courses = await courseService.getCourseByTeacherId(user);
+            }
             res.status(200).json({
                 success: true,
-                message: "Teaching courses retrieved successfully",
+                message: "Courses retrieved successfully",
                 data: { courses }
             });
         }

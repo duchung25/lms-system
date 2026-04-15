@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import mongooseDelete from "mongoose-delete";
 
-const LessonSchema = new mongoose.Schema({
+const lessonSchema = new mongoose.Schema({
     courseId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Course",
@@ -44,4 +45,4 @@ lessonSchema.plugin(mongooseDelete, {
 
 lessonSchema.index({ courseId: 1, order: 1 }, { unique: true });
 
-export default mongoose.model("Lesson", LessonSchema);
+export default mongoose.model("Lesson", lessonSchema);
