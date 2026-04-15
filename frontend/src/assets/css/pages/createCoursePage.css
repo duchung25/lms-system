@@ -1,19 +1,15 @@
-/* ====== Custom CreateCoursePage styles ====== */
 
-/* Nền form */
 .create-course-container {
   background: #f7f9fa;
   border-radius: 18px;
   box-shadow: 0 6px 32px -4px rgba(33, 43, 54, 0.08);
 }
 
-/* Tiêu đề lớn */
 .create-course-title {
   font-weight: 700;
   font-size: 1.7rem;
 }
 
-/* Nhấn mạnh tab (nav-tabs) */
 .create-course-tabs .nav-link.active {
   font-weight: 600;
   color: #2563eb;
@@ -76,7 +72,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Responsive: Cho mobile gọn lại */
 @media (max-width: 900px) {
   .create-course-container {
     padding: 12px !important;

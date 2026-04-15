@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
+import '../assets/css/components/card.css';
 
 export default function MyCoursesPage() {
   const { user, token } = useAuth();
   const [params] = useSearchParams();
-  const q = (params.get("q") || "").toLowerCase().trim();
+  const q = (params.get("q") || "").toLowerCase().trim(); 
 
   const [coursesData, setCoursesData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,8 +17,11 @@ export default function MyCoursesPage() {
     if (user.role === "teacher") {
       return "http://localhost:5000/api/courses/my-courses";
     }
+    if(user.role === "student") {
       return "http://localhost:5000/api/enrollments/me";
-    };
+    }
+    return "http://localhost:5000/api/courses";
+  };
     const fetchCourses = async () => {
       setLoading(true);
       setError("");
@@ -76,22 +80,22 @@ export default function MyCoursesPage() {
             <div className="text-center text-muted my-5">Không có khóa học nào.</div>
           )}
         {courses.map((c) => (
-          <div key={c.id} className="col-12 col-sm-6 col-lg-3">
-            <div className="card h-100">
+            <div key={c.id} className="col-12 col-sm-6 col-lg-3">
+            <Link 
+              to={`/courses/${c._id}`} 
+              className="card h-100 text-decoration-none text-dark course-card"
+              style={{ cursor: "pointer" }}
+            >
+              <div className="card-thumbnail mb-2">
+                <img src={c.thumbnail} alt={c.title} />
+              </div>
               <div className="card-body">
-                <div className="card__thumb-nail mb-2">
-                  <img src={c.thumbnail} alt={c.title} />
-                </div>
                 <div className="fw-bold">{c.title}</div>
                 <div className="text-muted small">{c.level}</div>
                 <div className="text-primary fw-bold mt-2">{c.price === 0 ? "Miễn phí" : `${c.price}VNĐ`}</div>
+                <div className="text-muted py-2">Giáo viên: {c.teacher?.name || "Chưa có thông tin"}</div>
               </div>
-              <div className="card-footer bg-white border-0 pt-0">
-                <Link className="btn btn-outline-primary w-100" to={`/courses/${c.id}`}>
-                  Xem chi tiết
-                </Link>
-              </div>
-            </div>
+            </Link>
           </div>
         ))}
       </div>

@@ -43,19 +43,39 @@ export default function CreateCoursePage() {
         }
     }
 
-    await fetch("http://localhost:5000/api/courses", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-        ...form,
-        thumbnail: imageUrl,
-        }),
-    });
-    alert("Tạo khóa học thành công!");
+    try {
+        const res = await fetch("http://localhost:5000/api/courses", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                ...form,
+                thumbnail: imageUrl,
+            }),
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        await res.json();
+        alert("Tạo khóa học thành công!");
+        setForm({
+            title: "",
+            description: "",
+            level: "",
+            category: "",
+            price: 0,
+        });
+        setThumbnail(null);
+        setThumbnailUrl("");
+    } catch (err) {
+        alert("Lỗi tạo khóa học: " + err.message);
+        console.error("Error:", err);
     }
+}
 
     return (
         <div className="container py-4 create-course-container">

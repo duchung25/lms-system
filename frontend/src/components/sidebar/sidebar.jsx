@@ -5,6 +5,7 @@ export default function Sidebar() {
   const { user } = useAuth();
   const linkClass = ({ isActive }) =>
     `list-group-item list-group-item-action ${isActive ? "active" : ""}`;
+  if(!user) return null;
   if(user.role === "admin"){
     return(
       <aside>

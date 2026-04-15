@@ -1,6 +1,7 @@
 import AppLayout from "../layouts/AppLayout.jsx";
 // import AdminLayout from "../layouts/AdminLayout.jsx";
 // import TeacherLayout from "../layouts/TeacherLayout.jsx";
+import CourseDetails from "../pages/courseDetails.jsx";
 
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import CoursesPage from "../pages/coursesPage.jsx";
@@ -9,25 +10,24 @@ import MyCoursesPage from "../pages/myCoursesPage.jsx";
 import CreateCoursePage from "../pages/createCoursePage.jsx";
 
 export default [
-  // USER (đăng nhập là vào được)
   {
     element: <AppLayout />,
     children: [
       {
         element: <ProtectedRoute />,
-        children: [{ path: "/my-courses", element: <MyCoursesPage /> }],
+        children: [
+          { path: "/my-courses", element: <MyCoursesPage /> },
+          { path: "/courses/:courseId", element: <CourseDetails /> }
+        ]
       },
     ],
   },
-
-  // ADMIN
   {
     element: <AppLayout />,
     children: [
       {
         element: <ProtectedRoute allowedRoles={["admin"]} />,
         children: [
-          // { path: "/admin/dashboard", element: <AdminDashboardPage /> },
           { path: "/admin/courses", element: <CoursesPage /> },
         ],
       },
