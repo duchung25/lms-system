@@ -98,6 +98,8 @@ const courseService = {
         }
         course.isPublished = true;
         await course.save();
+        const updatedCourse = await Course.findById(courseId).populate("teacherId", "username email avatar").lean();
+        return updatedCourse;
     },
     async unpublishCourse(courseId){
         const course = await Course.findById(courseId);
@@ -106,6 +108,8 @@ const courseService = {
         }
         course.isPublished = false;
         await course.save();
+        const updatedCourse = await Course.findById(courseId).populate("teacherId", "username email avatar").lean();
+        return updatedCourse;
     }
 }
 

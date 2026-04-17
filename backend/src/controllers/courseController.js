@@ -141,11 +141,11 @@ const courseController = {
     async publishCourse(req, res, next) {
         const courseId = req.params.courseId;
         try{
-            await courseService.publishCourse(courseId);
+            const course = await courseService.publishCourse(courseId);
             res.status(200).json({
                 success: true,
                 message: "Course published successfully",
-                data: null
+                data: { course }
             });
         }
         catch(error){
@@ -155,11 +155,11 @@ const courseController = {
     async unpublishCourse(req, res, next) {
         const courseId = req.params.courseId;
         try{
-            await courseService.unpublishCourse(courseId);
+            const course = await courseService.unpublishCourse(courseId);
             res.status(200).json({
                 success: true,
                 message: "Course unpublished successfully",
-                data: null
+                data: { course }
             });
         }
         catch(error){

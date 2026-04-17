@@ -14,9 +14,9 @@ connectDB();
 app.use(
   cors({
     origin: "http://localhost:5173", // FE Vite
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, // nếu sau này dùng cookie/session
+    credentials: true, 
   })
 );
 
