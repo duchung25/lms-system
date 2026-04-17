@@ -18,8 +18,6 @@ export default function CourseDetail() {
     )
       .then(res => res.json())
       .then(data => {
-        console.log("Course detail data:", data);
-        console.log("Course detail data.data:", data.data);
         setCourse(data.data.course);
         setLoading(false);
       })
@@ -35,7 +33,6 @@ export default function CourseDetail() {
     })
       .then(res => res.json())
       .then(data => {
-        console.log("Publish toggle data:", data);
         setCourse(data.data.course);
       });
   }
@@ -46,12 +43,17 @@ export default function CourseDetail() {
 
   return (
     <div className="container py-4">
-      <div className="row">
+      <div className="d-flex justify-content-between align-items-start mb-4">
         {user && user.role === "admin" && (
           <div className="mb-3">
             <button className={`btn btn-sm ms-3 ${course.isPublished ? "btn-warning" : "btn-success"}`} onClick={handlePublishToggle} value={courseId}>
               {course.isPublished ? "Unpublish" : "Publish"}
             </button>
+          </div>
+        )}
+        {user && (user.role === "admin" || user.role === "teacher") && (
+          <div className="mb-3">
+            <button className="btn btn-sm btn-danger">Delete Course</button>
           </div>
         )}
         {user && user.role === "teacher" && (
@@ -109,7 +111,7 @@ export default function CourseDetail() {
             <div>
               <h4 className="mb-3">Danh sách bài học</h4>
 
-              {course.lessons.length === 0 ? (
+              {!course.lessons || course.lessons.length === 0 ? (
                 <p>Chưa có bài học</p>
               ) : (
                     <ul className="list-group">
