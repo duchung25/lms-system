@@ -3,27 +3,28 @@ import { Link, useSearchParams } from "react-router-dom";
 import { debounce } from "lodash";
 import { useAuth } from "../auth/useAuth";
 import '../assets/css/components/card.css';
+import { FaBoxArchive, FaClipboardCheck  } from "../icons";
 
 const LEVEL_OPTIONS = [
-  { value: "", label: "Tất cả trình độ" },
-  { value: "Beginner", label: "Sơ cấp" },
-  { value: "Intermediate", label: "Trung cấp" },
-  { value: "Advanced", label: "Nâng cao" },
+  { value: "", label: "All Levels" },
+  { value: "Beginner", label: "Beginner" },
+  { value: "Intermediate", label: "Intermediate" },
+  { value: "Advanced", label: "Advanced" },
 ];
 
 const CATEGORY_OPTIONS = [
-  { value: "", label: "Tất cả danh mục" },
-  { value: "Programming", label: "Lập trình" },
-  { value: "Design", label: "Thiết kế" },
+  { value: "", label: "All Categories" },
+  { value: "Programming", label: "Programming" },
+  { value: "Design", label: "Design" },
   { value: "Marketing", label: "Marketing" },
-  { value: "Business", label: "Kinh doanh" },
-  { value: "Other", label: "Khác" },
+  { value: "Business", label: "Business" },
+  { value: "Other", label: "Other" },
 ];
 
 const PUBLISH_OPTIONS = [
-  { value: "", label: "Tất cả" },
-  { value: "true", label: "Đã xuất bản" },
-  { value: "false", label: "Chưa xuất bản" },
+  { value: "", label: "All" },
+  { value: "true", label: "Published" },
+  { value: "false", label: "Unpublished" },
 ];
 
 export default function CoursesPage() {
@@ -37,7 +38,12 @@ export default function CoursesPage() {
   const [coursesData, setCoursesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchInput, setSearchInput] = useState(q);
+  const [countPendingCourses, setCountPendingCourses] = useState(0);
 
+  useEffect(() => {
+    setSearchInput(q);
+  }, [q]);
   useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true);
@@ -57,6 +63,7 @@ export default function CoursesPage() {
         if (!res.ok) throw new Error("Failed to fetch courses");
         const data = await res.json();
         setCoursesData(Array.isArray(data.data.list) ? data.data.list : []);
+        setCountPendingCourses(data.data.list.filter(c => c.isPublished === false).length);
       } catch (error) {
           setCoursesData([]);
           setError("error fetching courses: " + error.message);
@@ -64,10 +71,29 @@ export default function CoursesPage() {
           setLoading(false);
       }
     };
-
     fetchCourses();
-  }, [q, category, level, published, token, user?.role]);
-  
+    }, [q, category, level, published, token, user?.role]);
+    useEffect(() => {
+      if (user && user.role === "admin") {
+        const fetchPendingCount = async () => {
+          try {
+            const res = await fetch("http://localhost:5000/api/courses/count/summary", {
+              headers: {
+                "Authorization": `Bearer ${token}`
+              }
+            });
+            if (!res.ok) throw new Error("Failed to fetch pending count");
+            const data = await res.json();
+            setCountPendingCourses(data.data.unpublishedCourses || 0);
+          } catch (error) {
+            setError("Error fetching pending courses count: " + error.message);
+            setCountPendingCourses(0);
+          }
+        };
+        fetchPendingCount();
+      }
+    }, [ token, user ]);
+
   const courses = useMemo(() => {
     if(!q) return coursesData;
     return coursesData.filter((c) =>
@@ -79,13 +105,11 @@ export default function CoursesPage() {
     return debounce((key, value) => {
       setParams((prev) => {
         const newParams = new URLSearchParams(prev);
-
         if (value) {
           newParams.set(key, value);
         } else {
           newParams.delete(key);
         }
-
         return newParams;
       }, { replace: true });
     }, 300);
@@ -99,8 +123,37 @@ export default function CoursesPage() {
 
   return (
     <div>
-      <div className="d-flex align-items-center justify-content-between mb-3">
+      <div className="d-flex align-items-center justify-content-between mb-3 mt-2">
         <h3 className="m-0">Khóa học</h3>
+        {user && user.role === "admin" && (
+          <div className="d-flex gap-2">
+            <Link to="/courses/archived" className="btn position-relative p-2"
+            style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 20
+            }}
+            > 
+              <FaBoxArchive className="me-1" />
+            </Link>
+            <Link to="/courses/approve" className="btn position-relative p-2 btn-hover"
+            style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 20
+            }}
+            >
+              <FaClipboardCheck className="me-1" />
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{countPendingCourses}</span>
+            </Link>
+          </div>
+        )}
         {q ? <span className="text-muted">Từ khóa: "{q}"</span> : null}
       </div>
       <div className="mb-3 row g-2">
@@ -108,9 +161,12 @@ export default function CoursesPage() {
           <input
             type="text"
             className="form-control"
-            value={q}
+            value={searchInput}
             placeholder="Tìm kiếm tên khoá học..."
-            onChange={e => updateFilter("q", e.target.value)}
+            onChange={(e) => {
+              setSearchInput(e.target.value);
+              updateFilter("q", e.target.value);
+            }}
           />
         </div>
         <div className="col-md-3">
@@ -151,7 +207,7 @@ export default function CoursesPage() {
       </div>
       <div className="row g-3">
         {courses.map((c) => (
-          <div key={c.id} className="col-12 col-sm-6 col-lg-3">
+          <div key={c._id} className="col-12 col-sm-6 col-lg-3">
             <Link 
               to={`/courses/${c._id}`} 
               className="card h-100 text-decoration-none text-dark course-card"
@@ -164,7 +220,7 @@ export default function CoursesPage() {
                 <div className="fw-bold">{c.title}</div>
                 <div className="text-muted small">{c.level}</div>
                 <div className="text-primary fw-bold mt-2">{c.price === 0 ? "Miễn phí" : `${c.price}VNĐ`}</div>
-                <div className="text-muted py-2">Giáo viên: {c.teacher?.name || "Chưa có thông tin"}</div>
+                <div className="text-muted py-2">Giáo viên: {c.teacherId?.email || "Chưa có thông tin"}</div>
               </div>
             </Link>
           </div>

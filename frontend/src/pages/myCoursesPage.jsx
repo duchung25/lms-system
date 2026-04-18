@@ -36,6 +36,7 @@ export default function MyCoursesPage() {
         }
         const data = await res.json();
         setCoursesData(Array.isArray(data.data.courses) ? data.data.courses : []);
+        console.log("Fetched courses:", data.data.courses);
       } catch (error) {
         console.error("Error fetching courses:", error);
         setCoursesData([]);
@@ -80,7 +81,7 @@ export default function MyCoursesPage() {
             <div className="text-center text-muted my-5">Không có khóa học nào.</div>
           )}
         {courses.map((c) => (
-            <div key={c.id} className="col-12 col-sm-6 col-lg-3">
+            <div key={c._id} className="col-12 col-sm-6 col-lg-3">
             <Link 
               to={`/courses/${c._id}`} 
               className="card h-100 text-decoration-none text-dark course-card"
@@ -93,7 +94,7 @@ export default function MyCoursesPage() {
                 <div className="fw-bold">{c.title}</div>
                 <div className="text-muted small">{c.level}</div>
                 <div className="text-primary fw-bold mt-2">{c.price === 0 ? "Miễn phí" : `${c.price}VNĐ`}</div>
-                <div className="text-muted py-2">Giáo viên: {c.teacher?.name || "Chưa có thông tin"}</div>
+                <div className="text-muted py-2">Giáo viên: {c.teacherId?.username || "Chưa có thông tin"}</div>
               </div>
             </Link>
           </div>

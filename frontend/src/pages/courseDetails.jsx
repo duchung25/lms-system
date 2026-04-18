@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../auth/useAuth.js";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function CourseDetail() {
   const { user, token } = useAuth();
   const { courseId } = useParams();
   const [course, setCourse] = useState(null);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,6 +37,21 @@ export default function CourseDetail() {
       .then(data => {
         setCourse(data.data.course);
       });
+  };
+  function handleDeleteCourse() {
+    fetch(`http://localhost:5000/api/courses/${courseId}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        setCourse(null);
+        navigate("/my-courses");
+      })
+      .catch(() => alert("Failed to delete course"));
   }
 
 
@@ -49,16 +66,6 @@ export default function CourseDetail() {
             <button className={`btn btn-sm ms-3 ${course.isPublished ? "btn-warning" : "btn-success"}`} onClick={handlePublishToggle} value={courseId}>
               {course.isPublished ? "Unpublish" : "Publish"}
             </button>
-          </div>
-        )}
-        {user && (user.role === "admin" || user.role === "teacher") && (
-          <div className="mb-3">
-            <button className="btn btn-sm btn-danger">Delete Course</button>
-          </div>
-        )}
-        {user && user.role === "teacher" && (
-          <div className="mb-3">
-            <button className="btn btn-sm btn-info">Edit Course</button>
           </div>
         )}
       </div>
@@ -96,10 +103,25 @@ export default function CourseDetail() {
             <h4 className="text-success">
               {course.price === 0 ? "Free" : `${course.price} VND`}
             </h4>
-
-            <button className="btn btn-primary w-100 mt-2">
-              Enroll Now
-            </button>
+            { user && user.role === "student" && (
+              <button className="btn btn-primary w-100 mt-2">
+                Enroll Now
+              </button>
+            )}
+              <div className="management_btn d-flex justify-content-center gap-2 mt-3 flex-1">
+                {user && (user.role === "admin" || user.role === "teacher") && (
+                  <>
+                    <Link to={`/courses/${courseId}/edit`} className="btn btn-sm btn-info">
+                      Edit Course
+                    </Link>
+                  </>
+                )}
+                {user && (user.role === "admin" || user.role === "teacher") && (
+                  <button className="btn btn-sm btn-danger" onClick={handleDeleteCourse}>
+                    Delete Course
+                  </button>
+                )}
+            </div>
           </div>
         </div>
       </div>

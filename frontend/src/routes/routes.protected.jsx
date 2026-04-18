@@ -7,7 +7,7 @@ import ProtectedRoute from "./ProtectedRoute.jsx";
 import CoursesPage from "../pages/coursesPage.jsx";
 
 import MyCoursesPage from "../pages/myCoursesPage.jsx";
-import CreateCoursePage from "../pages/createCoursePage.jsx";
+import CourseForm from "../pages/courseForm.jsx";
 
 export default [
   {
@@ -40,7 +40,9 @@ export default [
         element: <ProtectedRoute allowedRoles={["teacher"]} />,
         children: [
           { path: "/courses/my-courses", element: <MyCoursesPage /> },
-          { path: "/courses/create", element: <CreateCoursePage /> }
+          { path: "/courses/create", element: <CourseForm /> },
+          { path: "/courses/:courseId/edit", element: <CourseForm /> }
+
         ],
       },
     ],
