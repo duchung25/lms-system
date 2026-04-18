@@ -33,7 +33,7 @@ const courseService = {
         const skip = (page - 1) * limit;
 
         const [list, total] = await Promise.all([
-            Course.find(filter).sort(sortOpt).skip(skip).limit(limit),
+            Course.find(filter).populate("teacherId", "email").sort(sortOpt).skip(skip).limit(limit),
             Course.countDocuments(filter)
         ]);
         const totalPages = Math.ceil(total / limit);
@@ -110,6 +110,16 @@ const courseService = {
         await course.save();
         const updatedCourse = await Course.findById(courseId).populate("teacherId", "username email avatar").lean();
         return updatedCourse;
+    },
+    async countHandler(){
+        const totalCourses = await Course.countDocuments();
+        const publishedCourses = await Course.countDocuments({ isPublished: true });
+        const unpublishedCourses = await Course.countDocuments({ isPublished: false });
+        return {
+            totalCourses,
+            publishedCourses,
+            unpublishedCourses
+        };
     }
 }
 

@@ -165,6 +165,18 @@ const courseController = {
         catch(error){
             next(error);
         }
+    },
+    async countHandler(req, res, next) {
+        try {
+            const counts = await courseService.countHandler();
+            res.status(200).json({
+                success: true,
+                message: "Course counts retrieved successfully",
+                data: counts
+            });
+        } catch (error) {
+            next(error);
+        }
     }
 }
 

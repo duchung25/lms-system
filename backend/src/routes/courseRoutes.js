@@ -17,5 +17,6 @@ router.get('/:courseId', authMiddleware, courseController.getCourseDetail);
 router.patch('/:courseId', authMiddleware, writeAccessMiddleware, courseValidator.updateCourseValidationRules, courseValidator.validate, courseController.updateCourse);
 router.delete('/:courseId', authMiddleware, writeAccessMiddleware, courseController.deleteCourse);
 router.post('/:courseId/restore', authMiddleware, writeAccessMiddleware, courseController.restoreCourse);
+router.get('/count/summary', authMiddleware, courseController.countHandler);
 
 export default router;
