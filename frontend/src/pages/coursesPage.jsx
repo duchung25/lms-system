@@ -21,12 +21,6 @@ const CATEGORY_OPTIONS = [
   { value: "Other", label: "Other" },
 ];
 
-const PUBLISH_OPTIONS = [
-  { value: "", label: "All" },
-  { value: "true", label: "Published" },
-  { value: "false", label: "Unpublished" },
-];
-
 export default function CoursesPage() {
   const { token, user } = useAuth();
   const [params, setParams] = useSearchParams();
@@ -34,7 +28,7 @@ export default function CoursesPage() {
   const category = params.get("category") || "";
   const level = params.get("level") || "";
   const published = params.get("published") || "";
-
+  const deleted = params.get("deleted") || "";
   const [coursesData, setCoursesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -53,7 +47,8 @@ export default function CoursesPage() {
           q ? `q=${encodeURIComponent(q)}` : "",
           category ? `category=${encodeURIComponent(category)}` : "",
           level ? `level=${encodeURIComponent(level)}` : "",
-          user.role === "admin" && published ? `published=${published}` : ""
+          user.role === "admin" && published ? `published=${published}` : "",
+          user.role === "admin" && deleted ? `deleted=${deleted}` : "",
         ].filter(Boolean).join("&");
         const res = await fetch(`http://localhost:5000/api/courses${query ? "?" + query : ""}`, {
           headers: {
@@ -72,7 +67,7 @@ export default function CoursesPage() {
       }
     };
     fetchCourses();
-    }, [q, category, level, published, token, user?.role]);
+    }, [q, category, level, published, deleted, token, user?.role]);
     useEffect(() => {
       if (user && user.role === "admin") {
         const fetchPendingCount = async () => {
@@ -127,7 +122,7 @@ export default function CoursesPage() {
         <h3 className="m-0">Khóa học</h3>
         {user && user.role === "admin" && (
           <div className="d-flex gap-2">
-            <Link to="/courses/archived" className="btn position-relative p-2"
+            <Link to="/courses?deleted=true" className="btn position-relative p-2"
             style={{
               width: 44,
               height: 44,
@@ -139,7 +134,7 @@ export default function CoursesPage() {
             > 
               <FaBoxArchive className="me-1" />
             </Link>
-            <Link to="/courses/approve" className="btn position-relative p-2 btn-hover"
+            <Link to="/courses?published=false" className="btn position-relative p-2 btn-hover"
             style={{
               width: 44,
               height: 44,
@@ -154,7 +149,6 @@ export default function CoursesPage() {
             </Link>
           </div>
         )}
-        {q ? <span className="text-muted">Từ khóa: "{q}"</span> : null}
       </div>
       <div className="mb-3 row g-2">
         <div className="col-md-4">
@@ -191,19 +185,6 @@ export default function CoursesPage() {
             ))}
           </select>
         </div>
-        {user.role === "admin" && (
-          <div className="col-md-2">
-            <select
-              className="form-select"
-              value={published}
-              onChange={e => updateFilter("published", e.target.value)}
-            >
-              {PUBLISH_OPTIONS.map(opt => (
-                <option value={opt.value} key={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-        )}
       </div>
       <div className="row g-3">
         {courses.map((c) => (

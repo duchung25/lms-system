@@ -48,11 +48,23 @@ export default function CourseDetail() {
       .then(res => res.json())
       .then(data => {
         alert(data.message);
-        setCourse(null);
-        navigate("/my-courses");
+        navigate("/admin/courses");
       })
       .catch(() => alert("Failed to delete course"));
-  }
+  };
+  function handleRestoreCourse() {
+    fetch(`http://localhost:5000/api/courses/${courseId}/restore`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }    })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        navigate("/admin/courses?deleted=true");
+      })
+      .catch(() => alert("Failed to restore course"));
+  };
 
 
   if (loading) return <div className="text-center mt-5">Loading...</div>;
@@ -68,6 +80,11 @@ export default function CourseDetail() {
             </button>
           </div>
         )}
+        {user && user.role === "admin" && course.deleted ? (
+          <button className="btn btn-sm btn-info" onClick={handleRestoreCourse} value={courseId}>
+            Restore Course
+          </button>
+        ) : null}
       </div>
       <div className="row mb-4">
         <div className="col-md-8">
