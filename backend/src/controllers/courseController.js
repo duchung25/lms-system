@@ -21,7 +21,7 @@ const courseController = {
         try {
             const userRole = req.user.role;
             const {
-            q, category, published, level, page, limit, sort
+            q, category, published, level, page, limit, sort, deleted
             } = req.query;
             let filterPublished;
             if(userRole.toLowerCase() === "admin") {
@@ -34,6 +34,7 @@ const courseController = {
             category,
             level,
             published: filterPublished,
+            deleted,
             page: page ? parseInt(page, 10) : undefined,
             limit: limit ? parseInt(limit, 10) : undefined,
             sort

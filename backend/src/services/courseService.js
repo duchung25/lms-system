@@ -12,7 +12,7 @@ const courseService = {
     },
     async getAllCourse(options = {}) {
         const {
-            q, category, published, level,
+            q, category, published, level, deleted,
             page = 1,
             limit = 10,
             sort
@@ -22,6 +22,9 @@ const courseService = {
         if (q) filter.title = { $regex: q, $options: 'i' };
         if (category) filter.category = category;
         if (typeof published !== 'undefined') filter.isPublished = published;
+        if (typeof deleted !== 'undefined'){
+            filter.deleted = deleted === 'true';
+        }
         if (level) filter.level = level;
 
         const sortOpt = {};
@@ -31,7 +34,15 @@ const courseService = {
         }
 
         const skip = (page - 1) * limit;
+        if(deleted === 'true'){
+            const [list, total] = await Promise.all([
+                Course.findWithDeleted(filter).populate("teacherId", "email").sort(sortOpt).skip(skip).limit(limit),
+                Course.countDocumentsDeleted(filter)
+            ]);
+            const totalPages = Math.ceil(total / limit);
+            return { list, page, limit, total, totalPages };
 
+        }
         const [list, total] = await Promise.all([
             Course.find(filter).populate("teacherId", "email").sort(sortOpt).skip(skip).limit(limit),
             Course.countDocuments(filter)
@@ -42,7 +53,7 @@ const courseService = {
     },
     async getCourseDetail(courseId){
         const [course, lessons] = await Promise.all([
-            Course.findById(courseId)
+            Course.findOneWithDeleted({ _id: courseId })
             .populate("teacherId", "username email avatar")
             .lean(),
 

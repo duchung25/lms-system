@@ -5,7 +5,7 @@ const writeAccessMiddleware = async (req, res, next) => {
     const { userId } = req.user;
     const courseId = req.params.courseId;
 
-    const course = await Course.findById(courseId);
+    const course = await Course.findOneWithDeleted({ _id: courseId });
     if (!course) {
         return next(new AppError("Course not found", 404));
     }
