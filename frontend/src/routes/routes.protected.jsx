@@ -8,6 +8,7 @@ import CoursesPage from "../pages/coursesPage.jsx";
 
 import MyCoursesPage from "../pages/myCoursesPage.jsx";
 import CourseForm from "../pages/courseForm.jsx";
+import LessonForm from "../pages/lessonForm.jsx";
 
 export default [
   {
@@ -29,6 +30,7 @@ export default [
         element: <ProtectedRoute allowedRoles={["admin"]} />,
         children: [
           { path: "/admin/courses", element: <CoursesPage /> },
+          { path: "/courses/:courseId/lessons/new", element: <LessonForm /> },
         ],
       },
     ],
@@ -41,8 +43,8 @@ export default [
         children: [
           { path: "/courses/my-courses", element: <MyCoursesPage /> },
           { path: "/courses/create", element: <CourseForm /> },
-          { path: "/courses/:courseId/edit", element: <CourseForm /> }
-
+          { path: "/courses/:courseId/edit", element: <CourseForm /> },
+          { path: "/courses/:courseId/lessons/new", element: <LessonForm /> },
         ],
       },
     ],

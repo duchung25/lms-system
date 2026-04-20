@@ -10,14 +10,14 @@ export default function AppLayout() {
         <div className="min-vh-100 d-flex flex-column">
             <Header className="sticky-top" />
 
-            <div className="container-fluid flex-grow-1">
+            <div className="container-fluid flex-grow-1" style={{ marginTop: "72px" }}>
                 <div className="row">
                     {user && (
                         <>
-                            <div className="d-none d-md-block col-md-3 col-lg-2">
+                           <div className="d-none d-md-block col-md-1 col-xl-2 ps-0">
                                 <Sidebar />
                             </div>
-                            <div className="col-12 col-md-9 col-lg-10">
+                            <div className="col-md-11 col-xl-10">
                                 <Outlet />
                             </div>
                         </>

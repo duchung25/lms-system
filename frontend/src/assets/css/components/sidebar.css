@@ -1,0 +1,105 @@
+.sidebar {
+  background: var(--color-white);
+  border-right: 1px solid var(--color-glass-dark);
+  max-width: 260px;
+  height: 100vh;
+  box-shadow: var(--shadow-level-1);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  margin-top: 76.8px;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 12px;
+  margin: 0;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 8px 20px;
+  border-radius: 50px;
+  color: var(--color-black);
+  font-family: var(--font-primary);
+  font-size: var(--fs-body);
+  background: none;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  text-align: left;
+  margin: 0;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s;
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar-link-icon {
+  font-size: 22px;
+  display: inline-block;
+  min-width: 28px;
+  text-align: center;
+}
+
+.sidebar-link-text {
+  white-space: nowrap;
+  transition: opacity 0.15s, width 0.15s;
+  display: inline-block;
+}
+
+.sidebar-link:hover,
+.sidebar-link:focus-visible {
+  background: var(--color-glass-dark);
+  color: var(--color-black);
+  text-decoration: none;
+}
+
+.sidebar-link:first-child {
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+}
+.sidebar-link:last-child {
+  border-bottom-left-radius: 50px;
+  border-bottom-right-radius: 50px;
+}
+
+.sidebar-link.active,
+.sidebar-link[aria-current="page"] {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+.sidebar-link:focus-visible {
+  outline: 2px dashed var(--color-black);
+  outline-offset: 2px;
+}
+
+/* Responsive: Ẩn chữ, chỉ hiện icon, sidebar nhỏ lại */
+@media (max-width: 1200px) {
+  .sidebar {
+    min-width: 62px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .sidebar-link {
+    justify-content: center;
+    gap: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .sidebar-link-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    padding: 0;
+  }
+  .sidebar-link-icon {
+    min-width: 32px;
+    font-size: 22px;
+  }
+}

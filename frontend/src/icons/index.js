@@ -1,1 +1,1 @@
-export {FaCircleUser, FaFacebookF, FaGoogle, FaBoxArchive, FaClipboardCheck } from "react-icons/fa6";
+export {FaCircleUser, FaFacebookF, FaGoogle, FaBoxArchive, FaClipboardCheck, FaAddressBook, FaBook, FaUserGraduate, FaHouseChimney, FaSortDown } from "react-icons/fa6";

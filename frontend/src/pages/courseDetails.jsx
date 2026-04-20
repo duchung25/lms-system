@@ -72,38 +72,78 @@ export default function CourseDetail() {
 
   return (
     <div className="container py-4">
-      <div className="d-flex justify-content-between align-items-start mb-4">
-        {user && user.role === "admin" && (
-          <div className="mb-3">
-            <button className={`btn btn-sm ms-3 ${course.isPublished ? "btn-warning" : "btn-success"}`} onClick={handlePublishToggle} value={courseId}>
-              {course.isPublished ? "Unpublish" : "Publish"}
-            </button>
-          </div>
-        )}
-        {user && user.role === "admin" && course.deleted ? (
-          <button className="btn btn-sm btn-info" onClick={handleRestoreCourse} value={courseId}>
-            Restore Course
-          </button>
-        ) : null}
-      </div>
       <div className="row mb-4">
-        <div className="col-md-8">
-          <h2 className="fw-bold">{course.title}</h2>
-          <p className="text-muted">{course.description}</p>
-
-          <div className="d-flex gap-3 mt-3">
-            <span className="badge bg-primary">{course.level}</span>
-            <span className="badge bg-secondary">{course.category}</span>
-            {user && user.role === "admin" && (
-              <span className={`badge ${course.isPublished ? "bg-success" : "bg-danger"}`}>
-                {course.isPublished ? "Published" : "Unpublished"}
-              </span>
-            )}
+        <div className="col-md-8 mb-3 mb-md-0">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+            <div>
+              <h2 className="fw-bold text-feature-title mb-2">{course.title}</h2>
+              <div className="d-flex flex-wrap gap-2 align-items-center mb-2">
+                <span className="badge bg-primary">{course.level}</span>
+                <span className="badge bg-secondary">{course.category}</span>
+                {user && user.role === "admin" && (
+                  <span className={`badge ${course.isPublished ? "bg-success" : "bg-danger"}`}>
+                    {course.isPublished ? "Published" : "Unpublished"}
+                  </span>
+                )}
+              </div>
+              <div className="mt-1 mb-2 text-body-lg">
+                <span className="fw-medium">Teacher:</span>{" "}
+                {course.teacherId?.username} ({course.teacherId?.email})
+              </div>
+            </div>
+            <div className="d-flex gap-2 flex-wrap">
+              {user && user.role === "admin" && (
+                <button
+                  className={`btn btn-glass-dark btn-sm`}
+                  onClick={handlePublishToggle}
+                  value={courseId}
+                >
+                  {course.isPublished ? "Unpublish" : "Publish"}
+                </button>
+              )}
+              {user && user.role === "admin" && course.deleted && (
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={handleRestoreCourse}
+                  value={courseId}
+                >
+                  Restore
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="mt-3">
-            <strong>Teacher:</strong>{" "}
-            {course.teacherId?.username} ({course.teacherId?.email})
+          <p className="text-body">{course.description}</p>
+
+          <div className="mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h4 className="mb-0 text-subheading">Danh sách bài học</h4>
+              {(user && (user.role === "admin" || user.role === "teacher")) && (
+                <Link
+                  to={`/courses/${courseId}/lessons/new`}
+                  className="btn btn-secondary btn-sm"
+                >
+                  + Thêm bài học
+                </Link>
+              )}
+            </div>
+            {!course.lessons || course.lessons.length === 0 ? (
+              <p className="text-body-light mb-0">Chưa có bài học</p>
+            ) : (
+              <ul className="list-group">
+                {course.lessons.map((lesson) => (
+                  <li
+                    key={lesson._id || lesson.order}
+                    className="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <span>
+                      {lesson.order}. {lesson.title}
+                    </span>
+                    <span className="text-muted">{lesson.duration} phút</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
@@ -116,61 +156,28 @@ export default function CourseDetail() {
             />
           )}
 
-          <div className="border p-3 rounded">
-            <h4 className="text-success">
+          <div className="border p-3 rounded bg-white shadow-sm">
+            <h4 className="text-success text-feature-title mb-2">
               {course.price === 0 ? "Free" : `${course.price} VND`}
             </h4>
-            { user && user.role === "student" && (
+            {user && user.role === "student" && (
               <button className="btn btn-primary w-100 mt-2">
                 Enroll Now
               </button>
             )}
-              <div className="management_btn d-flex justify-content-center gap-2 mt-3 flex-1">
-                {user && (user.role === "admin" || user.role === "teacher") && (
-                  <>
-                    <Link to={`/courses/${courseId}/edit`} className="btn btn-sm btn-info">
-                      Edit Course
-                    </Link>
-                  </>
-                )}
-                {user && (user.role === "admin" || user.role === "teacher") && (
-                  <button className="btn btn-sm btn-danger" onClick={handleDeleteCourse}>
-                    Delete Course
-                  </button>
-                )}
-            </div>
+            {(user && (user.role === "admin" || user.role === "teacher")) && (
+              <div className="d-flex justify-content-center gap-2 mt-3">
+                <Link to={`/courses/${courseId}/edit`} className="btn btn-glass-dark btn-sm">
+                  Edit Course
+                </Link>
+                <button className="btn btn-danger btn-sm" onClick={handleDeleteCourse}>
+                  Delete Course
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {course.lessons?.length === 0 ? (
-        <p>Chưa có bài học</p>
-      ) : (
-        
-            <div>
-              <h4 className="mb-3">Danh sách bài học</h4>
-
-              {!course.lessons || course.lessons.length === 0 ? (
-                <p>Chưa có bài học</p>
-              ) : (
-                    <ul className="list-group">
-                      {course.lessons.map((lesson) => (
-                        <li
-                          key={lesson._id || lesson.order}
-                          className="list-group-item d-flex justify-content-between align-items-center"
-                        >
-                          <span>
-                            {lesson.order}. {lesson.title}
-                          </span>
-                          <span className="text-muted">
-                            {lesson.duration} phút
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-              </div>
-        )}
     </div>
   );
 }

@@ -1,13 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth.js";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import logo from "../../assets/img/logo_header.png";
-import "./header.css";
+import { FaSortDown } from "../../icons/index.js";
 
 export default function Header() {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
   const [q, setQ] = useState("");
+
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,49 +24,87 @@ export default function Header() {
     navigate("/auth/login");
   };
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <header className="bg-white border-bottom">
-      <div className="container-fluid py-3 px-lg-4">
-        <div className="d-flex align-items-center justify-content-between gap-3">
-          <Link to="/" className="text-decoration-none fw-bold text-dark d-flex align-items-center gap-2">
-            <img src={logo} alt="Logo"  className="header__logo"/>
-            Hungry Academy
-          </Link>
+    <header className="header">
+      <div className="header__container">
+        {/* Brand */}
+        <Link to="/" className="header__brand">
+          <img src={logo} alt="Logo" className="header__logo" />
+          <span className="text-feature-title">Hungry Academy</span>
+        </Link>
 
-          <form onSubmit={handleSubmit} className="header__search-form px-3">
-            <input
-              className="form-control rounded-pill"
-              placeholder="Search..."
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-            />
-          </form>
+        <form onSubmit={handleSubmit} className="header__search">
+          <input
+            className="header__input"
+            placeholder="Search..."
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </form>
 
-          <div className="d-flex align-items-center gap-2">
-            {isAuthenticated ? (
-              <>
-                <span className="text-truncate" style={{ maxWidth: 160 }}>
-                  {user?.name || user?.email || "User"}
+        <div className="header__actions">
+          {isAuthenticated ? (
+            <div className="user-menu" ref={menuRef}>
+              <button
+                className={`user-menu__trigger ${open ? "is-open" : ""}`}
+                onClick={() => setOpen((v) => !v)}
+                aria-expanded={open}
+              >
+                <span className="user-menu__name">
+                  {user?.username || "User"}
                 </span>
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary rounded-pill"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link to="/auth/register" className="btn btn-link text-decoration-none">
-                  Đăng ký
-                </Link>
-                <Link to="/auth/login" className="btn btn-link text-decoration-none br-4 login-btn">
-                  Đăng nhập
-                </Link>
-              </>
-            )}
-          </div>
+                <span className="user-menu__caret d-flex align-items-center">
+                  <FaSortDown />
+                </span>
+              </button>
+
+              {open && (
+                <div className="user-menu__dropdown">
+                  <Link
+                    to="/profile"
+                    className="user-menu__item"
+                    onClick={() => setOpen(false)}
+                  >
+                    Hồ sơ
+                  </Link>
+
+                  <Link
+                    to="/my-courses"
+                    className="user-menu__item"
+                    onClick={() => setOpen(false)}
+                  >
+                    Khóa học của tôi
+                  </Link>
+
+                  <button
+                    className="user-menu__item user-menu__item--danger"
+                    onClick={handleLogout}
+                  >
+                    Đăng xuất
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <Link to="/auth/register" className="header__link">
+                Đăng ký
+              </Link>
+              <Link to="/auth/login" className="btn btn-primary">
+                Đăng nhập
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

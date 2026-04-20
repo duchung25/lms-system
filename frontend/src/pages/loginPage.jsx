@@ -82,14 +82,14 @@ export default function LoginPage() {
           <div className="auth-card w-100">
             <h2 className="mb-3 auth-title">Đăng nhập ngay!</h2>
 
-            <button type="button" className="btn btn-outline-secondary w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 login__btn">
+            <button type="button" className=" login__btn">
               <FaGoogle />
               <span>Tiếp tục bằng Google</span>
             </button>
 
             <div className="row g-3 mt-1">
               <div className="col-12">
-                <button type="button" className="btn btn-outline-secondary w-100 fw-semibold d-flex align-items-center justify-content-center gap-2 login__btn">
+                <button type="button" className=" login__btn">
                   <FaFacebookF />
                   <span>Tiếp tục bằng Facebook</span>
                 </button>
@@ -141,7 +141,7 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                className="btn w-100 login__py mt-3 auth-submit"
+                className="w-100 login__py mt-3 auth-submit"
                 disabled={loading}
               >
                 {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
