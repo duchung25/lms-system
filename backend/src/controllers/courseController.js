@@ -51,8 +51,9 @@ const courseController = {
     },
     async getCourseDetail(req, res, next) {
         try{
+            const user = req.user;
             const { courseId } = req.params;
-            const course = await courseService.getCourseDetail(courseId);
+            const course = await courseService.getCourseDetail(courseId, user);
 
             res.status(200).json({
                 success: true,

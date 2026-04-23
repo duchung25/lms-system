@@ -4,12 +4,15 @@ const enrollmentController = {
     async enrollInCourse(req, res, next) {
         try{
             const studentId = req.user.userId;
-            const { courseId } = req.body;
-            const enrollment = await enrollmentService.enrollInCourse(courseId, studentId);
+            const { courseId } = req.params;
+            const { enrollment, firstLessonId } = await enrollmentService.enrollInCourse(courseId, studentId);
             res.status(201).json({
                 success: true,
                 message: "Enrolled in course successfully",
-                data: { enrollment }
+                data: { 
+                    enrollment,
+                    firstLessonId
+                 }
             });
         }
         catch(error){

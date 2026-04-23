@@ -13,16 +13,17 @@ const LessonService = {
         const lesson = await Lesson.create({ ...data, courseId: courseid, order: nextorder, createdBy: user.userId });
         return lesson;
     },
-    async getLessonsByCourse(courseId){
-        const course = await Course.findById(courseId);
+    async getLessonsByCourse(courseId, user){
+        const query = { _id: courseId };
+        if(user?.role === "student"){
+            query.isPublished = true;
+        }
+        const course = await Course.findOne(query).lean();
         if(!course){
             throw new AppError("Course not found", 404);
         }
-        if(!course.isPublished){
-            throw new AppError("Course is not published yet", 400);
-        }
         return await Lesson.find({ courseId })
-        .select(" title order duration ")
+        .select("_id title order duration ")
         .sort({ order: 1 })
         .lean();
     },
@@ -39,8 +40,8 @@ const LessonService = {
         .sort({ order: 1 })
         .lean();
     },
-    async getLessonById(courseId, lessonId){
-        const lesson = await Lesson.findById(lessonId);
+    async getLessonDetail(courseId, lessonId){
+        const lesson = await Lesson.findById(lessonId).select("title videoUrl createdAt courseId isPublished").lean();
         if(!lesson){
             throw new AppError("Lesson not found", 404);
         }

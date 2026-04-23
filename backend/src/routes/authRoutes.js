@@ -9,7 +9,6 @@ const  router = express.Router();
 router.post('/register', validators.registerValidationRules, validators.validate, authController.register);
 router.post('/login', validators.loginValidationRules, validators.validate, authController.login);
 
-// Protected route 
 router.get('/profile', authMiddleware, authController.getProfile);
 router.put('/profile', authMiddleware, authController.updateProfile);
 router.put('/change-password', authMiddleware, authController.changePassword);

@@ -1,13 +1,15 @@
 import Enrollment from "../models/Enrollment.js";
 import Course from "../models/Course.js";
+import Lesson from "../models/Lesson.js";
 import AppError from "../utils/AppError.js";
 
 const enrollmentService = {
     async enrollInCourse(courseId, studentId){
         const course = await Course.findById(courseId);
-        if(!course || !course.active){
+        if(!course || !course.isPublished){
             throw new AppError("Course not found", 404);
         }
+        const firstLesson = await Lesson.findOne({ courseId }).sort({ order: 1 }).select("_id").lean();
         const existing = await Enrollment.findOne({ courseId, studentId });
         if(existing){
             if(existing.status === "active"){
@@ -19,7 +21,8 @@ const enrollmentService = {
             return existing;
         }
         const enrollment = await Enrollment.create({ courseId, studentId });
-        return enrollment;
+        return { enrollment,
+                 firstLessonId: firstLesson ? firstLesson._id : null };
     },
     async unenrollFromCourse(courseId, studentId){
         const enrollment = await Enrollment.findOne({ courseId, studentId, status: "active" });

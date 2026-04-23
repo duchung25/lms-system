@@ -51,21 +51,18 @@ const courseService = {
 
         return { list, page, limit, total, totalPages };
     },
-    async getCourseDetail(courseId){
-        const [course, lessons] = await Promise.all([
-            Course.findOneWithDeleted({ _id: courseId })
+    async getCourseDetail(courseId, user){
+        const query = { _id: courseId };
+        if(user?.role === "student"){
+            query.isPublished = true;
+        }
+        const course = await Course.findOneWithDeleted(query)
             .populate("teacherId", "username email avatar")
-            .lean(),
-
-            Lesson.find({ courseId })
-            .select("title order duration")
-            .sort({ order: 1 })
-            .lean()
-        ]);
+            .lean();
         if(!course){
             throw new AppError("Course not found", 404);
         }
-        return { ...course, lessons };
+        return course ;
     },
     async updateCourse(courseId, updateData, currentUser){
         const course = await Course.findById(courseId);

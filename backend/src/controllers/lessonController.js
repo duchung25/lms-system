@@ -18,8 +18,9 @@ const LessonController = {
     },
     async getLessonsByCourse(req, res, next){
         try{
+            const user = req.user;
             const courseId = req.params.courseId;
-            const lessons = await LessonService.getLessonsByCourse(courseId);
+            const lessons = await LessonService.getLessonsByCourse(courseId, user);
             res.status(200).json({
                 success: true,
                 message: "Lessons retrieved successfully",
@@ -44,11 +45,11 @@ const LessonController = {
             next(error);
         }
     },
-    async getLessonById(req, res, next){
+    async getLessonDetail(req, res, next){
         try{
             const lessonId = req.params.lessonId;
             const courseId = req.params.courseId;
-            const lesson = await LessonService.getLessonById(courseId, lessonId);
+            const lesson = await LessonService.getLessonDetail(courseId, lessonId);
             res.status(200).json({
                 success: true,
                 message: "Lesson retrieved successfully",
