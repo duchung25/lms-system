@@ -1,6 +1,11 @@
 button,
 .btn {
-  all: unset;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: none;
+  padding: 0;
+  margin: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;

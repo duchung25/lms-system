@@ -7,23 +7,44 @@ export default function CourseDetail() {
   const { user, token } = useAuth();
   const { courseId } = useParams();
   const [course, setCourse] = useState(null);
+  const [lessons, setLessons] = useState([]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/courses/${courseId}`,
-      {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-       }
-    )
-      .then(res => res.json())
-      .then(data => {
-        setCourse(data.data.course);
+    async function fetchData() {
+      try {
+        const urls = [
+          `http://localhost:5000/api/courses/${courseId}`,
+          `http://localhost:5000/api/courses/${courseId}/lessons`
+        ];
+
+        const responses = await Promise.all(
+          urls.map(url =>
+            fetch(url, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            })
+          )
+        );
+        const [courseRes, lessonsRes] = await Promise.all(
+          responses.map(res => res.json())
+        );
+        if (!responses[0].ok) throw new Error(courseRes.message);
+        if (!responses[1].ok) throw new Error(lessonsRes.message);
+        console.log("courseRes:", courseRes);
+        setCourse(courseRes.data.course);
+        setLessons(lessonsRes.data.lessons);
+        
+
+      } catch (err) {
+        alert(err.message);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    }
+    fetchData();
   }, [courseId, token]);
   function handlePublishToggle() {
     const action = course.isPublished ? "unpublish" : "publish";
@@ -65,7 +86,30 @@ export default function CourseDetail() {
       })
       .catch(() => alert("Failed to restore course"));
   };
+  async function handleEnrollCourse() {
+    if(user.role !== "student"){
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:5000/api/enrollments/${courseId}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message );
+      }
+      if (data.data.firstLessonId) {
+        navigate(`/courses/${courseId}/lessons/${data.data.firstLessonId}`);
+      } else {
+        alert("Enrolled successfully, but no lessons available yet");
+      }
+
+    } catch (error) {
+      alert("Failed to enroll in course: " + error.message);
+    }
+  }
 
   if (loading) return <div className="text-center mt-5">Loading...</div>;
   if (!course) return <div className="text-center mt-5">Course not found</div>;
@@ -118,7 +162,7 @@ export default function CourseDetail() {
           <div className="mb-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h4 className="mb-0 text-subheading">Danh sách bài học</h4>
-              {(user && (user.role === "admin" || user.role === "teacher")) && (
+              {(user && ( user.role === "teacher")) && (
                 <Link
                   to={`/courses/${courseId}/lessons/new`}
                   className="btn btn-secondary btn-sm"
@@ -127,11 +171,11 @@ export default function CourseDetail() {
                 </Link>
               )}
             </div>
-            {!course.lessons || course.lessons.length === 0 ? (
+            {!lessons || lessons.length === 0 ? (
               <p className="text-body-light mb-0">Chưa có bài học</p>
             ) : (
               <ul className="list-group">
-                {course.lessons.map((lesson) => (
+                {lessons.map((lesson) => (
                   <li
                     key={lesson._id || lesson.order}
                     className="list-group-item d-flex justify-content-between align-items-center"
@@ -160,17 +204,29 @@ export default function CourseDetail() {
             <h4 className="text-success text-feature-title mb-2">
               {course.price === 0 ? "Free" : `${course.price} VND`}
             </h4>
-            {user && user.role === "student" && (
-              <button className="btn btn-primary w-100 mt-2">
-                Enroll Now
-              </button>
-            )}
+            {user && user.role === "student" ? (
+            course.isEnrolled ? (
+              <Link
+                to={`/courses/${courseId}/lessons/${course.firstLessonId}`}
+                className="btn btn-secondary w-100 mt-2"
+              >
+                Vào học
+              </Link>
+              ) : course.isPublished ? (
+                <button
+                  className="btn btn-primary w-100 mt-2"
+                  onClick={handleEnrollCourse}
+                >
+                  Enroll Now
+                </button>
+              ) : null
+            ) : null}
             {(user && (user.role === "admin" || user.role === "teacher")) && (
               <div className="d-flex justify-content-center gap-2 mt-3">
                 <Link to={`/courses/${courseId}/edit`} className="btn btn-glass-dark btn-sm">
                   Edit Course
                 </Link>
-                <button className="btn btn-danger btn-sm" onClick={handleDeleteCourse}>
+                <button className="btn btn-glass-dark btn-sm" onClick={handleDeleteCourse}>
                   Delete Course
                 </button>
               </div>

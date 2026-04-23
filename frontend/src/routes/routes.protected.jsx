@@ -1,4 +1,5 @@
 import AppLayout from "../layouts/AppLayout.jsx";
+import AuthLayout from "../layouts/AuthLayout.jsx";
 // import AdminLayout from "../layouts/AdminLayout.jsx";
 // import TeacherLayout from "../layouts/TeacherLayout.jsx";
 import CourseDetails from "../pages/courseDetails.jsx";
@@ -9,6 +10,7 @@ import CoursesPage from "../pages/coursesPage.jsx";
 import MyCoursesPage from "../pages/myCoursesPage.jsx";
 import CourseForm from "../pages/courseForm.jsx";
 import LessonForm from "../pages/lessonForm.jsx";
+import LessonDetail from "../pages/lessonDetails.jsx";
 
 export default [
   {
@@ -18,14 +20,9 @@ export default [
         element: <ProtectedRoute />,
         children: [
           { path: "/my-courses", element: <MyCoursesPage /> },
-          { path: "/courses/:courseId", element: <CourseDetails /> }
+          { path: "/courses/:courseId", element: <CourseDetails /> },
         ]
       },
-    ],
-  },
-  {
-    element: <AppLayout />,
-    children: [
       {
         element: <ProtectedRoute allowedRoles={["admin"]} />,
         children: [
@@ -33,11 +30,6 @@ export default [
           { path: "/courses/:courseId/lessons/new", element: <LessonForm /> },
         ],
       },
-    ],
-  },
-  {
-    element: <AppLayout />,
-    children: [
       {
         element: <ProtectedRoute allowedRoles={["teacher"]} />,
         children: [
@@ -49,4 +41,15 @@ export default [
       },
     ],
   },
+  {
+    element: <AuthLayout />,
+    children: [
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: "/courses/:courseId/lessons/:lessonId", element: <LessonDetail /> }
+        ],
+      },
+    ],
+  }
 ];
