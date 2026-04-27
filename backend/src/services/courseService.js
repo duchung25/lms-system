@@ -33,23 +33,26 @@ const courseService = {
             else sortOpt[sort] = 1;
         }
 
+        const pendingFilter = { ...filter, isPublished: false };
+
         const skip = (page - 1) * limit;
         if(deleted === 'true'){
-            const [list, total] = await Promise.all([
+            const [list, total, pendingCount] = await Promise.all([
                 Course.findWithDeleted(filter).populate("teacherId", "email").sort(sortOpt).skip(skip).limit(limit),
-                Course.countDocumentsDeleted(filter)
+                Course.countDocumentsDeleted(filter),
+                Course.countDocumentsDeleted(pendingFilter)
             ]);
             const totalPages = Math.ceil(total / limit);
-            return { list, page, limit, total, totalPages };
-
+            return { list, page, limit, total, totalPages, pendingCount};
         }
-        const [list, total] = await Promise.all([
+        const [list, total, pendingCount] = await Promise.all([
             Course.find(filter).populate("teacherId", "email").sort(sortOpt).skip(skip).limit(limit),
-            Course.countDocuments(filter)
+            Course.countDocuments(filter),
+            Course.countDocuments(pendingFilter)
         ]);
         const totalPages = Math.ceil(total / limit);
 
-        return { list, page, limit, total, totalPages };
+        return { list, page, limit, total, totalPages, pendingCount };
     },
     async getCourseDetail(courseId, user){
         const query = { _id: courseId };
