@@ -41,7 +41,7 @@ const enrollmentController = {
             res.status(200).json({
                 success: true,
                 message: "Course enrollments retrieved successfully",
-                data: { enrollments }
+                data: { courses }
             });
         }
         catch(error){

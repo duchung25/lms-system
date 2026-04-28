@@ -35,7 +35,17 @@ const enrollmentService = {
         return enrollment;
     },
     async getMyEnrollments(studentId){
-        return Enrollment.find({ studentId, status: "active"}).populate("courseId", "title description teacherId").lean();
+        const enrollments = await Enrollment.find({ studentId, status: "active" })
+                                            .populate({
+                                                path: "courseId",
+                                                select: "title description teacherId thumbnailUrl price lever",
+                                                populate: {
+                                                    path: "teacherId",
+                                                    select: "username email"
+                                                }
+                                            })
+                                            .lean();
+        return enrollments.map(e => e.couseId).filter(c => c != null);
     },
     async getCourseEnrollments(courseId){
         return Enrollment.find({ courseId, status: "active" }).populate("studentId", "username email avatar").lean();
