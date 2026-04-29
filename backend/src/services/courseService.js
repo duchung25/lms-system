@@ -73,7 +73,9 @@ const courseService = {
             throw new AppError("Course not found", 404);
         }
         Object.assign(course, updateData);
-        return await course.save().populate("teacherId", "username email avatar");
+        await course.save();
+        await course.populate("teacherId", "username email avatar");
+        return await course;
     },
     async deleteCourse(courseId){
         const course = await Course.findById(courseId);
