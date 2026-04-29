@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import RegisterImg from '../assets/img/register_image.jpg';
-import '../assets/css/pages/loginPage.css';
+// Tái sử dụng file CSS của Login
+import '../assets/css/pages/loginPage.css'; 
+import { register } from '../api/auth.api.js';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -12,7 +14,6 @@ export default function RegisterPage() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -22,7 +23,6 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
     setError('');
 
     const payload = {
@@ -38,77 +38,68 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        const detail =
-          data?.errors?.map((e) => e.message).join(', ') ||
-          data?.message ||
-          'Đăng ký thất bại';
-        throw new Error(detail);
-      }
-
-      setMessage(data?.message || 'Đăng ký thành công!');
+      await register(payload.username, payload.email, payload.password);
       setForm({ username: '', email: '', password: '' });
-      setTimeout(() => {
-        navigate('/auth/login');
-      }, 2000);
+      navigate('/auth/login');
     } catch (err) {
-      setError(err.message || 'Có lỗi xảy ra, vui lòng thử lại.');
+      const message = 
+        err.response?.data?.errors?.map(e => e.message).join(', ') ||
+        err.response?.data?.message ||
+        'Đã có lỗi xảy ra. Vui lòng thử lại.';
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container py-4">
-      <div className="row">
-        <div className="col-lg-6 d-flex flex-column align-items-center">
-          <img src={RegisterImg} alt="register-image" className="login-image" />
-          <span className="login__note">Chào mừng bạn</span>
-          <span>Tạo tài khoản để bắt đầu học tập ngay!</span>
+    <div className="container login-page">
+      <div className="row h-100">
+        {/* BÊN TRÁI: IMAGE (Giống Login) */}
+        <div className="d-none d-lg-flex col-lg-6 login-left flex-column justify-content-center align-items-center text-center">
+          <img src={RegisterImg} alt="Register" className="login-left__img" />
+          <div className="login-left__content">
+            <p className="login-left__note">Chào mừng bạn</p>
+            <p className="login-left__text">
+              Tạo tài khoản để bắt đầu học tập ngay!
+            </p>
+          </div>
         </div>
 
-        <div className="col-lg-6 d-flex justify-content-center">
-          <div className="auth-card w-100">
-            <h2 className="mb-3 auth-title">Đăng ký ngay!</h2>
+        {/* BÊN PHẢI: FORM (Giống Login) */}
+        <div className="col-12 col-lg-6 d-flex align-items-center justify-content-center login-form">
+          <div className="login-form__container">
+            <div className="login-header text-center text-lg-start">
+              <div className="login-logo justify-content-center justify-content-lg-start">
+                <div className="login-logo__icon">🎓</div>
+                <span className="login-logo__text">StudyHub</span>
+              </div>
+              <h2 className="login-title">Đăng ký ngay!</h2>
+              <p className="login-subtitle">
+                Trở thành học viên của cộng đồng ngay hôm nay
+              </p>
+            </div>
 
             <form onSubmit={handleSubmit}>
+              {/* USERNAME */}
               <div className="mb-3">
-                <div className="d-flex justify-content-between align-items-baseline mb-2">
-                  <label htmlFor="username" className="form-label fw-semibold mb-0">
-                    Username
-                  </label>
-                  <small className="text-muted">bắt buộc</small>
-                </div>
+                <label className="login-label">Username</label>
                 <input
                   type="text"
-                  className="form-control login__py"
-                  id="username"
-                  name="username" 
+                  className="login-input"
+                  name="username"
                   placeholder="Nhập username"
                   value={form.username}
                   onChange={handleChange}
                 />
               </div>
 
+              {/* EMAIL */}
               <div className="mb-3">
-                <div className="d-flex justify-content-between align-items-baseline mb-2">
-                  <label htmlFor="email" className="form-label fw-semibold mb-0">
-                    Email
-                  </label>
-                  <small className="text-muted">bắt buộc</small>
-                </div>
+                <label className="login-label">Email</label>
                 <input
                   type="email"
-                  className="form-control login__py"
-                  id="email"
+                  className="login-input"
                   name="email"
                   placeholder="email@example.com"
                   value={form.email}
@@ -116,47 +107,43 @@ export default function RegisterPage() {
                 />
               </div>
 
-              <div className="mb-2">
-                <div className="d-flex justify-content-between align-items-baseline mb-2">
-                  <label htmlFor="password" className="form-label fw-semibold mb-0">
-                    Mật khẩu
-                  </label>
-                  <small className="text-muted">bắt buộc</small>
-                </div>
-                <div className="text-muted small mb-2">
-                  Mật khẩu phải có ít nhất 8 ký tự, trong đó có ít nhất một ký tự đặc biệt
-                </div>
+              {/* PASSWORD */}
+              <div className="mb-3">
+                <label className="login-label">Mật khẩu</label>
                 <input
                   type="password"
-                  className="form-control login__py"
-                  id="password"
+                  className="login-input"
                   name="password"
-                  placeholder="Nhập mật khẩu"
+                  placeholder="••••••••"
                   value={form.password}
                   onChange={handleChange}
                 />
+                <p className="text-muted small mt-1" style={{ fontSize: '12px' }}>
+                  Ít nhất 8 ký tự, có ký tự đặc biệt
+                </p>
               </div>
 
-              {error && <p className="text-danger mt-2 mb-0">{error}</p>}
-              {message && <p className="text-success mt-2 mb-0">{message}</p>}
+              {error && <p className="text-danger mb-2">{error}</p>}
 
               <button
                 type="submit"
-                className="btn w-100 login__py mt-3 auth-submit"
+                className="login-submit mt-2"
                 disabled={loading}
               >
                 {loading ? 'Đang đăng ký...' : 'Đăng ký'}
               </button>
 
-              <p className="small mt-3 mb-0">
-                Bằng việc đăng ký, bạn đồng ý với{' '}
-                <a href="/terms">Điều khoản dịch vụ</a> và{' '}
-                <a href="/privacy">Chính sách về quyền riêng tư</a>.
-              </p>
-
-              <p className="mt-4 mb-0">
-                Bạn đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
-              </p>
+              <div className="login-footer">
+                <p className="small mb-3">
+                  Bằng việc đăng ký, bạn đồng ý với{' '}
+                  <a href="/terms" className="login-link">Điều khoản</a> và{' '}
+                  <a href="/privacy" className="login-link">Bảo mật</a>.
+                </p>
+                <p>
+                  Bạn đã có tài khoản?{' '}
+                  <a href="/auth/login" className="login-link">Đăng nhập ngay</a>
+                </p>
+              </div>
             </form>
           </div>
         </div>

@@ -7,7 +7,7 @@ export default function AppLayout() {
         <div className="min-vh-100 d-flex flex-column">
             <Header className="relative"/>
 
-            <div className="container-fluid flex-grow-1" style={{marginTop: "70px"}}>
+            <div className="container-fluid flex-grow-1" style={{marginTop: "64px", backgroundColor: "var(--color-background)"}}>
                 <div className="row">
                     <div className="col-12 col-md-12 col-lg-12">
                         <Outlet />

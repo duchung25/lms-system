@@ -10,7 +10,7 @@ export default function AppLayout() {
         <div className="min-vh-100 d-flex flex-column">
             <Header className="sticky-top" />
 
-            <div className="container-fluid flex-grow-1" style={{ marginTop: "72px" }}>
+            <div className="container-fluid flex-grow-1" style={{ marginTop: "64px", paddingTop: "20px", backgroundColor: "var(--color-background)" }}>
                 <div className="row">
                     {user && (
                         <>

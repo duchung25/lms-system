@@ -3,6 +3,8 @@
     import { useNavigate, useParams } from "react-router-dom";
     import '../assets/css/pages/createCoursePage.css';
 
+    import { useCreateCourse, useUpdateCourse } from "../hook/useCourse";
+
     export default function CreateCoursePage() {
         const { token } = useAuth();
         const navigate = useNavigate();
@@ -18,6 +20,9 @@
         price: 0,
         });
         const [loading, setLoading] = useState(false);
+
+        const { updateCourse } = useUpdateCourse(courseId);
+        const { createCourse } = useCreateCourse();
 
         useEffect(() => {
         if (isUpdateMode) {
@@ -76,24 +81,11 @@
         }
 
         try {
-            let apiUrl = "http://localhost:5000/api/courses";
-            let method = "POST";
-            if (isUpdateMode) {
-            apiUrl += `/${courseId}`;
-            method = "PATCH";
+            if(isUpdateMode){
+                await updateCourse({ ...form, thumbnail: imageUrl });
+            } else {
+                await createCourse({ ...form, thumbnail: imageUrl });
             }
-            const res = await fetch(apiUrl, {
-                method: method,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    ...form,
-                    thumbnail: imageUrl,
-                }),
-            });
-            await res.json();
             if(isUpdateMode){
                 alert("Cập nhật khóa học thành công!");
             } else {
@@ -110,7 +102,6 @@
             setThumbnailUrl("");
             navigate("/courses/my-courses");
         } catch (err) {
-            alert("Lỗi tạo khóa học: " + err.message);
             console.error("Error:", err);
         } finally {
             setLoading(false);

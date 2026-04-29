@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { debounce } from "lodash";
 import { useAuth } from "../auth/useAuth";
-import '../assets/css/components/card.css';
+import { useCourses } from "../hook/useCourse";
 import { FaBoxArchive, FaClipboardCheck  } from "../icons";
+
+import '../assets/css/components/card.css';
 
 const LEVEL_OPTIONS = [
   { value: "", label: "All Levels" },
@@ -22,79 +24,34 @@ const CATEGORY_OPTIONS = [
 ];
 
 export default function CoursesPage() {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const [params, setParams] = useSearchParams();
+
   const q = (params.get("q") || "").toLowerCase().trim();
   const category = params.get("category") || "";
   const level = params.get("level") || "";
   const published = params.get("published") || "";
   const deleted = params.get("deleted") || "";
-  const [coursesData, setCoursesData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [searchInput, setSearchInput] = useState(q);
-  const [countPendingCourses, setCountPendingCourses] = useState(0);
-
+  
   useEffect(() => {
     setSearchInput(q);
   }, [q]);
-  useEffect(() => {
-    const fetchCourses = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const query = [
-          q ? `q=${encodeURIComponent(q)}` : "",
-          category ? `category=${encodeURIComponent(category)}` : "",
-          level ? `level=${encodeURIComponent(level)}` : "",
-          user.role === "admin" && published ? `published=${published}` : "",
-          user.role === "admin" && deleted ? `deleted=${deleted}` : "",
-        ].filter(Boolean).join("&");
-        const res = await fetch(`http://localhost:5000/api/courses${query ? "?" + query : ""}`, {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
-        if (!res.ok) throw new Error("Failed to fetch courses");
-        const data = await res.json();
-        setCoursesData(Array.isArray(data.data.list) ? data.data.list : []);
-        setCountPendingCourses(data.data.list.filter(c => c.isPublished === false).length);
-      } catch (error) {
-          setCoursesData([]);
-          setError("error fetching courses: " + error.message);
-      } finally {
-          setLoading(false);
-      }
-    };
-    fetchCourses();
-    }, [q, category, level, published, deleted, token, user?.role]);
-    useEffect(() => {
-      if (user && user.role === "admin") {
-        const fetchPendingCount = async () => {
-          try {
-            const res = await fetch("http://localhost:5000/api/courses/count/summary", {
-              headers: {
-                "Authorization": `Bearer ${token}`
-              }
-            });
-            if (!res.ok) throw new Error("Failed to fetch pending count");
-            const data = await res.json();
-            setCountPendingCourses(data.data.unpublishedCourses || 0);
-          } catch (error) {
-            setError("Error fetching pending courses count: " + error.message);
-            setCountPendingCourses(0);
-          }
-        };
-        fetchPendingCount();
-      }
-    }, [ token, user ]);
+  const { courses, pendingCount, loading, error } = useCourses({ 
+    q, 
+    category,
+    level, 
+    published, 
+    deleted, 
+    role: user?.role 
+  });
 
-  const courses = useMemo(() => {
-    if(!q) return coursesData;
-    return coursesData.filter((c) =>
+  const filterCourse = useMemo(() => {
+    if(!q) return courses;
+    return courses.filter((c) =>
       (c.title || "").toLowerCase().includes(q)
     );
-  }, [q, coursesData]);
+  }, [q, courses]);
 
   const updateFilter = useMemo(() => {
     return debounce((key, value) => {
@@ -145,7 +102,7 @@ export default function CoursesPage() {
             }}
             >
               <FaClipboardCheck className="me-1" />
-              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{countPendingCourses}</span>
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{pendingCount}</span>
             </Link>
           </div>
         )}
@@ -187,7 +144,7 @@ export default function CoursesPage() {
         </div>
       </div>
       <div className="row g-3">
-        {courses.map((c) => (
+        {filterCourse.map((c) => (
           <div key={c._id} className="col-12 col-sm-6 col-lg-3">
             <Link 
               to={`/courses/${c._id}`} 

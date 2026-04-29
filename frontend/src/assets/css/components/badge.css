@@ -1,0 +1,22 @@
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* variants */
+.badge-primary {
+  background: var(--color-primary-fixed);
+  color: var(--color-primary);
+}
+
+.badge-success {
+  background: rgba(16,185,129,0.1);
+  color: var(--color-success);
+}
+
+.badge-warning {
+  background: rgba(245,158,11,0.1);
+  color: var(--color-secondary);
+}

@@ -19,7 +19,6 @@ export default [
       {
         element: <ProtectedRoute />,
         children: [
-          { path: "/my-courses", element: <MyCoursesPage /> },
           { path: "/courses/:courseId", element: <CourseDetails /> },
         ]
       },
@@ -33,10 +32,16 @@ export default [
       {
         element: <ProtectedRoute allowedRoles={["teacher"]} />,
         children: [
-          { path: "/courses/my-courses", element: <MyCoursesPage /> },
+          
           { path: "/courses/create", element: <CourseForm /> },
           { path: "/courses/:courseId/edit", element: <CourseForm /> },
           { path: "/courses/:courseId/lessons/new", element: <LessonForm /> },
+        ],
+      },
+      {
+        element: <ProtectedRoute allowedRoles={["teacher","student"]} />,
+        children: [
+          { path: "/courses/my-courses", element: <MyCoursesPage /> },
         ],
       },
     ],

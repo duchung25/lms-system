@@ -59,7 +59,7 @@ export default function Sidebar() {
           <span className="sidebar-link-icon"><FaBook /></span>
           <span className="sidebar-link-text">Khóa học</span>
         </NavLink>
-        <NavLink to="/my-courses" className={linkClass}>
+        <NavLink to="/courses/my-courses" className={linkClass}>
           <span className="sidebar-link-icon"><FaUserGraduate /></span>
           <span className="sidebar-link-text">Khóa học của tôi</span>
         </NavLink>

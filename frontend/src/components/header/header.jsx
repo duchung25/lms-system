@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth.js";
 import { useState, useRef, useEffect } from "react";
-import logo from "../../assets/img/logo_header.png";
 import { FaSortDown } from "../../icons/index.js";
 
 export default function Header() {
@@ -37,16 +36,22 @@ export default function Header() {
   return (
     <header className="header">
       <div className="header__container">
-        {/* Brand */}
+
         <Link to="/" className="header__brand">
-          <img src={logo} alt="Logo" className="header__logo" />
-          <span className="text-feature-title">Hungry Academy</span>
+          <span className="header__title">StudyHub</span>
         </Link>
+
+        <nav className="header__nav">
+          <Link to="/browse" className="header__nav-item active">Browse</Link>
+          <Link to="/learning" className="header__nav-item">Learning</Link>
+          <Link to="/community" className="header__nav-item">Community</Link>
+          <Link to="/resources" className="header__nav-item">Resources</Link>
+        </nav>
 
         <form onSubmit={handleSubmit} className="header__search">
           <input
             className="header__input"
-            placeholder="Search..."
+            placeholder="Search courses..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
@@ -56,38 +61,19 @@ export default function Header() {
           {isAuthenticated ? (
             <div className="user-menu" ref={menuRef}>
               <button
-                className={`user-menu__trigger ${open ? "is-open" : ""}`}
+                className="user-menu__trigger"
                 onClick={() => setOpen((v) => !v)}
-                aria-expanded={open}
               >
-                <span className="user-menu__name">
-                  {user?.username || "User"}
-                </span>
-                <span className="user-menu__caret d-flex align-items-center">
-                  <FaSortDown />
-                </span>
+                {user?.username || "User"}
+                <FaSortDown />
               </button>
 
               {open && (
                 <div className="user-menu__dropdown">
-                  <Link
-                    to="/profile"
-                    className="user-menu__item"
-                    onClick={() => setOpen(false)}
-                  >
-                    Hồ sơ
-                  </Link>
-
-                  <Link
-                    to="/my-courses"
-                    className="user-menu__item"
-                    onClick={() => setOpen(false)}
-                  >
-                    Khóa học của tôi
-                  </Link>
-
+                  <Link to="/profile" className="user-menu__item">Hồ sơ</Link>
+                  <Link to="/my-courses" className="user-menu__item">Khóa học của tôi</Link>
                   <button
-                    className="user-menu__item user-menu__item--danger"
+                    className="user-menu__item danger"
                     onClick={handleLogout}
                   >
                     Đăng xuất
@@ -98,14 +84,15 @@ export default function Header() {
           ) : (
             <>
               <Link to="/auth/register" className="header__link">
-                Đăng ký
+                Sign Up
               </Link>
               <Link to="/auth/login" className="btn btn-primary">
-                Đăng nhập
+                Sign In
               </Link>
             </>
           )}
         </div>
+
       </div>
     </header>
   );

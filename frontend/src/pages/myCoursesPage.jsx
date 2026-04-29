@@ -14,13 +14,7 @@ export default function MyCoursesPage() {
 
   useEffect(() => {
     const getCoursesApiUrl = () => {
-    if (user.role === "teacher") {
       return "http://localhost:5000/api/courses/my-courses";
-    }
-    if(user.role === "student") {
-      return "http://localhost:5000/api/enrollments/me";
-    }
-    return "http://localhost:5000/api/courses";
   };
     const fetchCourses = async () => {
       setLoading(true);

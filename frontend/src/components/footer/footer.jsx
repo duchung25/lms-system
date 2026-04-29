@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="border-top bg-white mt-4">
+    <footer className="border-top bg-white">
       <div className="container py-3">
         <div className="d-flex flex-wrap gap-2 justify-content-between text-muted">
           <div>© {new Date().getFullYear()} LMS</div>

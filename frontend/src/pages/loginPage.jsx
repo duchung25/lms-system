@@ -5,11 +5,13 @@ import { useAuth } from '../auth/useAuth';
 import LoginImg from '../assets/img/login_image.jpg';
 import '../assets/css/pages/loginPage.css';
 import { FaGoogle, FaFacebookF } from '../icons';
+import  loginImg from '../assets/img/login_image.jpg';
+
+import { login } from '../api/auth.api.js';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const auth = useAuth();
-
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -25,91 +27,89 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    const email = form.email.trim()
+    const password =  form.password
 
-    const payload = {
-      email: form.email.trim(),
-      password: form.password,
-    };
-
-    if (!payload.email || !payload.password) {
-      setError('Vui lòng nhập đầy đủ thông tin.');
+    if(!email || !password) {
+      setError('Vui lòng điền đầy đủ thông tin email và mật khẩu.');
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const res = await login(email, password);
+      const data = await res.data;
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        const detail =
-          data?.errors?.map((e) => e.message).join(', ') ||
-          data?.message ||
-          'Đăng nhập thất bại';
-        throw new Error(detail);
-      }
       auth.login({
         accessToken: data.data.token,
         user: data.data.user,
       })
 
-      if (data.data.user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/');
-      }
+      navigate(data.data.user.role === 'admin' ? '/admin/dashboard' : '/');
       } catch (err) {
-        setError(err.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+        const message = 
+          err.response?.data?.errors?.map(e => e.message).join(', ') ||
+          err.response?.data?.message ||
+          'Đã có lỗi xảy ra. Vui lòng thử lại.';
+        setError(message);
       } finally {
         setLoading(false);
       }
     };
 
   return (
-    <div className="container py-4">
-      <div className="row">
-        <div className="col-lg-6 d-flex flex-column align-items-center">
-          <img src={LoginImg} alt="login-image" className="login-image" />
-          <span className="login__note">Bạn có biết</span>
-          <span>Học tập là chìa khóa thành công?</span>
+    <div className="container login-page">
+      <div className="row h-100">
+        <div className="d-none d-lg-flex col-lg-6 login-left flex-column justify-content-center align-items-center text-center">
+          <img src={loginImg} alt="Login" className="login-left__img" />
+          <div className="login-left__content">
+            <p className="login-left__note">Bạn có biết?</p>
+            <p className="login-left__text">
+              Học tập là chìa khóa của thành công
+            </p>
+          </div>
         </div>
-        <div className="col-lg-6 d-flex justify-content-center">
-          <div className="auth-card w-100">
-            <h2 className="mb-3 auth-title">Đăng nhập ngay!</h2>
+        <div className="col-12 col-lg-6 d-flex align-items-center justify-content-center login-form">
+          <div className="login-form__container">
+            <div className="login-header text-center text-lg-start">
+              <div className="login-logo justify-content-center justify-content-lg-start">
+                <div className="login-logo__icon">🎓</div>
+                <span className="login-logo__text">StudyHub</span>
+              </div>
 
-            <button type="button" className=" login__btn">
-              <FaGoogle />
-              <span>Tiếp tục bằng Google</span>
-            </button>
+              <h2 className="login-title">Welcome back</h2>
+              <p className="login-subtitle">
+                Enter your details to access your dashboard
+              </p>
+            </div>
 
-            <div className="row g-3 mt-1">
-              <div className="col-12">
-                <button type="button" className=" login__btn">
-                  <FaFacebookF />
-                  <span>Tiếp tục bằng Facebook</span>
+            {/* SOCIAL */}
+            <div className="row g-3 mb-4">
+              <div className="col-6">
+                <button type="button" className="login-social__btn w-100">
+                  <FaGoogle /> <span>Google</span>
+                </button>
+              </div>
+              <div className="col-6">
+                <button type="button" className="login-social__btn w-100">
+                  <FaFacebookF /> <span>Facebook</span>
                 </button>
               </div>
             </div>
 
-            <div className="divider my-4">
-              <span>Hoặc đăng nhập bằng tài khoản</span>
+            {/* DIVIDER */}
+            <div className="login-divider">
+              <span>Or continue with email</span>
             </div>
 
+            {/* FORM */}
             <form onSubmit={handleSubmit}>
+
               <div className="mb-3">
-                <div className="d-flex justify-content-between align-items-baseline mb-2">
-                  <label htmlFor="email" className="form-label fw-semibold mb-0">Email</label>
-                  <small className="text-muted">bắt buộc</small>
-                </div>
+                <label className="login-label">Email</label>
                 <input
                   type="email"
-                  className="form-control login__py"
-                  id="email"
+                  className="login-input"
                   name="email"
                   placeholder="email@example.com"
                   value={form.email}
@@ -117,39 +117,46 @@ export default function LoginPage() {
                 />
               </div>
 
-              <div className="mb-2">
-                <div className="d-flex justify-content-between align-items-baseline mb-2">
-                  <label htmlFor="password" className="form-label fw-semibold mb-0">Mật khẩu</label>
-                  <small className="text-muted">bắt buộc</small>
+              <div className="mb-3">
+                <div className="d-flex justify-content-between">
+                  <label className="login-label">Password</label>
+                  <a href="/forgot-password" className="login-link">
+                    Forgot?
+                  </a>
                 </div>
+
                 <input
                   type="password"
-                  className="form-control login__py"
-                  id="password"
+                  className="login-input"
                   name="password"
-                  placeholder="Enter password"
+                  placeholder="••••••••"
                   value={form.password}
                   onChange={handleChange}
                 />
               </div>
 
-              {error && <p className="text-danger mt-2 mb-0">{error}</p>}
+              {error && <p className="text-danger mb-2">{error}</p>}
 
-              <a className="d-inline-block mt-2" href="/forgot-password">
-                Quên mật khẩu?
-              </a>
+              <div className="form-check mb-3">
+                <input className="form-check-input" type="checkbox" id="remember" />
+                <label className="form-check-label" htmlFor="remember">
+                  Keep me signed in
+                </label>
+              </div>
 
               <button
                 type="submit"
-                className="w-100 login__py mt-3 auth-submit"
+                className="login-submit"
                 disabled={loading}
               >
-                {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                {loading ? 'Đang đăng nhập...' : 'Sign In'}
               </button>
 
-              <p className="mt-4 mb-0">
-                Bạn chưa có tài khoản? <a href="/register">Đăng ký tài khoản ngay hôm nay</a>
+              <p className="login-footer">
+                Don’t have an account?{" "}
+                <a href="/auth/register">Create one</a>
               </p>
+
             </form>
           </div>
         </div>
