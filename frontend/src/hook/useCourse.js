@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
 import { courseService } from "../service/course.service";
+import { getErrorMessage } from "../helpers/error.helper.js";
 
 export const useCourses = ({ q, category, level, published, deleted, role }) => {
   const [courses, setCourses] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError("");
-
       try {
         const params = {
           q,
@@ -28,7 +26,7 @@ export const useCourses = ({ q, category, level, published, deleted, role }) => 
 
       } catch (err) {
         setCourses([]);
-        setError(err.message || "Failed to fetch courses");
+        console.error( getErrorMessage(err));
       } finally {
         setLoading(false);
       }
@@ -37,30 +35,27 @@ export const useCourses = ({ q, category, level, published, deleted, role }) => 
     fetchData();
   }, [q, category, level, published, deleted, role]);
 
-  return { courses, pendingCount, loading, error };
+  return { courses, pendingCount, loading };
 };
 
 export const useCourseDetail = (courseId) => {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if(!courseId) {
-      setCourse(false);
+      setCourse(null);
       return;
     }
 
     const fetchData = async () => {
       setLoading(true);
-      setError("");
-
       try {
         const result = await courseService.getCourseDetail(courseId);
         setCourse(result);
       }catch (err) {
         setCourse(null);
-        setError(err.message || "Failed to fetch course details");
+        console.error(getErrorMessage(err));
       } finally {
         setLoading(false);
       }
@@ -69,7 +64,7 @@ export const useCourseDetail = (courseId) => {
     fetchData();
     },[courseId]);
 
-  return { course, loading, error };
+  return { course, setCourse, loading };
 }
 
 export const useCourseForm = (initialValue = null) => {
@@ -91,8 +86,9 @@ export const useCourseForm = (initialValue = null) => {
   };
 
   const handleThumbnailChange = (file) => {
+    const preview = URL.createObjectURL(file);
     setThumbnailFile(file);
-    setThumbnailPreview(URL.createObjectURL(file));
+    setThumbnailPreview(preview);
   };
 
   const resetForm = () => {
@@ -112,45 +108,161 @@ export const useCourseForm = (initialValue = null) => {
 
 export const useCreateCourse = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const createCourse = async (courseData) => {
     setLoading(true);
-    setError("");
     try{
       const course = await courseService.createCourse(courseData);
       return course;
-    }catch (err) {
-      setError(err.message || "Failed to create course");
-      return null;
+      }catch (err) {
+        throw new Error(getErrorMessage(err));
     }finally {
       setLoading(false);
     }
   };
-  return { createCourse, loading, error };
+  return { createCourse, loading };
 }
 
 export const useUpdateCourse = (courseId) => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const updateCourse = async (updateData) => {
     if (!courseId) throw new Error("courseId is required");
     setLoading(true);
-    setError("");
     try {
       return await courseService.updateCourse(courseId, updateData);
     } catch (err) {
-      const message = err.message || "Failed to update course";
-      setError(message);
-      throw new Error(message);
+      throw new Error(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
   };
 
-  return { updateCourse, loading, error };
+  return { updateCourse, loading};
 };
 
+export const useDeleteCourse = () => {
+  const [loading, setLoading] = useState(false);
+
+  const deleteCourse = async (courseId) => {
+    setLoading(true);
+    try {
+      return await courseService.deleteCourse(courseId);
+    } catch (err) {
+      throw new Error(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { deleteCourse, loading };
+};
+
+export const useRestoreCourse = () => {
+  const [loading, setLoading] = useState(false);
+
+  const restoreCourse = async (courseId) => {
+    setLoading(true);
+    try {
+      return await courseService.restoreCourse(courseId);
+    } catch (err) {
+      throw new Error(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { restoreCourse, loading };
+};
+
+export const usePublishCourse = () => {
+  const [loading, setLoading] = useState(false);
+
+  const publishCourse = async (courseId) => {
+    setLoading(true);
+    try {
+      return await courseService.publishCourse(courseId);
+    } catch (err) {
+      throw new Error(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { publishCourse, loading };
+};
+
+export const useUnpublishCourse = () => {
+  const [loading, setLoading] = useState(false);
+
+  const unpublishCourse = async (courseId) => {
+    setLoading(true);
+    try {
+      const unpublishedCourse = await courseService.unpublishCourse(courseId);
+      return unpublishedCourse;
+    } catch (err) {
+      throw new Error(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { unpublishCourse, loading };
+};
+
+export const useEnrollCourse = () => {
+  const [loading, setLoading] = useState(false);
+
+  const enrollCourse = async (courseId) => {
+    setLoading(true);
+    try {
+      return await courseService.enrollCourse(courseId);
+    } catch (err) {
+      throw new Error(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { enrollCourse, loading };
+};
+
+export const useUnenrollCourse = () => {
+  const [loading, setLoading] = useState(false);
+
+  const unenrollCourse = async (courseId) => {
+    setLoading(true);
+    try {
+      return await courseService.unenrollCourse(courseId);
+    } catch (err) {
+      throw new Error(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { unenrollCourse, loading };
+};
+
+export const useCoursesByTeacher = () => {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchCourses = async (teacherId) => {
+    setLoading(true);
+    try {
+      const data = await courseService.getCourseByTeacherId(teacherId);
+      setCourses(data);
+      return data;
+    } catch (err) {
+      setCourses([]);
+      console.error(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { courses, loading, fetchCourses };
+};
 
   

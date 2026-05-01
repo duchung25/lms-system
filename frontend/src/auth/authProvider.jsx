@@ -4,8 +4,13 @@ import { AuthContext } from "./authContext.js";
 export default function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("accessToken"));
   const [user, setUser] = useState(() => {
+  try {
     const raw = localStorage.getItem("authUser");
-    return raw ? JSON.parse(raw) : null;
+    if (!raw || raw === "undefined") return null;
+      return JSON.parse(raw);
+  } catch {
+      return null;
+    } 
   });
 
   const isAuthenticated = !!token;

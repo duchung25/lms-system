@@ -1,23 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/useAuth';
+import { useLogin } from '../hook/useAuth';
 
 import LoginImg from '../assets/img/login_image.jpg';
 import '../assets/css/pages/loginPage.css';
 import { FaGoogle, FaFacebookF } from '../icons';
 import  loginImg from '../assets/img/login_image.jpg';
 
-import { login } from '../api/auth.api.js';
-
 export default function LoginPage() {
   const navigate = useNavigate();
-  const auth = useAuth();
+  const { login, loading } = useLogin();
+  const [error, setError] = useState(null);
   const [form, setForm] = useState({
     email: '',
     password: '',
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,7 +23,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError('')
     const email = form.email.trim()
     const password =  form.password
 
@@ -34,28 +31,18 @@ export default function LoginPage() {
       setError('Vui lòng điền đầy đủ thông tin email và mật khẩu.');
       return;
     }
-
-    setLoading(true);
     try {
-      const res = await login(email, password);
-      const data = await res.data;
-
-      auth.login({
-        accessToken: data.data.token,
-        user: data.data.user,
-      })
-
-      navigate(data.data.user.role === 'admin' ? '/admin/dashboard' : '/');
-      } catch (err) {
-        const message = 
-          err.response?.data?.errors?.map(e => e.message).join(', ') ||
-          err.response?.data?.message ||
-          'Đã có lỗi xảy ra. Vui lòng thử lại.';
-        setError(message);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const data = await login({ email, password });
+      navigate(
+        data.user.role === 'admin'
+          ? '/admin/dashboard'
+          : '/'
+      );
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err.message); 
+    }
+  };
 
   return (
     <div className="container login-page">

@@ -1,118 +1,87 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../auth/useAuth.js";
 import { useNavigate, Link } from "react-router-dom";
 
+import { useCourseDetail, useDeleteCourse, usePublishCourse, useUnpublishCourse, useEnrollCourse, useRestoreCourse } from "../hook/useCourse";
+import { useLessons } from "../hook/useLesson";
+
 export default function CourseDetail() {
-  const { user, token } = useAuth();
-  const { courseId } = useParams();
-  const [course, setCourse] = useState(null);
-  const [lessons, setLessons] = useState([]);
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const { courseId } = useParams();
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const urls = [
-          `http://localhost:5000/api/courses/${courseId}`,
-          `http://localhost:5000/api/courses/${courseId}/lessons`
-        ];
+  const [ error, setError ] = useState("");
 
-        const responses = await Promise.all(
-          urls.map(url =>
-            fetch(url, {
-              headers: {
-                Authorization: `Bearer ${token}`
-              }
-            })
-          )
-        );
-        const [courseRes, lessonsRes] = await Promise.all(
-          responses.map(res => res.json())
-        );
-        if (!responses[0].ok) throw new Error(courseRes.message);
-        if (!responses[1].ok) throw new Error(lessonsRes.message);
-        console.log("courseRes:", courseRes);
-        setCourse(courseRes.data.course);
-        setLessons(lessonsRes.data.lessons);
-        
+  const { course, setCourse, loading: courseLoading } = useCourseDetail(courseId);
+  const { lessons, loading: lessonsLoading } = useLessons(courseId);
+  const { deleteCourse, loading: deleting } = useDeleteCourse();
+  const { publishCourse, loading: publishing } = usePublishCourse();
+  const { unpublishCourse, loading: unpublishing } = useUnpublishCourse();
+  const { enrollCourse, loading: enrolling } = useEnrollCourse();
+  const { restoreCourse, loading: restoring } = useRestoreCourse();
 
-      } catch (err) {
-        alert(err.message);
-      } finally {
-        setLoading(false);
+  const pageLoading = courseLoading || lessonsLoading;
+  const loading =  deleting || publishing || unpublishing || enrolling || restoring;
+
+  const handlePublishToggle = async () => {
+    let publishedCourse;
+    try{
+      const action = course.isPublished ? "unpublish" : "publish";
+      if(action === "publish") {
+          publishedCourse = await publishCourse(courseId);
+        }
+      else {
+        publishedCourse = await unpublishCourse(courseId);
       }
+      setCourse(publishedCourse);
+    } catch (error) {
+      setError(error.message);
     }
-    fetchData();
-  }, [courseId, token]);
-  function handlePublishToggle() {
-    const action = course.isPublished ? "unpublish" : "publish";
-    fetch(`http://localhost:5000/api/courses/${courseId}/${action}`, {
-      method: "PATCH",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        setCourse(data.data.course);
-      });
   };
-  function handleDeleteCourse() {
-    fetch(`http://localhost:5000/api/courses/${courseId}`, {
-      method: "DELETE",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        alert(data.message);
-        navigate("/admin/courses");
-      })
-      .catch(() => alert("Failed to delete course"));
-  };
-  function handleRestoreCourse() {
-    fetch(`http://localhost:5000/api/courses/${courseId}/restore`, {
-      method: "PATCH",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }    })
-      .then(res => res.json())
-      .then(data => {
-        alert(data.message);
-        navigate("/admin/courses?deleted=true");
-      })
-      .catch(() => alert("Failed to restore course"));
-  };
-  async function handleEnrollCourse() {
-    if(user.role !== "student"){
-      return;
+
+  const handleDeleteCourse = async () => {
+    try{
+      await deleteCourse(courseId);
+      navigate(user.role === "admin" ? "/admin/courses" : "/courses/my-courses");
+    } catch (error) {
+      setError(error.message);
     }
+  };
+  const handleRestoreCourse = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/enrollments/${courseId}`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await restoreCourse(courseId);
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message );
-      }
-      if (data.data.firstLessonId) {
-        navigate(`/courses/${courseId}/lessons/${data.data.firstLessonId}`);
+      navigate("/admin/courses?deleted=true");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleEnrollCourse = async () => {
+    if (user.role !== "student") return;
+
+    try {
+      const data = await enrollCourse(courseId);
+      console.log("Enrollment successful:", data);
+      if (data.firstLessonId) {
+        navigate(
+          `/courses/${courseId}/lessons/${data.firstLessonId}`
+        );
       } else {
         alert("Enrolled successfully, but no lessons available yet");
       }
-
-    } catch (error) {
-      alert("Failed to enroll in course: " + error.message);
+    } catch (err) {
+      setError(err.message);
     }
-  }
+  };
 
-  if (loading) return <div className="text-center mt-5">Loading...</div>;
+  if (pageLoading) return <div className="text-center mt-5">Loading...</div>;
   if (!course) return <div className="text-center mt-5">Course not found</div>;
+  {error && (
+      <div className="alert alert-danger">{error}
+      </div>
+  )};
 
   return (
     <div className="container py-4">
@@ -141,7 +110,8 @@ export default function CourseDetail() {
                   className={`btn btn-glass-dark btn-sm`}
                   onClick={handlePublishToggle}
                   value={courseId}
-                >
+                  disabled={loading}
+                  >
                   {course.isPublished ? "Unpublish" : "Publish"}
                 </button>
               )}

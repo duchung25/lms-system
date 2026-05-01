@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegisterImg from '../assets/img/register_image.jpg';
-// Tái sử dụng file CSS của Login
 import '../assets/css/pages/loginPage.css'; 
-import { register } from '../api/auth.api.js';
+import { useRegister } from '../hook/useAuth.js';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { register, loading } = useRegister();
   const [form, setForm] = useState({
     username: '',
     email: '',
     password: '',
   });
-
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -36,26 +34,17 @@ export default function RegisterPage() {
       return;
     }
 
-    setLoading(true);
-    try {
-      await register(payload.username, payload.email, payload.password);
-      setForm({ username: '', email: '', password: '' });
+    try{
+      await register(payload);
       navigate('/auth/login');
     } catch (err) {
-      const message = 
-        err.response?.data?.errors?.map(e => e.message).join(', ') ||
-        err.response?.data?.message ||
-        'Đã có lỗi xảy ra. Vui lòng thử lại.';
-      setError(message);
-    } finally {
-      setLoading(false);
+      setError(err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
     }
   };
 
   return (
     <div className="container login-page">
       <div className="row h-100">
-        {/* BÊN TRÁI: IMAGE (Giống Login) */}
         <div className="d-none d-lg-flex col-lg-6 login-left flex-column justify-content-center align-items-center text-center">
           <img src={RegisterImg} alt="Register" className="login-left__img" />
           <div className="login-left__content">
@@ -66,7 +55,6 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* BÊN PHẢI: FORM (Giống Login) */}
         <div className="col-12 col-lg-6 d-flex align-items-center justify-content-center login-form">
           <div className="login-form__container">
             <div className="login-header text-center text-lg-start">
@@ -81,7 +69,6 @@ export default function RegisterPage() {
             </div>
 
             <form onSubmit={handleSubmit}>
-              {/* USERNAME */}
               <div className="mb-3">
                 <label className="login-label">Username</label>
                 <input
@@ -93,8 +80,6 @@ export default function RegisterPage() {
                   onChange={handleChange}
                 />
               </div>
-
-              {/* EMAIL */}
               <div className="mb-3">
                 <label className="login-label">Email</label>
                 <input
@@ -106,8 +91,6 @@ export default function RegisterPage() {
                   onChange={handleChange}
                 />
               </div>
-
-              {/* PASSWORD */}
               <div className="mb-3">
                 <label className="login-label">Mật khẩu</label>
                 <input
@@ -122,9 +105,7 @@ export default function RegisterPage() {
                   Ít nhất 8 ký tự, có ký tự đặc biệt
                 </p>
               </div>
-
               {error && <p className="text-danger mb-2">{error}</p>}
-
               <button
                 type="submit"
                 className="login-submit mt-2"
@@ -132,7 +113,6 @@ export default function RegisterPage() {
               >
                 {loading ? 'Đang đăng ký...' : 'Đăng ký'}
               </button>
-
               <div className="login-footer">
                 <p className="small mb-3">
                   Bằng việc đăng ký, bạn đồng ý với{' '}
