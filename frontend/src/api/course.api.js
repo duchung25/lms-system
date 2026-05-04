@@ -33,5 +33,17 @@ export const courseApi = {
     },
     unenrollCourse: (courseId) => {
         return apiClient.delete(`/enrollments/${courseId}`);
-    }
+    },
+    updateLearningProgress: (courseId, lessonId) => {
+        return apiClient.patch(`/enrollments/${courseId}/progress`, { lessonId });
+    },
+    completeLesson: (courseId, lessonId) => {
+        return apiClient.patch(`/enrollments/${courseId}/lessons/${lessonId}/complete`);
+    },
+    getMyCourses: () => {
+        return apiClient.get(`/courses/my-courses`);
+    },
+    getEnrolledCourses: () => {
+        return apiClient.get(`/enrollments/enrolled`);
+    },
 }

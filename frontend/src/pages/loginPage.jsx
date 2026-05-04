@@ -9,8 +9,8 @@ import  loginImg from '../assets/img/login_image.jpg';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, loading } = useLogin();
-  const [error, setError] = useState(null);
+  const { login, loading, error } = useLogin();
+  const [validationError, setValidationError] = useState("");
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -23,12 +23,11 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('')
+    setValidationError("");
     const email = form.email.trim()
     const password =  form.password
-
-    if(!email || !password) {
-      setError('Vui lòng điền đầy đủ thông tin email và mật khẩu.');
+    if (!email || !password) {
+      setValidationError('Vui lòng nhập đầy đủ thông tin.');
       return;
     }
     try {
@@ -39,8 +38,7 @@ export default function LoginPage() {
           : '/'
       );
     } catch (err) {
-      console.error('Login error:', err);
-      setError(err.message); 
+      console.error(err);
     }
   };
 
@@ -70,7 +68,6 @@ export default function LoginPage() {
               </p>
             </div>
 
-            {/* SOCIAL */}
             <div className="row g-3 mb-4">
               <div className="col-6">
                 <button type="button" className="login-social__btn w-100">
@@ -84,12 +81,10 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* DIVIDER */}
             <div className="login-divider">
               <span>Or continue with email</span>
             </div>
 
-            {/* FORM */}
             <form onSubmit={handleSubmit}>
 
               <div className="mb-3">
@@ -122,7 +117,10 @@ export default function LoginPage() {
                 />
               </div>
 
-              {error && <p className="text-danger mb-2">{error}</p>}
+              {validationError
+                ? <p className="text-danger mb-2">{validationError}</p>
+                : error && <p className="text-danger mb-2">{error}</p>
+              }
 
               <div className="form-check mb-3">
                 <input className="form-check-input" type="checkbox" id="remember" />

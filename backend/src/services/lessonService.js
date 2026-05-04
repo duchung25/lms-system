@@ -1,6 +1,8 @@
 import Lesson from "../models/Lesson.js";
 import Course from "../models/Course.js";
+import Enrollment from "../models/Enrollment.js";
 import AppError from "../utils/AppError.js";
+import enrollmentService from "./enrollmentService.js";
 
 const LessonService = {
     async createLesson(courseid, data, user ){
@@ -18,14 +20,48 @@ const LessonService = {
         if(user?.role === "student"){
             query.isPublished = true;
         }
-        const course = await Course.findOne(query).lean();
+        const course = await Course.findWithDeleted(query).lean();
         if(!course){
             throw new AppError("Course not found", 404);
         }
-        return await Lesson.find({ courseId })
+        const lessonQuery = { courseId };
+        if(user?.role === "student"){
+            lessonQuery.isPublished = true;
+        }
+        const lessons = await Lesson.find(lessonQuery)
         .select("_id title order duration ")
         .sort({ order: 1 })
         .lean();
+
+        if(user?.role !== "student"){
+            return lessons;
+        }
+
+        const enrollment = await Enrollment.findOne({
+            courseId,
+            studentId: user.userId,
+            status: "active"
+        }).lean();
+        if(!enrollment){
+            return lessons.map((lesson, index) => ({
+                ...lesson,
+                isCompleted: false,
+                isLocked: index !== 0
+            }));
+        }
+
+        const completedIds = new Set((enrollment.completedLessonIds || []).map(id => id.toString()));
+        return lessons.map((lesson, index) => {
+            const previousLesson = lessons[index - 1];
+            const isCompleted = completedIds.has(lesson._id.toString());
+            const canAccess = index === 0 || isCompleted || completedIds.has(previousLesson?._id.toString());
+            return {
+                ...lesson,
+                isCompleted,
+                isCurrent: enrollment.currentLessonId?.toString() === lesson._id.toString(),
+                isLocked: !canAccess
+            };
+        });
     },
     async getPublishedLessonsByCourse(courseId){
         const course = await Course.findById(courseId);
@@ -40,7 +76,7 @@ const LessonService = {
         .sort({ order: 1 })
         .lean();
     },
-    async getLessonDetail(courseId, lessonId){
+    async getLessonDetail(courseId, lessonId, user){
         const lesson = await Lesson.findById(lessonId).select("title videoUrl createdAt courseId isPublished").lean();
         if(!lesson){
             throw new AppError("Lesson not found", 404);
@@ -51,6 +87,12 @@ const LessonService = {
         const course = await Course.findById(lesson.courseId);
         if(!course.isPublished){
             throw new AppError("Course is not published yet", 400);
+        }
+        if(user?.role === "student"){
+            const canAccess = await enrollmentService.canAccessLesson(courseId, user.userId, lessonId);
+            if(!canAccess){
+                throw new AppError("Please complete the previous lesson before opening this lesson", 403);
+            }
         }
         return lesson;
     },

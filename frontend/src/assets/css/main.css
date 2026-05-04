@@ -15,4 +15,6 @@
 @import "./domain/course-card.css";
 @import "./domain/progress.css";
 
+@import "./components/toast.css";
+
 

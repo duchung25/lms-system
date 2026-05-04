@@ -3,8 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 import '../assets/css/pages/createCoursePage.css';
 
+
 export default function LessonForm() {
-    const { token } = useAuth();
+  const { token } = useAuth();
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
   const isUpdateMode = !!lessonId;

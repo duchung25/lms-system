@@ -1,55 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
+import { useMyCourses } from "../hook/useCourse.js";
 import '../assets/css/components/card.css';
 
 export default function MyCoursesPage() {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [params] = useSearchParams();
   const q = (params.get("q") || "").toLowerCase().trim(); 
 
-  const [coursesData, setCoursesData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const getCoursesApiUrl = () => {
-      return "http://localhost:5000/api/courses/my-courses";
-  };
-    const fetchCourses = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const res = await fetch(getCoursesApiUrl(), {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
-        if (!res.ok) {
-          throw new Error("Failed to fetch courses");
-        }
-        const data = await res.json();
-        setCoursesData(Array.isArray(data.data.courses) ? data.data.courses : []);
-        console.log("Fetched courses:", data.data.courses);
-      } catch (error) {
-        console.error("Error fetching courses:", error);
-        setCoursesData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourses();
-  }, [token, user?.role]);
+  const { courses, loading: coursesLoading, error } = useMyCourses();
   
-  const courses = useMemo(() => {
-    if(!q) return coursesData;
-    return coursesData.filter((c) =>
+  const filteredCourses = useMemo(() => {
+    if(!q) return courses;
+    return courses.filter((c) =>
       (c.title || "").toLowerCase().includes(q)
     );
-  }, [q, coursesData]);
+  }, [q, courses]);
 
-  if (loading) {
+  if (coursesLoading) {
     return <div>Đang tải...</div>;
   }
   if (error) {
@@ -71,10 +40,10 @@ export default function MyCoursesPage() {
             </Link>
           </div>
         )}
-        {courses.length === 0 && !loading && (
+        {courses.length === 0 && !coursesLoading && (
             <div className="text-center text-muted my-5">Không có khóa học nào.</div>
           )}
-        {courses.map((c) => (
+        {filteredCourses.map((c) => (
             <div key={c._id} className="col-12 col-sm-6 col-lg-3">
             <Link 
               to={`/courses/${c._id}`} 

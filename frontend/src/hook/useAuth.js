@@ -5,10 +5,12 @@ import { useAuth } from '../auth/useAuth';
 
 export const useLogin = () => {
     const [ loading, setLoading ] = useState(false);
+    const [error, setError] = useState("");
     const auth = useAuth();
 
     const login = async (payLoad) => {
         setLoading(true);
+        setError("");
         try{
             const res = await authService.login(payLoad);
             auth.login({
@@ -17,25 +19,31 @@ export const useLogin = () => {
             });
             return res;
         } catch (err) {
-            throw new Error(getErrorMessage(err) || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+            const message = getErrorMessage(err) || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+            setError(message);
+            throw new Error(message);
         } finally {
             setLoading(false);
         }
     };
-    return { login, loading };
+    return { login, loading, error };
 };
 export const useRegister = () => {
     const [ loading, setLoading ] = useState(false);
+    const [error, setError] = useState("");
     const register = async (payLoad) => {
         setLoading(true);
+        setError("");
         try{
             const res = await authService.register(payLoad);
             return res;
         }catch (err) {
-            throw new Error(getErrorMessage(err) || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+            const message = getErrorMessage(err) || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+            setError(message);
+            throw new Error(message);
         } finally {
             setLoading(false);
         }
     };
-    return { register, loading };
+    return { register, loading, error };
 };

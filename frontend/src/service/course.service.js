@@ -62,4 +62,28 @@ export const courseService = {
     const res = await courseApi.unenrollCourse(courseId);
     return res.data?.data ?? null;
   },
+
+  async updateLearningProgress(courseId, lessonId) {
+    const res = await courseApi.updateLearningProgress(courseId, lessonId);
+    return res.data?.data?.enrollment ?? null;
+  },
+
+  async completeLesson(courseId, lessonId) {
+    const res = await courseApi.completeLesson(courseId, lessonId);
+    return res.data?.data ?? null;
+  },
+
+  async getMyCourses() {
+    const res = await courseApi.getMyCourses();
+    return Array.isArray(res.data?.data?.courses)
+      ? res.data.data.courses
+      : [];
+  },
+
+  async getEnrolledCourses() {
+    const res = await courseApi.getEnrolledCourses();
+    return Array.isArray(res.data?.data?.courses)
+      ? res.data.data.courses
+      : [];
+  }
 };

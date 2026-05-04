@@ -1,59 +1,60 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useLessons, useLessonDetail } from "../hook/useLesson.js";
+import { useCompleteLesson, useUpdateLearningProgress } from "../hook/useCourse.js";
 import { useAuth } from "../auth/useAuth.js";
-import { useParams } from "react-router-dom";
+
 
 export default function LessonDetail() {
-  const { token } = useAuth();
   const { courseId, lessonId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [lessonAction, setLessonAction] = useState({
+    lessonId: null,
+    error: "",
+    message: "",
+    completed: false,
+  });
 
-  const [lesson, setLesson] = useState(null);
-  const [lessons, setLessons] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {lessons, loading: lessonsLoading, error: lessonsError} = useLessons(courseId);
+  const {lesson, loading: lessonLoading, error: lessonError} = useLessonDetail(courseId, lessonId);
+  const { updateLearningProgress } = useUpdateLearningProgress();
+  const { completeLesson, loading: completing } = useCompleteLesson();
+  const loading = lessonsLoading || lessonLoading;
+  const error = lessonsError || lessonError;
+  const activeLesson = lessons.find((l) => l._id === lessonId);
+  const currentLessonAction = lessonAction.lessonId === lessonId ? lessonAction : null;
+  const isLessonCompleted = currentLessonAction?.completed || activeLesson?.isCompleted;
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [detailRes, listRes] = await Promise.all([
-          fetch(
-            `http://localhost:5000/api/courses/${courseId}/lessons/${lessonId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          ),
-          fetch(
-            `http://localhost:5000/api/courses/${courseId}/lessons`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          ),
-        ]);
+    if (user?.role !== "student" || !courseId || !lessonId || !lesson) return;
 
-        const detailData = await detailRes.json();
-        const listData = await listRes.json();
+    updateLearningProgress(courseId, lessonId).catch(() => {});
+  }, [courseId, lessonId, lesson, updateLearningProgress, user?.role]);
 
-        if (!detailRes.ok || !listRes.ok) {
-          throw new Error("Failed to fetch data");
-        }
+  const handleCompleteLesson = async () => {
+    if (user?.role !== "student") return;
 
-        setLesson(detailData.data.lesson);
-        setLessons(listData.data.lessons);
-      } catch (err) {
-        console.error(err);
-        setLesson(null);
-        setLessons([]);
-      } finally {
-        setLoading(false);
+    try {
+      setLessonAction({ lessonId, error: "", message: "", completed: false });
+      const result = await completeLesson(courseId, lessonId);
+      setLessonAction({ lessonId, error: "", message: "", completed: true });
+
+      if (result?.nextLessonId) {
+        navigate(`/courses/${courseId}/lessons/${result.nextLessonId}`);
+        return;
       }
-    };
 
-    if (courseId && lessonId && token) {
-      fetchData();
+      setLessonAction({
+        lessonId,
+        error: "",
+        message: "Bạn đã hoàn thành khóa học này.",
+        completed: true,
+      });
+    } catch (err) {
+      setLessonAction({ lessonId, error: err.message, message: "", completed: false });
     }
-  }, [courseId, lessonId, token]);
+  };
 
   if (loading) {
     return (
@@ -61,6 +62,10 @@ export default function LessonDetail() {
         <div className="spinner-border text-primary" />
       </div>
     );
+  }
+
+  if (error) {
+      return <div className="alert alert-danger">Error: {error}</div>;
   }
 
   if (!lesson) {
@@ -99,6 +104,20 @@ export default function LessonDetail() {
               {new Date(lesson.createdAt).toLocaleDateString("vi-VN")}
             </div>
 
+            {user?.role === "student" && (
+              <div className="d-flex flex-column flex-sm-row gap-2 align-items-sm-center mb-3">
+                <button
+                  className="btn btn-primary"
+                  onClick={handleCompleteLesson}
+                  disabled={completing || isLessonCompleted}
+                >
+                  {isLessonCompleted ? "Đã hoàn thành" : "Hoàn thành bài học"}
+                </button>
+                {currentLessonAction?.message && <span className="text-success small">{currentLessonAction.message}</span>}
+                {currentLessonAction?.error && <span className="text-danger small">{currentLessonAction.error}</span>}
+              </div>
+            )}
+
             <hr />
 
             <div
@@ -130,9 +149,11 @@ export default function LessonDetail() {
               return (
                 <button
                   key={l._id}
-                  onClick={() =>
-                    (window.location.href = `/courses/${courseId}/lessons/${l._id}`)
-                  }
+                  onClick={() => {
+                    if (l.isLocked) return;
+                    navigate(`/courses/${courseId}/lessons/${l._id}`);
+                  }}
+                  disabled={l.isLocked}
                   className={`list-group-item list-group-item-action border-0 py-3 ${
                     isActive ? "active" : ""
                   }`}
@@ -143,7 +164,7 @@ export default function LessonDetail() {
                   <div className="d-flex flex-column">
                     <span className="fw-medium">{l.title}</span>
                     <small className={isActive ? "text-white-50" : "text-muted"}>
-                      Tap to view lesson
+                      {l.isCompleted ? "Đã hoàn thành" : l.isLocked ? "Bị khóa" : "Tap to view lesson"}
                     </small>
                   </div>
                 </button>

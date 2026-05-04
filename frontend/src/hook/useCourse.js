@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { courseService } from "../service/course.service";
 import { getErrorMessage } from "../helpers/error.helper.js";
 
@@ -6,10 +6,13 @@ export const useCourses = ({ q, category, level, published, deleted, role }) => 
   const [courses, setCourses] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setError("");
+
       try {
         const params = {
           q,
@@ -23,10 +26,12 @@ export const useCourses = ({ q, category, level, published, deleted, role }) => 
 
         setCourses(result.list);
         setPendingCount(result.pendingCount);
-
       } catch (err) {
         setCourses([]);
-        console.error( getErrorMessage(err));
+        setError(
+          getErrorMessage(err) ||
+            "Đã có lỗi xảy ra. Vui lòng thử lại."
+        );
       } finally {
         setLoading(false);
       }
@@ -35,54 +40,115 @@ export const useCourses = ({ q, category, level, published, deleted, role }) => 
     fetchData();
   }, [q, category, level, published, deleted, role]);
 
-  return { courses, pendingCount, loading };
+  return { courses, pendingCount, loading, error };
 };
 
 export const useCourseDetail = (courseId) => {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if(!courseId) {
+    if (!courseId) {
       setCourse(null);
       return;
     }
 
     const fetchData = async () => {
       setLoading(true);
+      setError("");
+
       try {
         const result = await courseService.getCourseDetail(courseId);
         setCourse(result);
-      }catch (err) {
+      } catch (err) {
         setCourse(null);
-        console.error(getErrorMessage(err));
+        setError(getErrorMessage(err));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-    },[courseId]);
+  }, [courseId]);
 
-  return { course, setCourse, loading };
-}
+  return { course, setCourse, loading, error };
+};
+
+export const useCoursesByTeacher = () => {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const fetchCourses = async (teacherId) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const data = await courseService.getCourseByTeacherId(teacherId);
+      setCourses(data);
+      return data;
+    } catch (err) {
+      setCourses([]);
+      setError(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { courses, loading, fetchCourses, error };
+};
+
+export const useMyCourses = () => {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchMyCourses = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const data = await courseService.getMyCourses();
+        setCourses(data);
+      } catch (err) {
+        setCourses([]);
+        setError(
+          getErrorMessage(err) ||
+            "Đã có lỗi xảy ra. Vui lòng thử lại."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyCourses();
+  }, []);
+
+  return { courses, loading, error };
+};
 
 export const useCourseForm = (initialValue = null) => {
   const [formData, setFormData] = useState(
     initialValue || {
-    title: "",
-    description: "",
-    category: "",
-    level: "beginner",
-    price: 0,
-    thumbnail: ""  
+      title: "",
+      description: "",
+      category: "",
+      level: "beginner",
+      price: 0,
+      thumbnail: "",
     }
   );
+
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState("");
 
   const updateField = (key, value) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
+    setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleThumbnailChange = (file) => {
@@ -98,47 +164,66 @@ export const useCourseForm = (initialValue = null) => {
       category: "",
       level: "beginner",
       price: 0,
-      thumbnail: ""
+      thumbnail: "",
     });
     setThumbnailFile(null);
     setThumbnailPreview("");
   };
-  return { formData, setFormData, updateField, resetForm, thumbnailFile, setThumbnailFile, thumbnailPreview, setThumbnailPreview, handleThumbnailChange };
-}
+
+  return {
+    formData,
+    setFormData,
+    updateField,
+    resetForm,
+    thumbnailFile,
+    setThumbnailFile,
+    thumbnailPreview,
+    setThumbnailPreview,
+    handleThumbnailChange,
+  };
+};
+
 
 export const useCreateCourse = () => {
   const [loading, setLoading] = useState(false);
 
   const createCourse = async (courseData) => {
     setLoading(true);
-    try{
-      const course = await courseService.createCourse(courseData);
-      return course;
-      }catch (err) {
-        throw new Error(getErrorMessage(err));
-    }finally {
+    try {
+      return await courseService.createCourse(courseData);
+    } catch (err) {
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
+    } finally {
       setLoading(false);
     }
   };
+
   return { createCourse, loading };
-}
+};
 
 export const useUpdateCourse = (courseId) => {
   const [loading, setLoading] = useState(false);
 
   const updateCourse = async (updateData) => {
     if (!courseId) throw new Error("courseId is required");
+
     setLoading(true);
     try {
       return await courseService.updateCourse(courseId, updateData);
     } catch (err) {
-      throw new Error(getErrorMessage(err));
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  return { updateCourse, loading};
+  return { updateCourse, loading };
 };
 
 export const useDeleteCourse = () => {
@@ -149,7 +234,10 @@ export const useDeleteCourse = () => {
     try {
       return await courseService.deleteCourse(courseId);
     } catch (err) {
-      throw new Error(getErrorMessage(err));
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
@@ -166,7 +254,10 @@ export const useRestoreCourse = () => {
     try {
       return await courseService.restoreCourse(courseId);
     } catch (err) {
-      throw new Error(getErrorMessage(err));
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
@@ -183,7 +274,10 @@ export const usePublishCourse = () => {
     try {
       return await courseService.publishCourse(courseId);
     } catch (err) {
-      throw new Error(getErrorMessage(err));
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
@@ -198,10 +292,12 @@ export const useUnpublishCourse = () => {
   const unpublishCourse = async (courseId) => {
     setLoading(true);
     try {
-      const unpublishedCourse = await courseService.unpublishCourse(courseId);
-      return unpublishedCourse;
+      return await courseService.unpublishCourse(courseId);
     } catch (err) {
-      throw new Error(getErrorMessage(err));
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
@@ -218,7 +314,10 @@ export const useEnrollCourse = () => {
     try {
       return await courseService.enrollCourse(courseId);
     } catch (err) {
-      throw new Error(getErrorMessage(err));
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
@@ -235,7 +334,10 @@ export const useUnenrollCourse = () => {
     try {
       return await courseService.unenrollCourse(courseId);
     } catch (err) {
-      throw new Error(getErrorMessage(err));
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
@@ -244,25 +346,75 @@ export const useUnenrollCourse = () => {
   return { unenrollCourse, loading };
 };
 
-export const useCoursesByTeacher = () => {
-  const [courses, setCourses] = useState([]);
+export const useUpdateLearningProgress = () => {
   const [loading, setLoading] = useState(false);
 
-  const fetchCourses = async (teacherId) => {
+  const updateLearningProgress = useCallback(async (courseId, lessonId) => {
     setLoading(true);
     try {
-      const data = await courseService.getCourseByTeacherId(teacherId);
-      setCourses(data);
-      return data;
+      return await courseService.updateLearningProgress(courseId, lessonId);
     } catch (err) {
-      setCourses([]);
-      console.error(getErrorMessage(err));
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  return { courses, loading, fetchCourses };
+  return { updateLearningProgress, loading };
 };
 
-  
+export const useCompleteLesson = () => {
+  const [loading, setLoading] = useState(false);
+
+  const completeLesson = useCallback(async (courseId, lessonId) => {
+    setLoading(true);
+    try {
+      return await courseService.completeLesson(courseId, lessonId);
+    } catch (err) {
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { completeLesson, loading };
+};
+
+export const useEnrolledCourses = (enabled = true) => {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!enabled) {
+      setCourses([]);
+      setLoading(false);
+      return;
+    }
+
+    const fetchEnrolledCourses = async () => {
+      setLoading(true);
+      setError("");
+
+      try{
+        const data = await courseService.getEnrolledCourses();
+        setCourses(data);
+      } catch (err) {
+        setCourses([]);
+        setError(getErrorMessage(err) || "Đã có lỗi xảy ra. Vui lòng thử lại.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEnrolledCourses();
+  }, [enabled]);
+
+  return { courses, loading, error };
+};

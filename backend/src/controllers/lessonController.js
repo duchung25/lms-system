@@ -49,7 +49,7 @@ const LessonController = {
         try{
             const lessonId = req.params.lessonId;
             const courseId = req.params.courseId;
-            const lesson = await LessonService.getLessonDetail(courseId, lessonId);
+            const lesson = await LessonService.getLessonDetail(courseId, lessonId, req.user);
             res.status(200).json({
                 success: true,
                 message: "Lesson retrieved successfully",

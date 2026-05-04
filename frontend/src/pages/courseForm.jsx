@@ -4,14 +4,18 @@
     import '../assets/css/pages/createCoursePage.css';
 
     import { useCreateCourse, useUpdateCourse } from "../hook/useCourse";
+    import Toast from "../components/toast/toast";
 
     export default function CreateCoursePage() {
         const { token } = useAuth();
         const navigate = useNavigate();
         const { courseId } = useParams();
+
         const isUpdateMode = !!courseId;
         const [thumbnail, setThumbnail] = useState(null);
         const [thumbnailUrl, setThumbnailUrl] = useState("");
+        const [toast, setToast] = useState(null);
+
         const [form, setForm] = useState({
         title: "",
         description: "",
@@ -75,7 +79,7 @@
             const data = await res.json();
             imageUrl = data.secure_url;
             } catch (err) {
-            alert("Lỗi upload ảnh: " + err.message);
+            setToast({ message: "Lỗi upload ảnh: " + err.message, type: "error" });
             return;
             }
         }
@@ -87,9 +91,9 @@
                 await createCourse({ ...form, thumbnail: imageUrl });
             }
             if(isUpdateMode){
-                alert("Cập nhật khóa học thành công!");
+                navigate(`/courses/${courseId}`);
             } else {
-                alert("Tạo khóa học thành công!");
+                setToast({ message: "Tạo khóa học thành công!", type: "success" });
             }
             setForm({
                 title: "",
@@ -100,9 +104,8 @@
             });
             setThumbnail(null);
             setThumbnailUrl("");
-            navigate("/courses/my-courses");
         } catch (err) {
-            console.error("Error:", err);
+            setToast({ message: err.message, type: "error" });
         } finally {
             setLoading(false);
         }
@@ -111,6 +114,9 @@
 
          return (
             <div className="container py-4 create-course-container">
+            {toast && (
+                <Toast message={toast.message} type={toast.type} onClose={setToast.bind(null, null)} />
+            )}
             <div className="d-flex align-items-center justify-content-between mb-3">
                 <h3 className="m-0 create-course-title">
                 {isUpdateMode ? "Chỉnh sửa khóa học" : "Thêm khóa học"}

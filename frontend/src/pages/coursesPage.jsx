@@ -72,6 +72,13 @@ export default function CoursesPage() {
   if (error) {
     return <div className="text-danger">Lỗi: {error}</div>;
   }
+  if(filterCourse.length === 0) {
+    return (
+      <div className="container py-4 text-center text-muted">
+        <p>Không tìm thấy khóa học nào phù hợp.</p>
+      </div>
+    );
+  }
 
   return (
     <div>

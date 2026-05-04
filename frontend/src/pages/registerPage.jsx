@@ -6,13 +6,13 @@ import { useRegister } from '../hook/useAuth.js';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const { register, loading } = useRegister();
+  const { register, loading, error } = useRegister();
+  const [ validationError, setValidationError ] = useState("");
   const [form, setForm] = useState({
     username: '',
     email: '',
     password: '',
   });
-  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,24 +21,21 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-
+    setValidationError("");
     const payload = {
       username: form.username.trim(),
       email: form.email.trim(),
       password: form.password,
     };
-
     if (!payload.username || !payload.email || !payload.password) {
-      setError('Vui lòng nhập đầy đủ thông tin.');
+      setValidationError('Vui lòng nhập đầy đủ thông tin.');
       return;
     }
-
     try{
       await register(payload);
       navigate('/auth/login');
     } catch (err) {
-      setError(err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+      console.error(err);
     }
   };
 
@@ -105,7 +102,10 @@ export default function RegisterPage() {
                   Ít nhất 8 ký tự, có ký tự đặc biệt
                 </p>
               </div>
-              {error && <p className="text-danger mb-2">{error}</p>}
+              {validationError
+                ? <p className="text-danger mb-2">{validationError}</p>
+                : error && <p className="text-danger mb-2">{error}</p>
+              }
               <button
                 type="submit"
                 className="login-submit mt-2"

@@ -2,26 +2,32 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../auth/useAuth.js";
 import { useNavigate, Link } from "react-router-dom";
+import Toast from "../components/toast/toast.jsx";
 
 import { useCourseDetail, useDeleteCourse, usePublishCourse, useUnpublishCourse, useEnrollCourse, useRestoreCourse } from "../hook/useCourse";
 import { useLessons } from "../hook/useLesson";
+import { useEnrolledCourses } from "../hook/useCourse";
 
 export default function CourseDetail() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { courseId } = useParams();
 
-  const [ error, setError ] = useState("");
 
-  const { course, setCourse, loading: courseLoading } = useCourseDetail(courseId);
-  const { lessons, loading: lessonsLoading } = useLessons(courseId);
+  const { course, setCourse, loading: courseLoading, error: courseError } = useCourseDetail(courseId);
+  const { lessons, loading: lessonsLoading, error: lessonsError } = useLessons(courseId);
   const { deleteCourse, loading: deleting } = useDeleteCourse();
   const { publishCourse, loading: publishing } = usePublishCourse();
   const { unpublishCourse, loading: unpublishing } = useUnpublishCourse();
   const { enrollCourse, loading: enrolling } = useEnrollCourse();
   const { restoreCourse, loading: restoring } = useRestoreCourse();
-
-  const pageLoading = courseLoading || lessonsLoading;
+  const { courses, loading: enrolledLoading } = useEnrolledCourses(user?.role === "student");
+  const enrolledCourse = courses?.find(ec => (ec._id || ec.courseId) === courseId);
+  const isEnrolled = Boolean(enrolledCourse);
+  const firstLessonId = enrolledCourse?.firstLessonId || lessons?.[0]?._id || null;
+  const continueLessonId = enrolledCourse?.currentLessonId || firstLessonId;
+  const [ toast, setToast ] = useState(null);
+  const pageLoading = courseLoading || lessonsLoading || (user?.role === "student" && enrolledLoading);
   const loading =  deleting || publishing || unpublishing || enrolling || restoring;
 
   const handlePublishToggle = async () => {
@@ -35,17 +41,18 @@ export default function CourseDetail() {
         publishedCourse = await unpublishCourse(courseId);
       }
       setCourse(publishedCourse);
+      setToast({ message: `Course ${action}ed successfully`, type: "success" });
     } catch (error) {
-      setError(error.message);
+      setToast({ message: error.message, type: "error" });
     }
   };
 
   const handleDeleteCourse = async () => {
     try{
       await deleteCourse(courseId);
-      navigate(user.role === "admin" ? "/admin/courses" : "/courses/my-courses");
+      user.role === "admin" ? navigate("/admin/courses?deleted=true") : navigate("/courses/my-courses");
     } catch (error) {
-      setError(error.message);
+      setToast({ message: error.message, type: "error" });
     }
   };
   const handleRestoreCourse = async () => {
@@ -54,37 +61,39 @@ export default function CourseDetail() {
 
       navigate("/admin/courses?deleted=true");
     } catch (err) {
-      setError(err.message);
+      setToast({ message: err.message, type: "error" });
     }
   };
 
   const handleEnrollCourse = async () => {
     if (user.role !== "student") return;
-
     try {
       const data = await enrollCourse(courseId);
-      console.log("Enrollment successful:", data);
-      if (data.firstLessonId) {
-        navigate(
-          `/courses/${courseId}/lessons/${data.firstLessonId}`
-        );
-      } else {
-        alert("Enrolled successfully, but no lessons available yet");
+      const lessonId = data.currentLessonId || data.firstLessonId || firstLessonId;
+      if (!lessonId) {
+        setToast({ message: "Khóa học chưa có bài học để vào học", type: "error" });
+        return;
       }
+      navigate(`/courses/${courseId}/lessons/${lessonId}`);
     } catch (err) {
-      setError(err.message);
+      setToast({ message: err.message, type: "error" });
     }
   };
 
   if (pageLoading) return <div className="text-center mt-5">Loading...</div>;
-  if (!course) return <div className="text-center mt-5">Course not found</div>;
-  {error && (
-      <div className="alert alert-danger">{error}
-      </div>
-  )};
+  if (courseError) {
+    return <div className="text-center mt-5"><h3>Error: {courseError}</h3></div>;
+  }
+  if (lessonsError) {
+    return <div className="text-center mt-5"><h3>Error loading lessons: {lessonsError}</h3></div>;
+  }
+  if(!course) return <div className="text-center mt-5"><h3>Course not found</h3></div>;
 
   return (
     <div className="container py-4">
+      {toast && (
+      <Toast message={toast.message} type={toast.type} onClose={setToast.bind(null, null)} />
+      )}
       <div className="row mb-4">
         <div className="col-md-8 mb-3 mb-md-0">
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
@@ -175,10 +184,10 @@ export default function CourseDetail() {
               {course.price === 0 ? "Free" : `${course.price} VND`}
             </h4>
             {user && user.role === "student" ? (
-            course.isEnrolled ? (
+            enrolledLoading ? null : isEnrolled ? (
               <Link
-                to={`/courses/${courseId}/lessons/${course.firstLessonId}`}
-                className="btn btn-secondary w-100 mt-2"
+                to={continueLessonId ? `/courses/${courseId}/lessons/${continueLessonId}` : "#"}
+                className={`btn btn-secondary w-100 mt-2 ${!continueLessonId ? "disabled" : ""}`}
               >
                 Vào học
               </Link>
