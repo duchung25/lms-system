@@ -45,6 +45,7 @@ export default function CoursesPage() {
     deleted, 
     role: user?.role 
   });
+  console.log("CoursesPage render", { q, category, level, published, deleted, courses });
 
   const filterCourse = useMemo(() => {
     if(!q) return courses;

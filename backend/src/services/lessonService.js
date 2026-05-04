@@ -12,7 +12,14 @@ const LessonService = {
         }
         const lastLesson = await Lesson.findOne({ courseId: courseid }).sort({ order: -1 });
         const nextorder = lastLesson ? lastLesson.order + 1 : 1;
+
         const lesson = await Lesson.create({ ...data, courseId: courseid, order: nextorder, createdBy: user.userId });
+        await Course.findByIdAndUpdate(courseid, { 
+            $inc: { 
+                totalLessons: 1,
+                totalDuration: data.duration || 0 
+            } 
+        });
         return lesson;
     },
     async getLessonsByCourse(courseId, user){
@@ -20,7 +27,7 @@ const LessonService = {
         if(user?.role === "student"){
             query.isPublished = true;
         }
-        const course = await Course.findWithDeleted(query).lean();
+        const course = await Course.findOneWithDeleted(query).lean();
         if(!course){
             throw new AppError("Course not found", 404);
         }
@@ -77,6 +84,10 @@ const LessonService = {
         .lean();
     },
     async getLessonDetail(courseId, lessonId, user){
+        const course = await Course.findById(courseId);
+        if(!course){
+            throw new AppError("Course not found", 404);
+        }
         const lesson = await Lesson.findById(lessonId).select("title videoUrl createdAt courseId isPublished").lean();
         if(!lesson){
             throw new AppError("Lesson not found", 404);
@@ -84,9 +95,8 @@ const LessonService = {
         if(!lesson.courseId.equals(courseId)){
             throw new AppError("Lesson does not belong to the specified course", 400);
         }
-        const course = await Course.findById(lesson.courseId);
-        if(!course.isPublished){
-            throw new AppError("Course is not published yet", 400);
+        if(user?.role === "student" && !course.isPublished){
+            throw new AppError("Course is not published yet", 403);
         }
         if(user?.role === "student"){
             const canAccess = await enrollmentService.canAccessLesson(courseId, user.userId, lessonId);
@@ -101,30 +111,71 @@ const LessonService = {
         if(!lesson){
             throw new AppError("Lesson not found", 404);
         }
-        delete data.order;
-        Object.assign(lesson, data);
-        return await lesson.save();
+        const allowed = ["title", "content", "videoUrl", "duration"];
+        for(const key of Object.keys(data)){
+            if(allowed.includes(key)){
+                lesson[key] = data[key];
+            }
+        }
+
+        const oldDuration = lesson.duration || 0;
+        const newDuration = data.duration ?? oldDuration;
+        const delta = newDuration - oldDuration;
+
+        await lesson.save();
+        if(delta !== 0){
+            await Course.findByIdAndUpdate(lesson.courseId, { 
+                $inc: { totalDuration: delta } 
+            });
+        }
+        return lesson;
     },
     async deleteLesson(lessonId, user){
         const lesson = await Lesson.findById(lessonId);
         if(!lesson){
             throw new AppError("Lesson not found", 404);
         }
-        await Lesson.delete({ _id: lessonId });
+        await Promise.all([
+            Lesson.delete({ _id: lessonId }),
+            Course.findByIdAndUpdate(lesson.courseId, { 
+                $inc: {
+                    totalLessons: -1,
+                    totalDuration: -(lesson.duration || 0)
+                }
+            }),
+            Lesson.updateMany(
+                { 
+                    courseId: lesson.courseId, 
+                    order: { $gt: lesson.order } 
+                }, 
+                    { $inc: { order: -1 } })
+        ]);
         return {
-            message: "Lesson deleted successfully",
-            deletedLessonId: lessonId
+            message: "Lesson deleted successfully"
         }
     },
     async restoreLesson(lessonId, user){
-        const lesson = await Lesson.findById(lessonId);
+        const lesson = await Lesson.findOneWithDeleted({ _id: lessonId });
         if(!lesson){
             throw new AppError("Lesson not found", 404);
         }
-        await Lesson.restore({ _id: lessonId });
+        await Promise.all([
+            Lesson.restore({ _id: lessonId }),
+            Course.findByIdAndUpdate(lesson.courseId, { 
+                $inc: {
+                    totalLessons: 1,
+                    totalDuration: lesson.duration || 0
+                }
+            }),
+            Lesson.updateMany(
+                { 
+                    courseId: lesson.courseId,
+                    order: { $gte: lesson.order } 
+                }, 
+                    { $inc: { order: 1 } })
+        ]);
         return {
-            message: "Lesson restored successfully",
-            restoredLessonId: lessonId
+            message: "Lesson restored successfully"
         }
     },
     async publishLesson(lessonId){

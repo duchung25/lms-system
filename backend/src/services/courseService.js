@@ -6,7 +6,6 @@ import AppError from '../utils/AppError.js';
 
 const courseService = {
     async createCourse(courseData) {
-        const {title, description, category, level, price, teacherId} = courseData;
         const course = await Course.create(courseData);
         return await course.populate("teacherId", "username email avatar");
     },
@@ -19,12 +18,16 @@ const courseService = {
         } = options;
 
         const filter = {};
+
         if (q) filter.title = { $regex: q, $options: 'i' };
         if (category) filter.category = category;
-        if (typeof published !== 'undefined') filter.isPublished = published;
-        if (typeof deleted !== 'undefined'){
-            filter.deleted = deleted === 'true';
-        }
+        if (level) filter.level = level;
+
+        if (published === 'true' || published === true) filter.isPublished = true;
+        else if (published === 'false' || published === false) filter.isPublished = false;
+
+        if (deleted === 'true' || deleted === true) filter.deleted = true;
+        else if (deleted === 'false' || deleted === false) filter.deleted = false;
         if (level) filter.level = level;
 
         const sortOpt = {};
@@ -33,7 +36,9 @@ const courseService = {
             else sortOpt[sort] = 1;
         }
 
-        const pendingFilter = { ...filter, isPublished: false };
+        const pendingFilter = { ...filter };
+        delete pendingFilter.isPublished;
+        pendingFilter.isPublished = false;
 
         const skip = (page - 1) * limit;
         if(deleted === 'true'){
@@ -67,62 +72,57 @@ const courseService = {
         }
         return course ;
     },
-    async updateCourse(courseId, updateData, currentUser){
+    async updateCourse(courseId, updateData) {
         const course = await Course.findById(courseId);
-        if(!course){
+        if (!course) {
             throw new AppError("Course not found", 404);
         }
-        Object.assign(course, updateData);
+        const allowedFields = ["title", "description", "category", "level", "price", "thumbnail"];
+        for (const key of allowedFields) {
+            if (key in updateData) {
+                course[key] = updateData[key];
+            }
+        }
         await course.save();
         await course.populate("teacherId", "username email avatar");
-        return await course;
+        return course;
     },
     async deleteCourse(courseId){
         const course = await Course.findById(courseId);
-        if(!course) {
-            throw new AppError("Course not found", 404);
-        }
-        await course.delete({ _id: courseId });
-        return {
-            message: "Course deleted successfully",
-            deletedCourseId: courseId
-        }
+        if(!course)  throw new AppError("Course not found", 404);
+        
+        await Promise.all([
+            Course.delete({ _id: courseId }),
+            Lesson.delete({ courseId })
+        ]);
+        return { message: "Course deleted successfully" };
     },
     async restoreCourse(courseId){
         const course = await Course.findWithDeleted({ _id: courseId });
         if(!course || course.length === 0){
             throw new AppError("Course not found", 404);
         }
-        await Course.restore({ _id: courseId });
-        return {
-            message: "Course restored successfully",
-            restoredCourseId: courseId
-        }
+        await Promise.all([
+            Course.restore({ _id: courseId }),
+            Lesson.restore({ courseId })
+        ]);
+        return { message: "Course restored successfully" };
     },
     async getCourseByTeacherId(teacherId){
         return await Course.find({ teacherId })
         .populate("teacherId", "username email avatar")
         .lean();
     },
-    async publishCourse(courseId){
+    async setPublishStatus(courseId, isPublished) {
         const course = await Course.findById(courseId);
-        if(!course){
-            throw new AppError("Course not found", 404);
-        }
-        course.isPublished = true;
+        if (!course) throw new AppError("Course not found", 404);
+
+        course.isPublished = isPublished;
         await course.save();
-        const updatedCourse = await Course.findById(courseId).populate("teacherId", "username email avatar").lean();
-        return updatedCourse;
-    },
-    async unpublishCourse(courseId){
-        const course = await Course.findById(courseId);
-        if(!course){
-            throw new AppError("Course not found", 404);
-        }
-        course.isPublished = false;
-        await course.save();
-        const updatedCourse = await Course.findById(courseId).populate("teacherId", "username email avatar").lean();
-        return updatedCourse;
+
+        return Course.findById(courseId)
+            .populate("teacherId", "username email avatar")
+            .lean();
     },
     async countHandler(){
         const totalCourses = await Course.countDocuments();

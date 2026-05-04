@@ -43,7 +43,7 @@ const courseController = {
             res.status(200).json({
             success: true,
             message: 'Courses retrieved successfully',
-            data: courses
+            data: { courses }
             });
         } catch (error) {
             next(error);
@@ -68,9 +68,8 @@ const courseController = {
     async updateCourse(req, res, next) {
         try{
             const { courseId } = req.params;
-            const currentUser = req.user;
             const updateData = req.body;
-            const course = await courseService.updateCourse(courseId, updateData, currentUser);
+            const course = await courseService.updateCourse(courseId, updateData);
             res.status(200).json({
                 success: true,
                 message: "Course updated successfully",
@@ -124,12 +123,12 @@ const courseController = {
     async getMyCourses(req, res, next) {
         try{
             const user = req.user.userId;
-            let courses;
+            let courses = [];
             if(req.user.role.toLowerCase() === "student"){
                 courses = await enrollmentService.getMyEnrollments(user);
             } else if(req.user.role.toLowerCase() === "teacher"){
                 courses = await courseService.getCourseByTeacherId(user);
-            }
+            }   
             res.status(200).json({
                 success: true,
                 message: "Courses retrieved successfully",
@@ -140,27 +139,21 @@ const courseController = {
             next(error);
         }
     },
-    async publishCourse(req, res, next) {
+    async setPublishStatus(req, res, next) {
         const courseId = req.params.courseId;
-        try{
-            const course = await courseService.publishCourse(courseId);
-            res.status(200).json({
-                success: true,
-                message: "Course published successfully",
-                data: { course }
+        const { status } = req.query;
+        if(!["publish", "unpublish"].includes(status)){
+            return res.status(400).json({
+                success: false,
+                message: "Invalid status value. Use 'publish' or 'unpublish'."
             });
         }
-        catch(error){
-            next(error);
-        }
-    },
-    async unpublishCourse(req, res, next) {
-        const courseId = req.params.courseId;
+        const isPublished = status === "publish";
         try{
-            const course = await courseService.unpublishCourse(courseId);
+            const course = await courseService.setPublishStatus(courseId, isPublished);
             res.status(200).json({
                 success: true,
-                message: "Course unpublished successfully",
+                message: isPublished ? "Course published successfully" : "Course unpublished successfully",
                 data: { course }
             });
         }

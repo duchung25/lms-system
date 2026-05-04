@@ -3,7 +3,7 @@ import { courseApi } from "../api/course.api";
 export const courseService = {
   async getCourses(params) {
     const res = await courseApi.getCourses(params);
-    const payload = res.data?.data || {};
+    const payload = res.data?.data?.courses || {};
 
     return {
       list: Array.isArray(payload.list) ? payload.list : [],

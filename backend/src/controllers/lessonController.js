@@ -82,8 +82,7 @@ const LessonController = {
             const result = await LessonService.deleteLesson(lessonId, userId);
             res.status(200).json({
                 success: true,
-                message: result.message,
-                data: { deletedLessonId: result.deletedLessonId }
+                message: result.message
             });
         }
         catch (error) {
@@ -98,7 +97,6 @@ const LessonController = {
             res.status(200).json({
                 success: true,
                 message: result.message,
-                data: { restoredLessonId: result.restoredLessonId }
             });
         }
         catch (error) {

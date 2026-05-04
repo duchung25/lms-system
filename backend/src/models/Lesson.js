@@ -15,9 +15,11 @@ const lessonSchema = new mongoose.Schema({
     },
     content: {
         type: String,
+        default: ""
     },
     videoUrl: {
         type: String,
+        default: null
     },
     order: {
         type: Number,
@@ -29,7 +31,8 @@ const lessonSchema = new mongoose.Schema({
     },
     duration: {
         type: Number, 
-        default: 0
+        default: 0,
+        min: 0
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -44,5 +47,6 @@ lessonSchema.plugin(mongooseDelete, {
 });
 
 lessonSchema.index({ courseId: 1, order: 1 }, { unique: true });
+lessonSchema.index({ courseId: 1, isPublished: 1 });
 
 export default mongoose.model("Lesson", lessonSchema);

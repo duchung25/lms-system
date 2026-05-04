@@ -11,8 +11,7 @@ router.use('/', lessonRoutes);
 
 router.get('/by-teacher/:teacherId', authMiddleware, courseController.getCoursesByTeacher);
 router.get('/my-courses', authMiddleware, courseController.getMyCourses);
-router.patch('/:courseId/publish', authMiddleware, writeAccessMiddleware, courseController.publishCourse);
-router.patch('/:courseId/unpublish', authMiddleware, writeAccessMiddleware, courseController.unpublishCourse);
+router.patch('/:courseId/publish-status', authMiddleware, writeAccessMiddleware, courseController.setPublishStatus);
 
 router.post('/', authMiddleware, courseValidator.createCourseValidationRules, courseValidator.validate, courseController.createCourse);
 router.get('/', authMiddleware,  courseController.getAllCourse);

@@ -39,16 +39,27 @@ const courseSchema = new mongoose.Schema(
             type: Number,
             default: 0
         },
+        slug: {
+            type: String,
+            unique: true,
+            index: true,
+            sparse: true
+        },
+        totalLessons:   { type: Number, default: 0 },
+        totalDuration:  { type: Number, default: 0 },
+        studentsCount:  { type: Number, default: 0 },
     },
     {
         timestamps: true
-    }
+    },
 );
 courseSchema.plugin(mongooseDelete, { 
     deletedAt: true, 
     overrideMethods: "all"
 });
-
+courseSchema.index({ teacherId: 1 });
+courseSchema.index({ isPublished: 1 });
+courseSchema.index({ createdAt: -1 });
 
 const Course = mongoose.model("Course", courseSchema);
 
