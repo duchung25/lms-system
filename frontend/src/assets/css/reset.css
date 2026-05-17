@@ -24,8 +24,6 @@ body {
   font-feature-settings: 'kern' 1;
 }
 
-/* ========== HEADINGS ========== */
-
 h1 {
   font-size: var(--fs-display);
   font-weight: var(--fw-display);
@@ -72,8 +70,6 @@ h6 {
   color: var(--color-black);
 }
 
-/* ========== PARAGRAPH ========== */
-
 p {
   margin: 0 0 var(--spacing-16) 0;
   font-size: var(--fs-body);
@@ -87,7 +83,6 @@ p:last-child {
   margin-bottom: 0;
 }
 
-/* ========== LINKS ========== */
 
 :where(a) {
   color: var(--color-black);
@@ -98,13 +93,13 @@ p:last-child {
   font-feature-settings: 'kern' 1;
 }
 
-:where(a:hover) {
+/* :where(a:hover) {
   opacity: 0.7;
 }
 
 :where(a:visited) {
   color: var(--color-black);
-}
+} */
 
 :where(a:focus-visible) {
   outline: dashed 2px var(--color-black);
@@ -253,8 +248,6 @@ hr {
   border: 0;
 }
 
-/* ========== TABLES ========== */
-
 table {
   border-collapse: collapse;
   width: 100%;
@@ -285,8 +278,6 @@ tbody td {
 tbody tr:hover {
   background-color: rgba(0, 0, 0, 0.04);
 }
-
-/* ========== PRINT STYLES ========== */
 
 @media print {
   body {
@@ -322,8 +313,6 @@ tbody tr:hover {
   }
 }
 
-/* ========== ACCESSIBILITY ========== */
-
 .sr-only {
   position: absolute !important;
   width: 1px !important;
@@ -348,8 +337,6 @@ tbody tr:hover {
   border-width: 0;
 }
 
-/* ========== FOCUS VISIBLE FALLBACK ========== */
-
 :focus {
   outline: dashed 2px var(--color-black);
   outline-offset: 2px;
@@ -358,8 +345,6 @@ tbody tr:hover {
 :focus:not(:focus-visible) {
   outline: none;
 }
-
-/* ========== ANIMATION UTILITIES ========== */
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -371,8 +356,6 @@ tbody tr:hover {
     scroll-behavior: auto !important;
   }
 }
-
-/* ========== PRINT MEDIA ========== */
 
 @media print {
   body {

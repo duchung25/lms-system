@@ -11,7 +11,11 @@ export const authService = {
     },
     getProfile: async () => {
         const res = await authApi.getProfile();
-        return res.data?.data || null;
+        return res.data?.data.user || null;
+    },
+    editProfile: async (data) => {
+        const res = await authApi.editProfile(data);
+        return res.data?.data.user || null;
     },
     changePassword: async (payLoad) => {
         const res = await authApi.changePassword(payLoad);

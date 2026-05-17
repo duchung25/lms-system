@@ -22,11 +22,14 @@ export const courseApi = {
     getCourseByTeacherId: (teacherId) => {
         return apiClient.get(`/courses/by-teacher/${teacherId}`);
     },
-    publishCourse: (courseId) => {
-        return apiClient.patch(`/courses/${courseId}/publish`);
-    },
-    unpublishCourse: (courseId) => {
-        return apiClient.patch(`/courses/${courseId}/unpublish`);
+    // publishCourse: (courseId) => {
+    //     return apiClient.patch(`/courses/${courseId}/publish`);
+    // },
+    // unpublishCourse: (courseId) => {
+    //     return apiClient.patch(`/courses/${courseId}/unpublish`);
+    // },
+    setPublistCOurse: (courseId, status) => {
+        return apiClient.patch(`/courses/${courseId}/publish-status`, { status });
     },
     enrollCourse: (courseId) => {
         return apiClient.post(`/enrollments/${courseId}`);

@@ -4,7 +4,7 @@ import { useAuth } from "../auth/useAuth.js";
 import { useNavigate, Link } from "react-router-dom";
 import Toast from "../components/toast/toast.jsx";
 
-import { useCourseDetail, useDeleteCourse, usePublishCourse, useUnpublishCourse, useEnrollCourse, useRestoreCourse } from "../hook/useCourse";
+import { useCourseDetail, useDeleteCourse, useSetPublishCourse , useEnrollCourse, useRestoreCourse } from "../hook/useCourse";
 import { useLessons } from "../hook/useLesson";
 import { useEnrolledCourses } from "../hook/useCourse";
 
@@ -17,8 +17,7 @@ export default function CourseDetail() {
   const { course, setCourse, loading: courseLoading, error: courseError } = useCourseDetail(courseId);
   const { lessons, loading: lessonsLoading, error: lessonsError } = useLessons(courseId);
   const { deleteCourse, loading: deleting } = useDeleteCourse();
-  const { publishCourse, loading: publishing } = usePublishCourse();
-  const { unpublishCourse, loading: unpublishing } = useUnpublishCourse();
+  const { setPublishCourse, loading: publishing } = useSetPublishCourse();
   const { enrollCourse, loading: enrolling } = useEnrollCourse();
   const { restoreCourse, loading: restoring } = useRestoreCourse();
   const { courses, loading: enrolledLoading } = useEnrolledCourses(user?.role === "student");
@@ -28,18 +27,13 @@ export default function CourseDetail() {
   const continueLessonId = enrolledCourse?.currentLessonId || firstLessonId;
   const [ toast, setToast ] = useState(null);
   const pageLoading = courseLoading || lessonsLoading || (user?.role === "student" && enrolledLoading);
-  const loading =  deleting || publishing || unpublishing || enrolling || restoring;
+  const loading =  deleting || publishing || enrolling || restoring;
 
   const handlePublishToggle = async () => {
     let publishedCourse;
     try{
       const action = course.isPublished ? "unpublish" : "publish";
-      if(action === "publish") {
-          publishedCourse = await publishCourse(courseId);
-        }
-      else {
-        publishedCourse = await unpublishCourse(courseId);
-      }
+      publishedCourse = await setPublishCourse(courseId, action);
       setCourse(publishedCourse);
       setToast({ message: `Course ${action}ed successfully`, type: "success" });
     } catch (error) {

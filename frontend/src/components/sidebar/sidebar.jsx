@@ -1,6 +1,6 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
-import { FaAddressBook, FaBook, FaUserGraduate, FaHouseChimney } from "../../icons";
+import { FaAddressBook, FaBook, FaUserGraduate, FaHouseChimney, BiBook, BiHome, BiUser, BiSolidDashboard } from "../../icons";
 
 export default function Sidebar() {
   const { user } = useAuth();
@@ -13,17 +13,21 @@ export default function Sidebar() {
     return (
       <aside className="sidebar">
         <div className="list-group sidebar-nav">
+          <NavLink to="/" className={linkClass}>
+            <span className="sidebar-link-icon"><BiHome /></span>
+            <span className="sidebar-link-text">Home</span>
+          </NavLink>
           <NavLink to="/admin/dashboard" className={linkClass}>
-            <span className="sidebar-link-icon"><FaAddressBook /></span>
-            <span className="sidebar-link-text">Admin Dashboard</span>
+            <span className="sidebar-link-icon"><BiSolidDashboard /></span>
+            <span className="sidebar-link-text">Dashboard</span>
           </NavLink>
           <NavLink to="/admin/courses" className={linkClass}>
-            <span className="sidebar-link-icon"><FaBook /></span>
-            <span className="sidebar-link-text">Manage Courses</span>
+            <span className="sidebar-link-icon"><BiBook /></span>
+            <span className="sidebar-link-text">Courses</span>
           </NavLink>
           <NavLink to="/admin/users" className={linkClass}>
-            <span className="sidebar-link-icon"><FaUserGraduate /></span>
-            <span className="sidebar-link-text">Manage Users</span>
+            <span className="sidebar-link-icon"><BiUser /></span>
+            <span className="sidebar-link-text">Users</span>
           </NavLink>
         </div>
       </aside>
@@ -34,12 +38,16 @@ export default function Sidebar() {
     return (
       <aside className="sidebar">
         <div className="list-group sidebar-nav">
+          <Link to="/courses/create" className="btn btn-primary create-course-btn mb-2">
+              <span>+</span>
+              Create new course
+            </Link>
           <NavLink to="/teacher/dashboard" className={linkClass}>
-            <span className="sidebar-link-icon"><FaAddressBook /></span>
-            <span className="sidebar-link-text">Teacher Dashboard</span>
+            <span className="sidebar-link-icon"><BiSolidDashboard /></span>
+            <span className="sidebar-link-text">Dashboard</span>
           </NavLink>
           <NavLink to="/courses/my-courses" className={linkClass}>
-            <span className="sidebar-link-icon"><FaBook /></span>
+            <span className="sidebar-link-icon"><BiBook /></span>
             <span className="sidebar-link-text">My Courses</span>
           </NavLink>
         </div>
@@ -47,21 +55,24 @@ export default function Sidebar() {
     );
   }
 
-  // Default user
   return (
     <aside className="sidebar">
       <div className="list-group sidebar-nav">
-        <NavLink to="/courses" className={linkClass}>
-          <span className="sidebar-link-icon"><FaHouseChimney /></span>
-          <span className="sidebar-link-text">Trang chủ</span>
+        <NavLink to="/" className={linkClass}>
+          <span className="sidebar-link-icon"><BiHome /></span>
+          <span className="sidebar-link-text">Home</span>
+        </NavLink>
+        <NavLink to="/dashboard" className={linkClass}>
+          <span className="sidebar-link-icon"><BiSolidDashboard /></span>
+          <span className="sidebar-link-text">Dashboard</span>
         </NavLink>
         <NavLink to="/courses" className={linkClass}>
-          <span className="sidebar-link-icon"><FaBook /></span>
-          <span className="sidebar-link-text">Khóa học</span>
+          <span className="sidebar-link-icon"><BiBook /></span>
+          <span className="sidebar-link-text">Courses</span>
         </NavLink>
         <NavLink to="/courses/my-courses" className={linkClass}>
-          <span className="sidebar-link-icon"><FaUserGraduate /></span>
-          <span className="sidebar-link-text">Khóa học của tôi</span>
+          <span className="sidebar-link-icon"><BiUser /></span>
+          <span className="sidebar-link-text">My Courses</span>
         </NavLink>
       </div>
     </aside>

@@ -43,16 +43,10 @@ export const courseService = {
       : [];
   },
 
-  async publishCourse(courseId) {
-    const res = await courseApi.publishCourse(courseId);
+  async setPublishCourse(courseId, status) {
+    const res = await courseApi.setPublistCOurse(courseId, status);
     return res.data?.data?.course ?? null;
   },
-
-  async unpublishCourse(courseId) {
-    const res = await courseApi.unpublishCourse(courseId);
-    return res.data?.data?.course ?? null;
-  },
-
   async enrollCourse(courseId) {
     const res = await courseApi.enrollCourse(courseId);
     return res.data?.data ?? null;

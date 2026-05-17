@@ -59,7 +59,7 @@ a:focus-visible {
 
 .btn-white:hover,
 .btn-secondary:hover {
-  background-color: var(--color-surface-container-low);
+  background-color: var(--bs-btn-hover-bg);
   box-shadow: var(--shadow-hover);
 }
 

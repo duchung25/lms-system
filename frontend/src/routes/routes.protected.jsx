@@ -6,6 +6,8 @@ import CourseDetails from "../pages/courseDetails.jsx";
 
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import CoursesPage from "../pages/coursesPage.jsx";
+import MyProfile from "../pages/myProfile.jsx";
+import UserManagement from "../pages/userManagement.jsx";
 
 import MyCoursesPage from "../pages/myCoursesPage.jsx";
 import CourseForm from "../pages/courseForm.jsx";
@@ -20,6 +22,7 @@ export default [
         element: <ProtectedRoute />,
         children: [
           { path: "/courses/:courseId", element: <CourseDetails /> },
+          { path: "/my-profile", element: <MyProfile /> },
         ]
       },
       {
@@ -27,6 +30,7 @@ export default [
         children: [
           { path: "/admin/courses", element: <CoursesPage /> },
           { path: "/courses/:courseId/lessons/new", element: <LessonForm /> },
+          { path: "/admin/users", element: <UserManagement /> }
         ],
       },
       {

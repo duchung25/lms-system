@@ -65,12 +65,19 @@ export default function Header() {
                 onClick={() => setOpen((v) => !v)}
               >
                 {user?.username || "User"}
+                {user?.avatar ? (
+                  <img src={user.avatar} alt={user.username} className="user-menu__avatar" />
+                ) : (
+                  <div className="user-menu__avatar user-menu__avatar--placeholder" aria-label="User avatar">
+                    {user?.username ? user.username.split(" ").map(n => n[0]).join("").toUpperCase() : "N/A"}
+                  </div>
+                )}
                 <FaSortDown />
               </button>
 
               {open && (
                 <div className="user-menu__dropdown">
-                  <Link to="/profile" className="user-menu__item">Hồ sơ</Link>
+                  <Link to="/my-profile" className="user-menu__item">Hồ sơ</Link>
                   <Link to="/my-courses" className="user-menu__item">Khóa học của tôi</Link>
                   <button
                     className="user-menu__item danger"

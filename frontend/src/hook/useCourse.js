@@ -266,13 +266,13 @@ export const useRestoreCourse = () => {
   return { restoreCourse, loading };
 };
 
-export const usePublishCourse = () => {
-  const [loading, setLoading] = useState(false);
 
-  const publishCourse = async (courseId) => {
+export const useSetPublishCourse = () => {
+  const [loading, setLoading] = useState(false);
+  const setPublishCourse = async (courseId, status) => {
     setLoading(true);
     try {
-      return await courseService.publishCourse(courseId);
+      return await courseService.setPublishCourse(courseId, status);
     } catch (err) {
       throw new Error(
         getErrorMessage(err) ||
@@ -283,28 +283,8 @@ export const usePublishCourse = () => {
     }
   };
 
-  return { publishCourse, loading };
-};
-
-export const useUnpublishCourse = () => {
-  const [loading, setLoading] = useState(false);
-
-  const unpublishCourse = async (courseId) => {
-    setLoading(true);
-    try {
-      return await courseService.unpublishCourse(courseId);
-    } catch (err) {
-      throw new Error(
-        getErrorMessage(err) ||
-          "Đã có lỗi xảy ra. Vui lòng thử lại."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { unpublishCourse, loading };
-};
+  return { setPublishCourse, loading };
+}
 
 export const useEnrollCourse = () => {
   const [loading, setLoading] = useState(false);

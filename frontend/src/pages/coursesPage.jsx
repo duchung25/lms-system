@@ -83,38 +83,6 @@ export default function CoursesPage() {
 
   return (
     <div>
-      <div className="d-flex align-items-center justify-content-between mb-3 mt-2">
-        <h3 className="m-0">Khóa học</h3>
-        {user && user.role === "admin" && (
-          <div className="d-flex gap-2">
-            <Link to="/courses?deleted=true" className="btn position-relative p-2"
-            style={{
-              width: 44,
-              height: 44,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 20
-            }}
-            > 
-              <FaBoxArchive className="me-1" />
-            </Link>
-            <Link to="/courses?published=false" className="btn position-relative p-2 btn-hover"
-            style={{
-              width: 44,
-              height: 44,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 20
-            }}
-            >
-              <FaClipboardCheck className="me-1" />
-              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{pendingCount}</span>
-            </Link>
-          </div>
-        )}
-      </div>
       <div className="mb-3 row g-2">
         <div className="col-md-4">
           <input
@@ -150,6 +118,37 @@ export default function CoursesPage() {
             ))}
           </select>
         </div>
+        <div className="col-md-2 d-flex align-items-center justify-content-between mb-3 mt-2">
+        {user && user.role === "admin" && (
+          <div className="d-flex gap-2">
+            <Link to="/courses?deleted=true" className="btn position-relative p-2"
+            style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 20
+            }}
+            > 
+              <FaBoxArchive className="me-1" />
+            </Link>
+            <Link to="/courses?published=false" className="btn position-relative p-2 btn-hover"
+            style={{
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 20
+            }}
+            >
+              <FaClipboardCheck className="me-1" />
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{pendingCount}</span>
+            </Link>
+          </div>
+        )}
+      </div>
       </div>
       <div className="row g-3">
         {filterCourse.map((c) => (

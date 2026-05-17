@@ -1,0 +1,205 @@
+.user-mng-title1 {
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  color: var(--color-primary);
+  margin-bottom: 2px;
+}
+
+.user-mng-desc {
+  font-size: var(--fs-body);
+  color: var(--color-outline);
+  margin-bottom: 24px;
+}
+
+.user-mng-head {
+  margin-bottom: 8px;
+}
+
+.user-mng-filter,
+.user-mng-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-mng-export i {
+  font-size: 1.2rem;
+}
+.search-bar__input {
+  width: 100%;
+  max-width: 260px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--color-outline-variant);
+  background: var(--color-surface);
+  font-size: 14px;
+}
+
+.user-mng-table-wrap {
+  background: var(--color-surface-container);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-level-2);
+  padding: 0 0 8px 0;
+  margin-bottom: 20px;
+}
+
+.user-mng-table {
+  margin-bottom: 0;
+  background: transparent;
+}
+.user-mng-table th, .user-mng-table td {
+  border: none;
+  background: transparent;
+  padding: 16px 12px;
+  vertical-align: middle;
+  font-size: var(--fs-body);
+}
+.user-mng-table th {
+  color: var(--color-on-surface-variant);
+  font-weight: 600;
+  background: transparent;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  object-fit: cover;
+  background: var(--color-surface-dim);
+  box-shadow: var(--shadow-level-1);
+}
+
+.user-email {
+  color: var(--color-outline-variant);
+  font-size: var(--fs-label);
+}
+
+.badge.role-badge {
+  font-size: 0.85rem;
+  border-radius: var(--radius-md);
+  padding: 3px 10px;
+  font-weight: 500;
+  background: var(--color-primary-fixed);
+  color: var(--color-primary);
+}
+.badge.role-instructor {
+  background: var(--color-primary-fixed-dim);
+  color: var(--color-primary);
+}
+.badge.role-student {
+  background: var(--color-secondary-fixed);
+  color: var(--color-secondary);
+}
+
+/* Status */
+.status-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.status-active {
+  background: var(--color-primary);
+}
+.status-pending {
+  background: var(--color-outline-variant);
+}
+.status-text {
+  font-size: 1rem;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.activity-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 90px;
+}
+.activity-bar {
+  background: var(--color-primary-fixed);
+  height: 6px;
+  border-radius: 999px;
+  min-width: 44px;
+  flex-grow: 1;
+  margin-right: 6px;
+}
+.activity-percent {
+  color: var(--color-outline);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.user-row {
+  transition: background 0.2s;
+}
+.user-row:hover {
+  background: var(--color-surface-container-low);
+}
+
+/* Paging */
+.user-mng-paging {
+  padding: 16px 16px 8px 16px;
+  border-top: 1px solid var(--color-outline-variant);
+}
+
+.pagination .btn {
+  min-width: 30px;
+  font-size: 1rem;
+  margin-right: 4px;
+}
+.pagination .btn:last-child {
+  margin-right: 0;
+}
+
+/* Stats */
+.user-mng-stats {
+  margin-bottom: 0;
+}
+.statbox {
+  background: var(--color-surface-container);
+  box-shadow: var(--shadow-level-1);
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  margin-bottom: 14px;
+  min-height: 105px;
+}
+.statbox-title {
+  font-size: var(--fs-label);
+  color: var(--color-outline);
+  margin-bottom: 3px;
+}
+.statbox-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 3px;
+}
+.statbox-caption {
+  font-size: 0.9rem;
+  color: var(--color-outline);
+  font-weight: 400;
+}
+.statbox-change {
+  font-size: 0.8rem;
+  margin-left: 8px;
+  color: var(--color-tertiary);
+}
+.statbox-up {
+  color: var(--color-primary);
+}
+.statbox-pending {
+  margin-left: 12px;
+  font-size: 0.95rem;
+}
+.text-danger {
+  color: var(--color-error);
+}
+.filter-option{
+  font-size: var(--fs-body);
+  width: 220px;
+  color: var(--color-outline);
+  transition: background 0.2s;
+  top: 30px;
+  z-index: 10;
+}

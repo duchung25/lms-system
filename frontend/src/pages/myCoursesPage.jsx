@@ -1,11 +1,9 @@
 import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useAuth } from "../auth/useAuth";
 import { useMyCourses } from "../hook/useCourse.js";
 import '../assets/css/components/card.css';
 
 export default function MyCoursesPage() {
-  const { user } = useAuth();
   const [params] = useSearchParams();
   const q = (params.get("q") || "").toLowerCase().trim(); 
 
@@ -33,13 +31,6 @@ export default function MyCoursesPage() {
       </div>
 
       <div className="row g-3">
-        {user.role === "teacher" && (
-          <div className="col-12">
-            <Link to="/courses/create" className="btn btn-primary">
-              Tạo khóa học mới
-            </Link>
-          </div>
-        )}
         {courses.length === 0 && !coursesLoading && (
             <div className="text-center text-muted my-5">Không có khóa học nào.</div>
           )}

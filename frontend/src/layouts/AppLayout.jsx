@@ -3,6 +3,7 @@ import Header from "../components/header/header.jsx";
 import Footer from "../components/footer/footer.jsx";
 import Sidebar from "../components/sidebar/sidebar.jsx";
 import { useAuth } from "../auth/useAuth.js";
+import { FaMaxcdn } from "react-icons/fa6";
 
 export default function AppLayout() {
   const { user } = useAuth();
@@ -11,10 +12,10 @@ export default function AppLayout() {
             <Header className="sticky-top" />
 
             <div className="container-fluid flex-grow-1" style={{ marginTop: "64px", paddingTop: "20px", backgroundColor: "var(--color-background)" }}>
-                <div className="row">
+                <div className="row" style={{marginBottom: "100px"}}>
                     {user && (
                         <>
-                           <div className="d-none d-md-block col-md-1 col-xl-2 ps-0">
+                           <div className="d-none d-md-block col-md-1 col-xl-2 ps-0" style={{ maxWidth: "184px" }}>
                                 <Sidebar />
                             </div>
                             <div className="col-md-11 col-xl-10">

@@ -22,9 +22,9 @@
   --color-background: #fcf8ff;
   --color-on-background: #1b1b24;
 
-  --color-surface: #fcf8ff;
+  --color-surface: #f8fafc;
+  --color-on-surface: #1b1b24 ;
   --color-surface-dim: #dcd8e5;
-  --color-surface-bright: #fcf8ff;
 
   --color-surface-container-lowest: #ffffff;
   --color-surface-container-low: #f5f2ff;
