@@ -141,19 +141,18 @@ const courseController = {
     },
     async setPublishStatus(req, res, next) {
         const courseId = req.params.courseId;
-        const { status } = req.query;
+        const { status } = req.body;
         if(!["publish", "unpublish"].includes(status)){
             return res.status(400).json({
                 success: false,
                 message: "Invalid status value. Use 'publish' or 'unpublish'."
             });
         }
-        const isPublished = status === "publish";
         try{
-            const course = await courseService.setPublishStatus(courseId, isPublished);
+            const course = await courseService.setPublishStatus(courseId, status);
             res.status(200).json({
                 success: true,
-                message: isPublished ? "Course published successfully" : "Course unpublished successfully",
+                message: status === "publish" ? "Course published successfully" : "Course unpublished successfully",
                 data: { course }
             });
         }

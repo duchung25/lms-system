@@ -113,11 +113,16 @@ const courseService = {
         .populate("teacherId", "username email avatar")
         .lean();
     },
-    async setPublishStatus(courseId, isPublished) {
+    async setPublishStatus(courseId, status) {
         const course = await Course.findById(courseId);
         if (!course) throw new AppError("Course not found", 404);
-
-        course.isPublished = isPublished;
+        console.log('==> Status FE gửi lên:', status);
+        if(status === "publish"){
+            course.isPublished = true;
+        } else if(status === "unpublish"){
+            course.isPublished = false;
+        }
+         console.log('==> isPublished sau sửa:', course.isPublished);
         await course.save();
 
         return Course.findById(courseId)

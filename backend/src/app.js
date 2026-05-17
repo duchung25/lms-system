@@ -13,7 +13,8 @@ connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // FE Vite
+    origin: ["http://localhost:5173",
+      "http://192.168.111.18:5173",], 
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, 

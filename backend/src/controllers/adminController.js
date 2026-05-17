@@ -3,11 +3,17 @@ import adminService from "../services/adminService.js";
 const adminController = {
     async getAllUsers(req, res, next){
         try{
-            const userList = await adminService.getAllUsers();
+            const querryParams = req.query;
+            const userList = await adminService.getAllUsers(querryParams);
             res.status(200).json({
                 success: true,
-                message: userList.length > 0 ? "Lấy danh sách người dùng thành công" : "Không có người dùng nào",
-                data: { users: userList }
+                message: userList.users.length > 0 ? "Lấy danh sách người dùng thành công" : "Không có người dùng nào",
+                data: { users: userList.users, 
+                        total: userList.total, 
+                        page: userList.page, 
+                        limit: userList.limit, 
+                        totalPages: userList.totalPages 
+        }
             });
         } catch (error) {
             next(error);

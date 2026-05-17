@@ -30,7 +30,6 @@ const authController = {
             next(error);
         }
     },
-    // users/profile
     async getProfile(req, res, next) {
         try{
             const userId = req.user.userId;

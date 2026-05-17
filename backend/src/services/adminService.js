@@ -3,8 +3,45 @@ import bcryptjs from 'bcryptjs';
 import AppError from '../utils/AppError.js';
 
 const adminService = {
-    async getAllUsers() {
-        return await User.find().lean();
+    async getAllUsers(querryParams) {
+        const {
+            role,
+            active,
+            deleted,
+            search,
+            page = 1,
+            limit = 5,
+            sort = "-createdAt",
+        } = querryParams;
+        const filter = {};
+        if (role) {
+            filter.role = role;
+        }
+        if(active !== undefined && active !== ""){
+            filter.active = active === "true";
+        }
+        if(deleted !== undefined && deleted !== ""){
+            filter.deleted = deleted === "true";
+        }
+        if(search){
+            filter.$or = [
+                { name: { $regex: search, $options: "i" } },
+                { email: { $regex: search, $options: "i" } },
+            ];
+        }
+        const users = await User.find(filter)
+            .sort(sort)
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
+        const total = await User.countDocuments(filter);
+        return {
+            users,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        };
     },
     async getUserById(userId) {
         const user = await User.findById(userId);
