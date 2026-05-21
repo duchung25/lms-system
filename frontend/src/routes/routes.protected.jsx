@@ -3,16 +3,15 @@ import AuthLayout from "../layouts/AuthLayout.jsx";
 // import AdminLayout from "../layouts/AdminLayout.jsx";
 // import TeacherLayout from "../layouts/TeacherLayout.jsx";
 import CourseDetails from "../pages/courseDetails.jsx";
-
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import CoursesPage from "../pages/coursesPage.jsx";
 import MyProfile from "../pages/myProfile.jsx";
 import UserManagement from "../pages/userManagement.jsx";
-
 import MyCoursesPage from "../pages/myCoursesPage.jsx";
 import CourseForm from "../pages/courseForm.jsx";
 import LessonForm from "../pages/lessonForm.jsx";
 import LessonDetail from "../pages/lessonDetails.jsx";
+import AdminDashboard from "../pages/adminDashboard.jsx";
 
 export default [
   {
@@ -30,7 +29,8 @@ export default [
         children: [
           { path: "/admin/courses", element: <CoursesPage /> },
           { path: "/courses/:courseId/lessons/new", element: <LessonForm /> },
-          { path: "/admin/users", element: <UserManagement /> }
+          { path: "/admin/users", element: <UserManagement /> },
+          { path: "/admin/dashboard", element: <AdminDashboard /> }
         ],
       },
       {
