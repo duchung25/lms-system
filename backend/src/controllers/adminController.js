@@ -103,6 +103,20 @@ const adminController = {
             next(error);
         }
     },
+    async getDashboardStatistics(req, res, next) {
+        try {
+            const statistics =
+                await adminService.getDashboardStatistics();
+
+            res.status(200).json({
+                success: true,
+                message: "Lấy thống kê dashboard thành công",
+                data: statistics
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default adminController;

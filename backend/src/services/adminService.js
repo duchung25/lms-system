@@ -25,11 +25,11 @@ const adminService = {
         }
         if(search){
             filter.$or = [
-                { name: { $regex: search, $options: "i" } },
+                { username: { $regex: search, $options: "i" } },
                 { email: { $regex: search, $options: "i" } },
             ];
         }
-        const users = await User.find(filter)
+        const users = await User.findWithDeleted(filter)
             .sort(sort)
             .skip((page - 1) * limit)
             .limit(limit)
@@ -105,6 +105,122 @@ const adminService = {
             message: "Đặt lại mật khẩu thành công"
         };
     },
+    async getDashboardStatistics() {
+        const today = new Date();
+
+        const startOfToday = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate()
+        );
+
+        const startOfMonth = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            1
+        );
+
+        const [
+            totalUsers,
+            activeUsers,
+            inactiveUsers,
+            deletedUsers,
+            totalStudents,
+            totalTeachers,
+            totalAdmins,
+            newUsersToday,
+            newUsersThisMonth,
+            monthlyGrowth
+        ] = await Promise.all([
+            User.countDocumentsWithDeleted(),
+
+            User.countDocuments({
+                active: true,
+                deleted: false
+            }),
+
+            User.countDocuments({
+                active: false,
+                deleted: false
+            }),
+
+            User.countDocuments({
+                deleted: true
+            }),
+
+            User.countDocuments({
+                role: "student",
+                deleted: false
+            }),
+
+            User.countDocuments({
+                role: "teacher",
+                deleted: false
+            }),
+
+            User.countDocuments({
+                role: "admin",
+                deleted: false
+            }),
+
+            User.countDocuments({
+                createdAt: {
+                    $gte: startOfToday
+                },
+                deleted: false
+            }),
+
+            User.countDocuments({
+                createdAt: {
+                    $gte: startOfMonth
+                },
+                deleted: false
+            }),
+
+            User.aggregate([
+                {
+                    $match: {
+                        deleted: { $ne: true }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: "$createdAt" },
+                            month: { $month: "$createdAt" }
+                        },
+                        totalUsers: {
+                            $sum: 1
+                        }
+                    }
+                },
+                {
+                    $sort: {
+                        "_id.year": 1,
+                        "_id.month": 1
+                    }
+                }
+            ])
+        ]);
+
+        return {
+            overview: {
+                totalUsers,
+                activeUsers,
+                inactiveUsers,
+                deletedUsers,
+                totalStudents,
+                totalTeachers,
+                totalAdmins,
+                newUsersToday,
+                newUsersThisMonth
+            },
+
+            charts: {
+                userGrowthByMonth: monthlyGrowth
+            }
+        };
+    }
 }
 
 export default adminService;
