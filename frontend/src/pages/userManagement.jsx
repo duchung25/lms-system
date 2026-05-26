@@ -468,50 +468,6 @@ export default function UserManagement() {
             </div>
           </div>
         </div>
-        <div className="row gx-3 user-mng-stats">
-          <div className="col-lg-4 col-12">
-            <div className="statbox">
-              <div className="statbox-title">
-                Total Users
-              </div>
-              <div className="statbox-value">
-                {pagination.total}
-                <span className="statbox-change statbox-up">
-                  +12%
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-4 col-6">
-            <div className="statbox">
-              <div className="statbox-title">
-                Active Instructors
-              </div>
-              <div className="statbox-value">
-                158
-              </div>
-              <div className="statbox-caption">
-                Last 30 days
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-4 col-6">
-            <div className="statbox">
-              <div className="statbox-title">
-                Enrolled Students
-              </div>
-              <div className="statbox-value">
-                2,334
-                <span className="statbox-pending">
-                  |
-                  <span className="text-danger">
-                    42 pending
-                  </span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </>
   );

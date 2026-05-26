@@ -12,7 +12,7 @@ export default function AppLayout() {
             <Header className="sticky-top" />
 
             <div className="container-fluid flex-grow-1" style={{ marginTop: "64px", paddingTop: "20px", backgroundColor: "var(--color-background)" }}>
-                <div className="row" style={{marginBottom: "100px"}}>
+                <div className="row" style={{marginBottom: "10px"}}>
                     {user && (
                         <>
                            <div className="d-none d-md-block col-md-1 col-xl-2 ps-0" style={{ maxWidth: "184px" }}>

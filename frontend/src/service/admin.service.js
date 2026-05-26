@@ -24,5 +24,9 @@ export const adminService = {
   getDashboardStatistics: async () => {
     const res = await adminApi.getDashboardStatistics();
     return res.data?.data || {};
-  }
+  },
+  getCourseDashboard: async () => {
+    const res = await adminApi.getCourseDashboard();
+    return res.data?.data || {};
+  },
 };

@@ -18,5 +18,8 @@ export const adminApi = {
   },
   getDashboardStatistics: () => {
     return apiClient.get("/admin/dashboard/statistics");
-  }
+  },
+  getCourseDashboard: () => {
+    return apiClient.get("/admin/dashboard/courses");
+  },
 };

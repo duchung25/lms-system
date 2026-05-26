@@ -144,3 +144,34 @@ export const useGetDashboardStatistics = () => {
     }, [fetchStatistics]);
     return { statistics, loading, error, refetch: fetchStatistics };
 }
+export const useGetCourseDashboard = () => {
+    const [loading, setLoading] = useState(false);
+    const [courseStats, setCourseStats] = useState(null);
+    const [error, setError] = useState("");
+
+    const fetchCourseStats = useCallback(async () => {
+        setLoading(true);
+        setError("");
+
+        try {
+            const data = await adminService.getCourseDashboard();
+            setCourseStats(data || {});
+        } catch (err) {
+            const message = getErrorMessage(err) || "Đã có lỗi xảy ra.";
+            setError(message);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchCourseStats();
+    }, [fetchCourseStats]);
+
+    return {
+        courseStats,
+        loading,
+        error,
+        refetch: fetchCourseStats
+    };
+};
