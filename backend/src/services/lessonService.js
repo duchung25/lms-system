@@ -70,6 +70,12 @@ const LessonService = {
             };
         });
     },
+    async getFirstLesson(courseId) {
+        return Lesson.findOne({ courseId, isPublished: true }).sort({ order: 1 }).select("_id").lean();
+    },
+    async getPublishedLessons(courseId) {
+        return Lesson.find({ courseId, isPublished: true }).sort({ order: 1 }).select("_id order").lean();
+    },
     async getPublishedLessonsByCourse(courseId){
         const course = await Course.findById(courseId);
         if(!course){

@@ -171,6 +171,19 @@ const courseController = {
         } catch (error) {
             next(error);
         }
+    },
+    async getDashboard(req, res, next) {
+        try {
+            const dashboard = await courseService.getCourseDashboard(req.user);
+
+            res.status(200).json({
+                success: true,
+                message: "Dashboard retrieved successfully",
+                data: dashboard
+            });
+        } catch (error) {
+            next(error);
+        }
     }
 }
 

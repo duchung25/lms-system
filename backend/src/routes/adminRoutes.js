@@ -2,12 +2,14 @@ import express from 'express';
 import adminController from '../controllers/adminController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import authorizeMiddleware from '../middlewares/authorizeMiddleware.js';
+import courseController from '../controllers/courseController.js';
 
 const router = express.Router();
 
 router.use(authMiddleware, authorizeMiddleware('admin'));
 
 router.get("/dashboard/statistics", adminController.getDashboardStatistics);
+router.get("/dashboard/courses", courseController.getDashboard);
 
 router.get('/users', adminController.getAllUsers);
 router.get('/users/email', adminController.getUserByEmail);

@@ -46,7 +46,7 @@ lessonSchema.plugin(mongooseDelete, {
     overrideMethods: "all"
 });
 
-lessonSchema.index({ courseId: 1, order: 1 }, { unique: true });
+lessonSchema.index({ courseId: 1, order: 1, isPublished: 1 }, { unique: true });
 lessonSchema.index({ courseId: 1, isPublished: 1 });
 
 export default mongoose.model("Lesson", lessonSchema);

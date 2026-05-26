@@ -1,15 +1,8 @@
 import Enrollment from "../models/Enrollment.js";
 import Course from "../models/Course.js";
 import Lesson from "../models/Lesson.js";
+import LessonService from "./lessonService.js";
 import AppError from "../utils/AppError.js";
-
-const getFirstLesson = (courseId) => {
-    return Lesson.findOne({ courseId, isPublished: true }).sort({ order: 1 }).select("_id").lean();
-};
-
-const getPublishedLessons = (courseId) => {
-    return Lesson.find({ courseId, isPublished: true }).sort({ order: 1 }).select("_id order").lean();
-};
 
 const getLessonProgressState = (lessons, completedLessonIds, lessonId) => {
     const completedIds = new Set(completedLessonIds.map(id => id.toString()));
@@ -28,36 +21,46 @@ const getLessonProgressState = (lessons, completedLessonIds, lessonId) => {
 };
 
 const enrollmentService = {
-    async enrollInCourse(courseId, studentId){
+    async enrollInCourse(courseId, studentId) {
         const course = await Course.findById(courseId);
-        if(!course || !course.isPublished){
+        if (!course?.isPublished) {
             throw new AppError("Course not found", 404);
         }
-        const firstLesson = await getFirstLesson(courseId);
-        const existing = await Enrollment.findOne({ courseId, studentId });
-        if(existing){
-            if(existing.status === "active"){
+
+        const firstLessonId = (await LessonService.getFirstLesson(courseId))?._id || null;
+        let enrollment = await Enrollment.findOne({ courseId, studentId });
+        if (enrollment) {
+            if (enrollment.status === "active") {
                 throw new AppError("Already enrolled in this course", 400);
             }
-            existing.status = "active";
-            existing.cancelledAt = null;
-            existing.currentLessonId = existing.currentLessonId || firstLesson?._id || null;
-            await existing.save();
-            return {
-                enrollment: existing,
-                firstLessonId: firstLesson ? firstLesson._id : null,
-                currentLessonId: existing.currentLessonId || firstLesson?._id || null
-            };
+            enrollment.status = "active";
+            enrollment.cancelledAt = null;
+            enrollment.currentLessonId ||= firstLessonId;
+            await enrollment.save();
+            await Course.findByIdAndUpdate(courseId, {
+                $inc: {
+                    studentsCount: 1
+                }
+            });
+        } 
+        else {
+            enrollment = await Enrollment.create({
+                courseId,
+                studentId,
+                currentLessonId: firstLessonId,
+                lastAccessedAt: firstLessonId ? new Date() : null
+            });
+            await Course.findByIdAndUpdate(courseId, {
+                $inc: {
+                    studentsCount: 1
+                }
+            });
         }
-        const enrollment = await Enrollment.create({
-            courseId,
-            studentId,
-            currentLessonId: firstLesson?._id || null,
-            lastAccessedAt: firstLesson ? new Date() : null
-        });
-        return { enrollment,
-                 firstLessonId: firstLesson ? firstLesson._id : null,
-                 currentLessonId: enrollment.currentLessonId };
+        return {
+            enrollment,
+            firstLessonId,
+            currentLessonId: enrollment.currentLessonId
+        };
     },
     async unenrollFromCourse(courseId, studentId){
         const enrollment = await Enrollment.findOne({ courseId, studentId, status: "active" });
@@ -67,54 +70,88 @@ const enrollmentService = {
         enrollment.status = "cancelled";
         enrollment.cancelledAt = new Date();
         await enrollment.save();
-        return enrollment;
-    },
-    async getMyEnrollments(studentId){
-        const enrollments = await Enrollment.find({ studentId, status: "active" })
-                                            .populate({
-                                                path: "courseId",
-                                                select: "title description teacherId thumbnail price level",
-                                                populate: {
-                                                    path: "teacherId",
-                                                    select: "username email"
-                                                }
-                                            })
-                                            .lean();
-        const courseIds = enrollments.map(e => e.courseId?._id).filter(Boolean);
-        const firstLessons = await Lesson.find({ courseId: { $in: courseIds }, isPublished: true })
-                                        .sort({ order: 1 })
-                                        .select("_id courseId")
-                                        .lean();
-        const firstLessonByCourse = new Map();
-        const publishedLessonIds = new Set();
-        firstLessons.forEach((lesson) => {
-            publishedLessonIds.add(lesson._id.toString());
-            const key = lesson.courseId.toString();
-            if(!firstLessonByCourse.has(key)){
-                firstLessonByCourse.set(key, lesson._id);
+        await Course.findByIdAndUpdate(courseId, {
+            $inc: {
+                studentsCount: -1
             }
         });
-
-        return enrollments
-            .filter(e => e.courseId)
-            .map(e => {
-                const courseKey = e.courseId._id.toString();
-                const firstLessonId = firstLessonByCourse.get(courseKey) || null;
-                const savedLessonId = e.currentLessonId?.toString();
-                const currentLessonId = savedLessonId && publishedLessonIds.has(savedLessonId)
-                    ? e.currentLessonId
-                    : firstLessonId;
-                return {
-                    ...e.courseId,
-                    enrollmentId: e._id,
-                    currentLessonId,
-                    firstLessonId,
-                    progressPercent: e.progressPercent || 0,
-                    completedLessonIds: e.completedLessonIds || [],
-                    lastAccessedAt: e.lastAccessedAt
-                };
-            });
+        return enrollment;
     },
+    // async getMyEnrollments(studentId){
+    //     const enrollments = await Enrollment.find({ studentId, status: "active" })
+    //                                         .populate({
+    //                                             path: "courseId",
+    //                                             select: "title description teacherId thumbnail price level",
+    //                                             populate: {
+    //                                                 path: "teacherId",
+    //                                                 select: "username email"
+    //                                             }
+    //                                         })
+    //                                         .lean();
+    //     const courseIds = enrollments.map(e => e.courseId?._id).filter(Boolean);
+    //     const firstLessons = await Lesson.find({ courseId: { $in: courseIds }, isPublished: true })
+    //                                     .sort({ order: 1 })
+    //                                     .select("_id courseId")
+    //                                     .lean();
+    //     const firstLessonByCourse = new Map();
+    //     const publishedLessonIds = new Set();
+    //     firstLessons.forEach((lesson) => {
+    //         publishedLessonIds.add(lesson._id.toString());
+    //         const key = lesson.courseId.toString();
+    //         if(!firstLessonByCourse.has(key)){
+    //             firstLessonByCourse.set(key, lesson._id);
+    //         }
+    //     });
+
+    //     return enrollments
+    //         .filter(e => e.courseId)
+    //         .map(e => {
+    //             const courseKey = e.courseId._id.toString();
+    //             const firstLessonId = firstLessonByCourse.get(courseKey) || null;
+    //             const savedLessonId = e.currentLessonId?.toString();
+    //             const currentLessonId = savedLessonId && publishedLessonIds.has(savedLessonId)
+    //                 ? e.currentLessonId
+    //                 : firstLessonId;
+    //             return {
+    //                 ...e.courseId,
+    //                 enrollmentId: e._id,
+    //                 currentLessonId,
+    //                 firstLessonId,
+    //                 progressPercent: e.progressPercent || 0,
+    //                 completedLessonIds: e.completedLessonIds || [],
+    //                 lastAccessedAt: e.lastAccessedAt
+    //             };
+    //         });
+    // },
+    async getMyEnrollments(studentId) {
+        const enrollments = await Enrollment.find({
+            studentId,
+            status: "active"
+        })
+            .populate({
+                path: "courseId",
+                select: "title description teacherId thumbnail price level",
+                populate: {
+                    path: "teacherId",
+                    select: "username email"
+                }
+            })
+            .lean();
+
+        return enrollments.map(e => ({
+            _id: e.courseId?._id,
+            title: e.courseId?.title,
+            description: e.courseId?.description,
+            thumbnail: e.courseId?.thumbnail,
+            price: e.courseId?.price,
+            level: e.courseId?.level,
+            teacherId: e.courseId?.teacherId,
+            enrollmentId: e._id,
+            progressPercent: e.progressPercent || 0,
+            lastAccessedAt: e.lastAccessedAt
+        }));
+    },
+                                                
     async getCourseEnrollments(courseId){
         return Enrollment.find({ courseId, status: "active" }).populate("studentId", "username email avatar").lean();
     },
@@ -133,7 +170,7 @@ const enrollmentService = {
             throw new AppError("Lesson not found", 404);
         }
 
-        const lessons = await getPublishedLessons(courseId);
+        const lessons = await LessonService.getPublishedLessons(courseId);
         const progressState = getLessonProgressState(lessons, enrollment.completedLessonIds, lessonId);
         if(!progressState.canAccess){
             throw new AppError("Please complete the previous lesson before opening this lesson", 403);
@@ -155,7 +192,7 @@ const enrollmentService = {
             throw new AppError("Enrollment not found", 404);
         }
 
-        const lessons = await getPublishedLessons(courseId);
+        const lessons = await LessonService.getPublishedLessons(courseId);
         const progressState = getLessonProgressState(lessons, enrollment.completedLessonIds, lessonId);
         if(progressState.lessonIndex === -1){
             throw new AppError("Lesson not found", 404);
@@ -194,7 +231,7 @@ const enrollmentService = {
             throw new AppError("Enrollment not found", 404);
         }
 
-        const lessons = await getPublishedLessons(courseId);
+        const lessons = await LessonService.getPublishedLessons(courseId);
         const progressState = getLessonProgressState(lessons, enrollment.completedLessonIds || [], lessonId);
         if(progressState.lessonIndex === -1){
             throw new AppError("Lesson not found", 404);

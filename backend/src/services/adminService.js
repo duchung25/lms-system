@@ -124,7 +124,6 @@ const adminService = {
             totalUsers,
             activeUsers,
             inactiveUsers,
-            deletedUsers,
             totalStudents,
             totalTeachers,
             totalAdmins,
@@ -142,10 +141,6 @@ const adminService = {
             User.countDocuments({
                 active: false,
                 deleted: false
-            }),
-
-            User.countDocuments({
-                deleted: true
             }),
 
             User.countDocuments({
@@ -208,7 +203,6 @@ const adminService = {
                 totalUsers,
                 activeUsers,
                 inactiveUsers,
-                deletedUsers,
                 totalStudents,
                 totalTeachers,
                 totalAdmins,

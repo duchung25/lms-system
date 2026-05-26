@@ -1,6 +1,7 @@
 
 import Course from '../models/Course.js';
 import Lesson from '../models/Lesson.js';
+import Enrollment from '../models/Enrollment.js'
 import AppError from '../utils/AppError.js';
 
 
@@ -129,14 +130,158 @@ const courseService = {
             .populate("teacherId", "username email avatar")
             .lean();
     },
-    async countHandler(){
-        const totalCourses = await Course.countDocuments();
-        const publishedCourses = await Course.countDocuments({ isPublished: true });
-        const unpublishedCourses = await Course.countDocuments({ isPublished: false });
-        return {
+    async getCourseDashboard(user) {
+        const query = {};
+
+        // teacher chỉ xem course của họ
+        if (user.role.toLowerCase() === "teacher") {
+            query.teacherId = user.userId;
+        }
+
+        const [
             totalCourses,
             publishedCourses,
-            unpublishedCourses
+            draftCourses,
+
+            latestCourses,
+            topCourses,
+
+            courseStats,
+
+            totalEnrollments,
+            completedEnrollments,
+
+            averageProgress,
+
+            enrollmentGrowth
+        ] = await Promise.all([
+            // ===== COURSE COUNTS =====
+            Course.countDocuments(query),
+
+            Course.countDocuments({ ...query, isPublished: true }),
+
+            Course.countDocuments({ ...query, isPublished: false }),
+
+            // ===== LATEST COURSES =====
+            Course.find(query)
+                .select("title thumbnail level studentsCount createdAt isPublished")
+                .sort({ createdAt: -1 })
+                .limit(5)
+                .lean(),
+
+            // ===== TOP COURSES =====
+            Course.find(query)
+                .select("title thumbnail level studentsCount totalLessons")
+                .sort({ studentsCount: -1 })
+                .limit(5)
+                .lean(),
+
+            // ===== COURSE STATS =====
+            Course.aggregate([
+                { $match: query },
+
+                {
+                    $group: {
+                        _id: null,
+
+                        totalStudents: { $sum: "$studentsCount" },
+
+                        totalLessons: { $sum: "$totalLessons" },
+
+                        totalDuration: { $sum: "$totalDuration" }
+                    }
+                }
+            ]),
+
+            // ===== ENROLLMENTS =====
+            Enrollment.countDocuments({ status: "active" }),
+
+            Enrollment.countDocuments({
+                status: "active",
+                progressPercent: 100
+            }),
+
+            // ===== AVERAGE PROGRESS =====
+            Enrollment.aggregate([
+                { $match: { status: "active" } },
+
+                {
+                    $group: {
+                        _id: null,
+                        averageProgress: { $avg: "$progressPercent" }
+                    }
+                }
+            ]),
+
+            // ===== ENROLLMENT GROWTH =====
+            Enrollment.aggregate([
+                { $match: { status: "active" } },
+
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: "$createdAt" },
+                            month: { $month: "$createdAt" }
+                        },
+
+                        totalEnrollments: { $sum: 1 }
+                    }
+                },
+
+                {
+                    $sort: {
+                        "_id.year": 1,
+                        "_id.month": 1
+                    }
+                }
+            ])
+        ]);
+
+        const stats = courseStats[0] || {
+            totalStudents: 0,
+            totalLessons: 0,
+            totalDuration: 0
+        };
+
+        const avgProgress = Math.round(
+            averageProgress[0]?.averageProgress || 0
+        );
+
+        const completionRate = totalEnrollments > 0
+            ? Math.round(
+                (completedEnrollments / totalEnrollments) * 100
+            )
+            : 0;
+
+        return {
+            overview: {
+                totalCourses,
+                publishedCourses,
+                draftCourses,
+
+                totalStudents: stats.totalStudents,
+
+                totalLessons: stats.totalLessons,
+
+                totalDuration: stats.totalDuration
+            },
+
+            learningStats: {
+                totalEnrollments,
+                completedEnrollments,
+
+                averageProgress: avgProgress,
+
+                completionRate
+            },
+
+            charts: {
+                enrollmentGrowth
+            },
+
+            topCourses,
+
+            latestCourses
         };
     }
 }
