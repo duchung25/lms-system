@@ -174,8 +174,20 @@ const courseController = {
     },
     async getDashboard(req, res, next) {
         try {
-            const dashboard = await courseService.getCourseDashboard(req.user);
-
+            const dashboard = await courseService.getAdminCourseDashboard();
+            res.status(200).json({
+                success: true,
+                message: "Dashboard retrieved successfully",
+                data: dashboard
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+    async getTeacherDashboard(req, res, next) {
+        try {
+            const teacherId = req.user.userId;
+            const dashboard = await courseService.getTeacherCourseDashboard(teacherId);
             res.status(200).json({
                 success: true,
                 message: "Dashboard retrieved successfully",

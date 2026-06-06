@@ -3,6 +3,7 @@ import Course from "../models/Course.js";
 import Lesson from "../models/Lesson.js";
 import LessonService from "./lessonService.js";
 import AppError from "../utils/AppError.js";
+import lessonProgressService from "./lessonProgressService.js";
 
 const getLessonProgressState = (lessons, completedLessonIds, lessonId) => {
     const completedIds = new Set(completedLessonIds.map(id => id.toString()));
@@ -26,7 +27,9 @@ const enrollmentService = {
         if (!course?.isPublished) {
             throw new AppError("Course not found", 404);
         }
-
+        if (course.price > 0) {
+            throw new AppError("This course is not free. Please purchase the course before enrolling.", 400);
+        }
         const firstLessonId = (await LessonService.getFirstLesson(courseId))?._id || null;
         let enrollment = await Enrollment.findOne({ courseId, studentId });
         if (enrollment) {
@@ -77,52 +80,6 @@ const enrollmentService = {
         });
         return enrollment;
     },
-    // async getMyEnrollments(studentId){
-    //     const enrollments = await Enrollment.find({ studentId, status: "active" })
-    //                                         .populate({
-    //                                             path: "courseId",
-    //                                             select: "title description teacherId thumbnail price level",
-    //                                             populate: {
-    //                                                 path: "teacherId",
-    //                                                 select: "username email"
-    //                                             }
-    //                                         })
-    //                                         .lean();
-    //     const courseIds = enrollments.map(e => e.courseId?._id).filter(Boolean);
-    //     const firstLessons = await Lesson.find({ courseId: { $in: courseIds }, isPublished: true })
-    //                                     .sort({ order: 1 })
-    //                                     .select("_id courseId")
-    //                                     .lean();
-    //     const firstLessonByCourse = new Map();
-    //     const publishedLessonIds = new Set();
-    //     firstLessons.forEach((lesson) => {
-    //         publishedLessonIds.add(lesson._id.toString());
-    //         const key = lesson.courseId.toString();
-    //         if(!firstLessonByCourse.has(key)){
-    //             firstLessonByCourse.set(key, lesson._id);
-    //         }
-    //     });
-
-    //     return enrollments
-    //         .filter(e => e.courseId)
-    //         .map(e => {
-    //             const courseKey = e.courseId._id.toString();
-    //             const firstLessonId = firstLessonByCourse.get(courseKey) || null;
-    //             const savedLessonId = e.currentLessonId?.toString();
-    //             const currentLessonId = savedLessonId && publishedLessonIds.has(savedLessonId)
-    //                 ? e.currentLessonId
-    //                 : firstLessonId;
-    //             return {
-    //                 ...e.courseId,
-    //                 enrollmentId: e._id,
-    //                 currentLessonId,
-    //                 firstLessonId,
-    //                 progressPercent: e.progressPercent || 0,
-    //                 completedLessonIds: e.completedLessonIds || [],
-    //                 lastAccessedAt: e.lastAccessedAt
-    //             };
-    //         });
-    // },
     async getMyEnrollments(studentId) {
         const enrollments = await Enrollment.find({
             studentId,
@@ -170,11 +127,7 @@ const enrollmentService = {
             throw new AppError("Lesson not found", 404);
         }
 
-        const lessons = await LessonService.getPublishedLessons(courseId);
-        const progressState = getLessonProgressState(lessons, enrollment.completedLessonIds, lessonId);
-        if(!progressState.canAccess){
-            throw new AppError("Please complete the previous lesson before opening this lesson", 403);
-        }
+        await lessonProgressService.canAccessLesson(courseId, studentId, lessonId);
 
         enrollment.currentLessonId = lessonId;
         enrollment.lastAccessedAt = new Date();
@@ -187,57 +140,121 @@ const enrollmentService = {
             throw new AppError("lessonId is required", 400);
         }
 
-        const enrollment = await Enrollment.findOne({ courseId, studentId, status: "active" });
-        if(!enrollment){
-            throw new AppError("Enrollment not found", 404);
-        }
-
-        const lessons = await LessonService.getPublishedLessons(courseId);
-        const progressState = getLessonProgressState(lessons, enrollment.completedLessonIds, lessonId);
-        if(progressState.lessonIndex === -1){
-            throw new AppError("Lesson not found", 404);
-        }
-        if(!progressState.canAccess){
-            throw new AppError("Please complete the previous lesson before completing this lesson", 403);
-        }
-
-        const completedIds = enrollment.completedLessonIds.map(id => id.toString());
-        if(!completedIds.includes(lessonId.toString())){
-            enrollment.completedLessonIds.push(lessonId);
-            completedIds.push(lessonId.toString());
-        }
-
-        const completedLessonIds = new Set(completedIds);
-        const completedCount = lessons.filter(lesson => completedLessonIds.has(lesson._id.toString())).length;
-        const totalLessons = lessons.length;
-        const isCourseCompleted = totalLessons > 0 && completedCount >= totalLessons;
-
-        enrollment.currentLessonId = progressState.nextLessonId || lessonId;
-        enrollment.lastAccessedAt = new Date();
-        enrollment.progressPercent = totalLessons > 0
-            ? Math.min(100, Math.round((completedCount / totalLessons) * 100))
-            : 0;
-
-        await enrollment.save();
+        const result = await lessonProgressService.markLessonCompleted(courseId, studentId, lessonId);
         return {
-            enrollment,
-            nextLessonId: progressState.nextLessonId,
-            isCourseCompleted
+            enrollment: await Enrollment.findOne({ courseId, studentId, status: "active" }).lean(),
+            nextLessonId: result.nextLessonId,
+            isCourseCompleted: result.isCourseCompleted
         };
     },
     async canAccessLesson(courseId, studentId, lessonId){
-        const enrollment = await Enrollment.findOne({ courseId, studentId, status: "active" }).lean();
-        if(!enrollment){
-            throw new AppError("Enrollment not found", 404);
-        }
+        return lessonProgressService.canAccessLesson(courseId, studentId, lessonId);
+    },
+    async getStudentDashboard(studentId) {
+        const [
+            activeCourses,
+            completedCourses,
+            averageProgress,
+            continueLearning,
+            recentCourses,
+            progressDistribution
+        ] = await Promise.all([
+            Enrollment.countDocuments({
+                studentId,
+                status: "active"
+            }),
 
-        const lessons = await LessonService.getPublishedLessons(courseId);
-        const progressState = getLessonProgressState(lessons, enrollment.completedLessonIds || [], lessonId);
-        if(progressState.lessonIndex === -1){
-            throw new AppError("Lesson not found", 404);
-        }
+            Enrollment.countDocuments({
+                studentId,
+                status: "active",
+                progressPercent: 100
+            }),
 
-        return progressState.canAccess;
+            Enrollment.aggregate([
+                {
+                    $match: {
+                        studentId,
+                        status: "active"
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        averageProgress: {
+                            $avg: "$progressPercent"
+                        }
+                    }
+                }
+            ]),
+
+            Enrollment.find({
+                studentId,
+                status: "active",
+                progressPercent: { $lt: 100 }
+            })
+                .populate(
+                    "courseId",
+                    "title thumbnail level"
+                )
+                .populate(
+                    "currentLessonId",
+                    "title order"
+                )
+                .sort({ lastAccessedAt: -1 })
+                .limit(5)
+                .lean(),
+
+            Enrollment.find({
+                studentId,
+                status: "active"
+            })
+                .populate(
+                    "courseId",
+                    "title thumbnail level"
+                )
+                .sort({ lastAccessedAt: -1 })
+                .limit(5)
+                .lean(),
+
+            Enrollment.aggregate([
+                {
+                    $match: {
+                        studentId,
+                        status: "active"
+                    }
+                },
+                {
+                    $bucket: {
+                        groupBy: "$progressPercent",
+                        boundaries: [0, 25, 50, 75, 100, 101],
+                        default: "other",
+                        output: {
+                            count: { $sum: 1 }
+                        }
+                    }
+                }
+            ])
+        ]);
+
+        const avgProgress = Math.round(
+            averageProgress[0]?.averageProgress ?? 0
+        );
+
+        return {
+            overview: {
+                activeCourses,
+                completedCourses,
+                averageProgress: avgProgress
+            },
+
+            continueLearning,
+
+            recentCourses,
+
+            charts: {
+                progressDistribution
+            }
+        };
     }
 };
 

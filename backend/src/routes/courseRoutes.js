@@ -4,18 +4,37 @@ import courseValidator from '../validators/courseValidator.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
 import writeAccessMiddleware from '../middlewares/writeAccessMiddleware.js';
 import lessonRoutes from './lessonRoutes.js';
+import authorizeMiddleware from '../middlewares/authorizeMiddleware.js';
+import ratingController from '../controllers/ratingController.js';
+import ratingValidator from '../validators/ratingValidator.js';
 
 const router = express.Router();
 
 router.use('/', lessonRoutes);
 
-router.get('/by-teacher/:teacherId', authMiddleware, courseController.getCoursesByTeacher);
+router.get('/by-teacher/:teacherId', authMiddleware, authorizeMiddleware('teacher', 'admin'), courseController.getCoursesByTeacher);
 router.get('/my-courses', authMiddleware, courseController.getMyCourses);
 router.patch('/:courseId/publish-status', authMiddleware, writeAccessMiddleware, courseController.setPublishStatus);
+router.get('/teacher/dashboard', authMiddleware, authorizeMiddleware('teacher'), courseController.getTeacherDashboard);
+router.post(
+  '/:courseId/ratings',
+  authMiddleware,
+  authorizeMiddleware('student'),
+  ratingValidator.upsertRatingValidationRules,
+  ratingValidator.validate,
+  ratingController.upsertRating
+);
+router.put(
+  '/:courseId/ratings',
+  authMiddleware,
+  authorizeMiddleware('student'),
+  ratingValidator.upsertRatingValidationRules,
+  ratingValidator.validate,
+  ratingController.upsertRating
+);
 
-router.post('/', authMiddleware, courseValidator.createCourseValidationRules, courseValidator.validate, courseController.createCourse);
+router.post('/', authMiddleware, authorizeMiddleware('teacher'), courseValidator.createCourseValidationRules, courseValidator.validate, courseController.createCourse);
 router.get('/', authMiddleware,  courseController.getAllCourse);
-router.get('/count/summary', authMiddleware, courseController.countHandler);
 router.get('/:courseId', authMiddleware, courseController.getCourseDetail);
 router.patch('/:courseId', authMiddleware, writeAccessMiddleware, courseValidator.updateCourseValidationRules, courseValidator.validate, courseController.updateCourse);
 router.delete('/:courseId', authMiddleware, writeAccessMiddleware, courseController.deleteCourse);

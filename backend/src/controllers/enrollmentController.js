@@ -93,6 +93,20 @@ const enrollmentController = {
         catch(error){
             next(error);
         }
+    },
+    async getStudentDashboard(req, res, next) {
+        try{
+            const studentId = req.user.userId;
+            const dashboardData = await enrollmentService.getStudentDashboard(studentId);
+            res.status(200).json({
+                success: true,
+                message: "Student dashboard retrieved successfully",
+                data: { dashboardData }
+            });
+        }
+        catch(error){
+            next(error);
+        }
     }
 };
 

@@ -5,8 +5,7 @@ import authorizeMiddleware from '../middlewares/authorizeMiddleware.js';
 
 const router = express.Router();
 
-//Create a teacher request
-router.post("/", authMiddleware, teacherRequestController.createTeacherRequest);
+router.post("/", authMiddleware, authorizeMiddleware("student"), teacherRequestController.createTeacherRequest);
 router.get("/me", authMiddleware, teacherRequestController.getMyRequest);
 
 // Admin actions

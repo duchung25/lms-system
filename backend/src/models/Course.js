@@ -48,6 +48,8 @@ const courseSchema = new mongoose.Schema(
         totalLessons:   { type: Number, default: 0 },
         totalDuration:  { type: Number, default: 0 },
         studentsCount:  { type: Number, default: 0 },
+        averageRating: { type: Number, default: 0 },
+        ratingCount: { type: Number, default: 0 },
     },
     {
         timestamps: true

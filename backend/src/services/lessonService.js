@@ -3,6 +3,7 @@ import Course from "../models/Course.js";
 import Enrollment from "../models/Enrollment.js";
 import AppError from "../utils/AppError.js";
 import enrollmentService from "./enrollmentService.js";
+import lessonProgressService from "./lessonProgressService.js";
 
 const LessonService = {
     async createLesson(courseid, data, user ){
@@ -31,11 +32,7 @@ const LessonService = {
         if(!course){
             throw new AppError("Course not found", 404);
         }
-        const lessonQuery = { courseId };
-        if(user?.role === "student"){
-            lessonQuery.isPublished = true;
-        }
-        const lessons = await Lesson.find(lessonQuery)
+        const lessons = await Lesson.find({ courseId, isPublished: true })
         .select("_id title order duration ")
         .sort({ order: 1 })
         .lean();
@@ -44,31 +41,7 @@ const LessonService = {
             return lessons;
         }
 
-        const enrollment = await Enrollment.findOne({
-            courseId,
-            studentId: user.userId,
-            status: "active"
-        }).lean();
-        if(!enrollment){
-            return lessons.map((lesson, index) => ({
-                ...lesson,
-                isCompleted: false,
-                isLocked: index !== 0
-            }));
-        }
-
-        const completedIds = new Set((enrollment.completedLessonIds || []).map(id => id.toString()));
-        return lessons.map((lesson, index) => {
-            const previousLesson = lessons[index - 1];
-            const isCompleted = completedIds.has(lesson._id.toString());
-            const canAccess = index === 0 || isCompleted || completedIds.has(previousLesson?._id.toString());
-            return {
-                ...lesson,
-                isCompleted,
-                isCurrent: enrollment.currentLessonId?.toString() === lesson._id.toString(),
-                isLocked: !canAccess
-            };
-        });
+        return lessonProgressService.getLessonStates(courseId, user.userId);
     },
     async getFirstLesson(courseId) {
         return Lesson.findOne({ courseId, isPublished: true }).sort({ order: 1 }).select("_id").lean();
@@ -105,10 +78,7 @@ const LessonService = {
             throw new AppError("Course is not published yet", 403);
         }
         if(user?.role === "student"){
-            const canAccess = await enrollmentService.canAccessLesson(courseId, user.userId, lessonId);
-            if(!canAccess){
-                throw new AppError("Please complete the previous lesson before opening this lesson", 403);
-            }
+            await lessonProgressService.canAccessLesson(courseId, user.userId, lessonId);
         }
         return lesson;
     },

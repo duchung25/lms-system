@@ -1,4 +1,5 @@
 import LessonService from '../services/lessonService.js';
+import lessonProgressService from '../services/lessonProgressService.js';
 
 const LessonController = {
     async createLesson(req, res, next){
@@ -125,6 +126,58 @@ const LessonController = {
                 success: true,
                 message: "Lesson unpublished successfully",
                 data: null
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    },
+    async completeLesson(req, res, next){
+        try{
+            const { courseId, lessonId } = req.params;
+            const result = await lessonProgressService.markLessonCompleted(
+                courseId,
+                req.user.userId,
+                lessonId
+            );
+            res.status(200).json({
+                success: true,
+                message: "Lesson completed successfully",
+                data: result
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    },
+    async getCourseProgress(req, res, next){
+        try{
+            const { courseId } = req.params;
+            const progress = await lessonProgressService.getCourseProgress(
+                courseId,
+                req.user.userId
+            );
+            res.status(200).json({
+                success: true,
+                message: "Course progress retrieved successfully",
+                data: { progress }
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    },
+    async getUnlockedLessons(req, res, next){
+        try{
+            const { courseId } = req.params;
+            const lessons = await lessonProgressService.getUnlockedLessons(
+                courseId,
+                req.user.userId
+            );
+            res.status(200).json({
+                success: true,
+                message: "Unlocked lessons retrieved successfully",
+                data: { lessons }
             });
         }
         catch (error) {

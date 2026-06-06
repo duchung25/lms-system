@@ -59,6 +59,10 @@ orderSchema.index(
         }
     }
 );
+orderSchema.index(
+  { studentId: 1, courseId: 1 },
+  { unique: true }
+);
 
 const Order = mongoose.model("Order", orderSchema);
 
