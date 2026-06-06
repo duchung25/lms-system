@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { lessonService } from "../service/lesson.service";
 import { getErrorMessage } from "../helpers/error.helper";
 
@@ -69,6 +69,72 @@ export const useLessonDetail = (courseId, lessonId) => {
   }, [courseId, lessonId]);
 
   return { lesson, loading, error };
+};
+
+export const useUnlockedLessons = (courseId, enabled = true) => {
+  const [lessons, setLessons] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const fetchLessons = useCallback(async () => {
+    if (!courseId || !enabled) {
+      setLessons([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const data = await lessonService.getUnlockedLessons(courseId);
+      setLessons(data);
+    } catch (err) {
+      setLessons([]);
+      setError(getErrorMessage(err) || "Đã có lỗi xảy ra. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  }, [courseId, enabled]);
+
+  useEffect(() => {
+    fetchLessons();
+  }, [fetchLessons]);
+
+  return { lessons, loading, error, refreshLessons: fetchLessons };
+};
+
+export const useCourseProgress = (courseId, enabled = true) => {
+  const [progress, setProgress] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const fetchProgress = useCallback(async () => {
+    if (!courseId || !enabled) {
+      setProgress(null);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const data = await lessonService.getCourseProgress(courseId);
+      setProgress(data);
+    } catch (err) {
+      setProgress(null);
+      setError(getErrorMessage(err) || "Đã có lỗi xảy ra. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  }, [courseId, enabled]);
+
+  useEffect(() => {
+    fetchProgress();
+  }, [fetchProgress]);
+
+  return { progress, loading, error, refreshProgress: fetchProgress };
 };
 
 export const useCreateLesson = () => {

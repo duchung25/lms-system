@@ -16,6 +16,15 @@ export const lessonApi = {
     deleteLesson: (courseId, lessonId) => {
         return apiClient.delete(`/courses/${courseId}/lessons/${lessonId}`);
     },
+    completeLesson: (courseId, lessonId) => {
+        return apiClient.post(`/courses/${courseId}/lessons/${lessonId}/complete`);
+    },
+    getCourseProgress: (courseId) => {
+        return apiClient.get(`/courses/${courseId}/progress`);
+    },
+    getUnlockedLessons: (courseId) => {
+        return apiClient.get(`/courses/${courseId}/unlocked-lessons`);
+    },
     // restoreLesson: (courseId, lessonId) => {
     //     return apiClient.patch(`/courses/${courseId}/lessons/${lessonId}/restore`);
     // }

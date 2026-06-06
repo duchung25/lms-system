@@ -1,0 +1,145 @@
+.teacher-dashboard-v2 {
+  padding: 24px;
+  background: var(--color-background);
+  min-height: 100vh;
+  font-family: var(--font-primary);
+}
+
+/* HEADER */
+.td-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.td-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.td-tabs button {
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-surface-container);
+  cursor: pointer;
+}
+
+.td-tabs button.active {
+  background: var(--color-primary-container);
+  color: white;
+}
+
+/* GLASS EFFECT (theo design system bạn) */
+.glass {
+  background: var(--color-surface-container-low);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-level-1);
+  backdrop-filter: blur(10px);
+}
+
+/* HERO */
+.td-hero {
+  display: flex;
+  justify-content: space-between;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.td-pills {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.pill {
+  padding: 8px 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-container);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.pill.highlight {
+  background: var(--color-primary-container);
+  color: white;
+}
+
+/* GRID */
+.td-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* TIMELINE */
+.timeline-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.timeline-row .dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary-container);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* MINI ROW */
+.mini-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mini-row img {
+  width: 50px;
+  height: 35px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+/* REVENUE HERO */
+.td-revenue-hero {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+}
+
+.td-inline-kpi {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  opacity: 0.9;
+}
+
+/* LEDGER */
+.ledger-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .td-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .td-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}

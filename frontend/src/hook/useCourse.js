@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { courseService } from "../service/course.service";
 import { getErrorMessage } from "../helpers/error.helper.js";
+import { lessonService } from "../service/lesson.service";
 
 export const useCourses = ({ q, category, level, published, deleted, role }) => {
   const [courses, setCourses] = useState([]);
@@ -352,7 +353,7 @@ export const useCompleteLesson = () => {
   const completeLesson = useCallback(async (courseId, lessonId) => {
     setLoading(true);
     try {
-      return await courseService.completeLesson(courseId, lessonId);
+      return await lessonService.completeLesson(courseId, lessonId);
     } catch (err) {
       throw new Error(
         getErrorMessage(err) ||
@@ -397,4 +398,30 @@ export const useEnrolledCourses = (enabled = true) => {
   }, [enabled]);
 
   return { courses, loading, error };
+};
+
+export const useTeacherDashboard = () => {
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const data = await courseService.getTeacherDashboard();
+        setDashboardData(data);
+      } catch (err) {
+        setDashboardData(null);
+        setError(getErrorMessage(err) || "Đã có lỗi xảy ra. Vui lòng thử lại.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  return { dashboardData, loading, error };
 };

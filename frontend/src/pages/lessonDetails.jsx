@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useLessons, useLessonDetail } from "../hook/useLesson.js";
+import { useUnlockedLessons, useLessonDetail } from "../hook/useLesson.js";
 import { useCompleteLesson, useUpdateLearningProgress } from "../hook/useCourse.js";
 import { useAuth } from "../auth/useAuth.js";
+import CommentSection from "../components/comments/commentSection.jsx";
+import { FaCircleCheck, FaLock, FaCirclePlay } from "react-icons/fa6";
 
 
 export default function LessonDetail() {
@@ -16,8 +18,8 @@ export default function LessonDetail() {
     completed: false,
   });
 
-  const {lessons, loading: lessonsLoading, error: lessonsError} = useLessons(courseId);
   const {lesson, loading: lessonLoading, error: lessonError} = useLessonDetail(courseId, lessonId);
+  const {lessons, loading: lessonsLoading, error: lessonsError, refreshLessons} = useUnlockedLessons(courseId, !!courseId && !!lesson);
   const { updateLearningProgress } = useUpdateLearningProgress();
   const { completeLesson, loading: completing } = useCompleteLesson();
   const loading = lessonsLoading || lessonLoading;
@@ -38,6 +40,7 @@ export default function LessonDetail() {
     try {
       setLessonAction({ lessonId, error: "", message: "", completed: false });
       const result = await completeLesson(courseId, lessonId);
+      await refreshLessons();
       setLessonAction({ lessonId, error: "", message: "", completed: true });
 
       if (result?.nextLessonId) {
@@ -132,19 +135,31 @@ export default function LessonDetail() {
               )}
             </div>
           </div>
+
+          <CommentSection key={`${courseId}-${lessonId}`} courseId={courseId} lessonId={lessonId} />
         </div>
       </div>
 
       <div className="col-12 col-lg-4">
 
         <div className="card border-0 shadow-sm sticky-top" style={{ top: 16 }}>
-          <div className="card-header bg-white border-bottom">
+          <div className="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
             <strong>Lessons</strong>
+            <span className="text-muted small">
+              {lessons.filter((l) => l.isCompleted).length}/{lessons.length}
+            </span>
           </div>
 
           <div className="list-group list-group-flush overflow-auto" style={{ maxHeight: "80vh" }}>
             {lessons.map((l) => {
               const isActive = l._id === lessonId;
+              const icon = l.isCompleted ? (
+                <FaCircleCheck className="text-success" />
+              ) : l.isLocked ? (
+                <FaLock className="text-muted" />
+              ) : (
+                <FaCirclePlay className="text-primary" />
+              );
 
               return (
                 <button
@@ -161,11 +176,14 @@ export default function LessonDetail() {
                     transition: "all var(--transition-base)",
                   }}
                 >
-                  <div className="d-flex flex-column">
-                    <span className="fw-medium">{l.title}</span>
-                    <small className={isActive ? "text-white-50" : "text-muted"}>
-                      {l.isCompleted ? "Đã hoàn thành" : l.isLocked ? "Bị khóa" : "Tap to view lesson"}
-                    </small>
+                  <div className="d-flex align-items-start gap-2">
+                    <span className="mt-1">{icon}</span>
+                    <div className="d-flex flex-column text-start">
+                      <span className="fw-medium">{l.title}</span>
+                      <small className={isActive ? "text-white-50" : "text-muted"}>
+                        {l.isCompleted ? "Completed" : l.isLocked ? "Locked" : "Unlocked"}
+                      </small>
+                    </div>
                   </div>
                 </button>
               );

@@ -12,6 +12,8 @@ import CourseForm from "../pages/courseForm.jsx";
 import LessonForm from "../pages/lessonForm.jsx";
 import LessonDetail from "../pages/lessonDetails.jsx";
 import AdminDashboard from "../pages/adminDashboard.jsx";
+import PaymentPage from "../pages/paymentPage.jsx";
+import TeacherDashboard from "../pages/teacherDashboard.jsx";
 
 export default [
   {
@@ -36,7 +38,7 @@ export default [
       {
         element: <ProtectedRoute allowedRoles={["teacher"]} />,
         children: [
-          
+          { path: "/teacher/dashboard", element: <TeacherDashboard /> },
           { path: "/courses/create", element: <CourseForm /> },
           { path: "/courses/:courseId/edit", element: <CourseForm /> },
           { path: "/courses/:courseId/lessons/new", element: <LessonForm /> },
@@ -48,6 +50,12 @@ export default [
           { path: "/courses/my-courses", element: <MyCoursesPage /> },
         ],
       },
+      {
+        element: <ProtectedRoute allowedRoles={["student"]} />,
+        children: [
+          { path: "/payment/:orderId", element: <PaymentPage /> },
+        ],
+      }
     ],
   },
   {

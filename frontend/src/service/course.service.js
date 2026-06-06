@@ -79,5 +79,9 @@ export const courseService = {
     return Array.isArray(res.data?.data?.courses)
       ? res.data.data.courses
       : [];
+  },
+  async getTeacherDashboard() {
+    const res = await courseApi.getTeacherDashboard();
+    return res.data?.data ?? null;
   }
 };

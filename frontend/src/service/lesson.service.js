@@ -29,4 +29,19 @@ export const lessonService = {
     const res = await lessonApi.deleteLesson(courseId, lessonId);
     return res.data?.data?.lesson ?? null;
   },
+
+  async completeLesson(courseId, lessonId) {
+    const res = await lessonApi.completeLesson(courseId, lessonId);
+    return res.data?.data ?? null;
+  },
+
+  async getCourseProgress(courseId) {
+    const res = await lessonApi.getCourseProgress(courseId);
+    return res.data?.data?.progress ?? null;
+  },
+
+  async getUnlockedLessons(courseId) {
+    const res = await lessonApi.getUnlockedLessons(courseId);
+    return Array.isArray(res.data?.data?.lessons) ? res.data.data.lessons : [];
+  },
 };
