@@ -1,4 +1,5 @@
 import express from 'express';
+import navLinkRoutes from './navLinkRoutes.js';
 import authRoutes from './authRoutes.js';
 import adminRoutes from './adminRoutes.js';
 import courseRoutes from './courseRoutes.js';
@@ -17,4 +18,5 @@ router.use('/enrollments', enrollmentRoutes);
 router.use('/orders', orderRoutes);
 router.use('/payments', paymentRoutes);
 
+router.use('/navlinks', navLinkRoutes);
 export default router;

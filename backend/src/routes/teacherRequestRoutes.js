@@ -8,7 +8,6 @@ const router = express.Router();
 router.post("/", authMiddleware, authorizeMiddleware("student"), teacherRequestController.createTeacherRequest);
 router.get("/me", authMiddleware, teacherRequestController.getMyRequest);
 
-// Admin actions
 router.get("/", authMiddleware, authorizeMiddleware("admin"), teacherRequestController.getAllTeacherRequests);
 router.patch("/:id/approve", authMiddleware, authorizeMiddleware("admin"), teacherRequestController.approveTeacherRequest);
 router.patch("/:id/reject", authMiddleware, authorizeMiddleware("admin"), teacherRequestController.rejectTeacherRequest);
