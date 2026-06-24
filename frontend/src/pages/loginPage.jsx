@@ -1,11 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../hook/useAuth';
-
-import LoginImg from '../assets/img/login_image.jpg';
-import '../assets/css/pages/loginPage.css';
 import { FaGoogle, FaFacebookF } from '../icons';
-import  loginImg from '../assets/img/login_image.jpg';
+import loginImg from '../assets/img/login_image.jpg';
 
 export default function LoginPage() {
   const navigate = useNavigate();

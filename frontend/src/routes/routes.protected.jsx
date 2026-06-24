@@ -14,6 +14,7 @@ import LessonDetail from "../pages/lessonDetails.jsx";
 import AdminDashboard from "../pages/adminDashboard.jsx";
 import PaymentPage from "../pages/paymentPage.jsx";
 import TeacherDashboard from "../pages/teacherDashboard.jsx";
+import AdminNavLink from "../pages/adminNavLink.jsx";
 
 export default [
   {
@@ -32,7 +33,8 @@ export default [
           { path: "/admin/courses", element: <CoursesPage /> },
           { path: "/courses/:courseId/lessons/new", element: <LessonForm /> },
           { path: "/admin/users", element: <UserManagement /> },
-          { path: "/admin/dashboard", element: <AdminDashboard /> }
+          { path: "/admin/dashboard", element: <AdminDashboard /> },
+          { path: "/admin/navlinks", element: <AdminNavLink /> }
         ],
       },
       {

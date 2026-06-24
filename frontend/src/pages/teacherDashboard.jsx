@@ -14,8 +14,6 @@ import {
 import { useTeacherDashboard } from "../hook/useCourse";
 import { useGetTeacherOrderDashboard } from "../hook/useOrder";
 
-import "../assets/css/pages/teacherDashboard.css";
-
 export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState("courses");
 

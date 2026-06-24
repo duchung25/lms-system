@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useGetAllUsers, useDeleteUser, useRestoreUser, useDeactivateUser, useResetPassword } from "../hook/useAdmin.js";
-import "../assets/css/pages/userManagement.css";
 import { IoIosSearch, SlOptionsVertical } from "../icons";
 import Toast from "../components/toast/toast.jsx";
 

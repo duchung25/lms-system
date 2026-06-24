@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegisterImg from '../assets/img/register_image.jpg';
 import { useRegister } from '../hook/useAuth.js';
-import '../assets/css/pages/loginPage.css'; 
 
 export default function RegisterPage() {
   const navigate = useNavigate();

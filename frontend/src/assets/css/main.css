@@ -1,6 +1,17 @@
+/* ============================
+   RESET & BASE IMPORT
+============================ */
 @import "./reset.css";
 @import "./variables.css";
 
+/* ============================
+   BASE ANIMATIONS
+============================ */
+@import "./base/animations.css";
+
+/* ============================
+   COMPONENTS
+============================ */
 @import "./components/button.css";
 @import "./components/input.css";
 @import "./components/card.css";
@@ -8,14 +19,29 @@
 @import "./components/badge.css";
 @import "./components/header.css";
 @import "./components/footer.css";
+@import "./components/toast.css";
 
-
+/* ============================
+   LAYOUT
+============================ */
 @import "./layout/navbar.css";
 @import "./layout/sidebar.css";
 
+/* ============================
+   DOMAIN
+============================ */
 @import "./domain/course-card.css";
 @import "./domain/progress.css";
 
-@import "./components/toast.css";
-
-
+/* ============================
+   PAGES
+============================ */
+@import "./pages/homePage.css";
+@import "./pages/loginPage.css";
+@import "./pages/adminDashBoard.css";
+@import "./pages/teacherDashboard.css";
+@import "./pages/userManagement.css";
+@import "./pages/myProfile.css";
+@import "./pages/createCoursePage.css";
+@import "./pages/detailCourse.css";
+@import "./pages/coursesPage.css";

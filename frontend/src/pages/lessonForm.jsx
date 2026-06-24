@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
-import '../assets/css/pages/createCoursePage.css';
-
 
 export default function LessonForm() {
   const { token } = useAuth();

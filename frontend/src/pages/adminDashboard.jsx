@@ -28,8 +28,6 @@ import {
   useGetCourseDashboard
 } from "../hook/useAdmin";
 
-import "../assets/css/pages/adminDashBoard.css";
-
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("users");
 

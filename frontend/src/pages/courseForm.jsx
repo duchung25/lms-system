@@ -1,7 +1,6 @@
     import { useEffect, useState } from "react";
     import { useAuth } from "../auth/useAuth";
     import { useNavigate, useParams } from "react-router-dom";
-    import '../assets/css/pages/createCoursePage.css';
 
     import { useCreateCourse, useUpdateCourse } from "../hook/useCourse";
     import Toast from "../components/toast/toast";

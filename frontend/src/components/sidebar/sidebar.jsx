@@ -1,35 +1,39 @@
 import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
-import { FaAddressBook, FaBook, FaUserGraduate, FaHouseChimney, BiBook, BiHome, BiUser, BiSolidDashboard } from "../../icons";
+import { BiBook, BiHome, BiUser, BiSolidDashboard } from "../../icons";
 
 export default function Sidebar() {
   const { user } = useAuth();
   const linkClass = ({ isActive }) =>
-    `list-group-item list-group-item-action sidebar-link${isActive ? " active" : ""}`;
+    `sidebar-link${isActive ? " active" : ""}`;
 
   if (!user) return null;
 
   if (user.role === "admin") {
     return (
       <aside className="sidebar">
-        <div className="list-group sidebar-nav">
+        <nav className="sidebar-nav">
+          <div className="sidebar-section-label">Hệ thống</div>
           <NavLink to="/" className={linkClass}>
             <span className="sidebar-link-icon"><BiHome /></span>
-            <span className="sidebar-link-text">Home</span>
+            <span className="sidebar-link-text">Trang chủ</span>
           </NavLink>
           <NavLink to="/admin/dashboard" className={linkClass}>
             <span className="sidebar-link-icon"><BiSolidDashboard /></span>
-            <span className="sidebar-link-text">Dashboard</span>
+            <span className="sidebar-link-text">Bảng điều khiển</span>
           </NavLink>
           <NavLink to="/admin/courses" className={linkClass}>
             <span className="sidebar-link-icon"><BiBook /></span>
-            <span className="sidebar-link-text">Courses</span>
+            <span className="sidebar-link-text">Khóa học</span>
           </NavLink>
           <NavLink to="/admin/users" className={linkClass}>
             <span className="sidebar-link-icon"><BiUser /></span>
-            <span className="sidebar-link-text">Users</span>
+            <span className="sidebar-link-text">Người dùng</span>
           </NavLink>
-        </div>
+          <NavLink to="/admin/navlinks" className={linkClass}>
+            <span className="sidebar-link-text">Quản lý Menu</span>
+          </NavLink>  
+        </nav>
       </aside>
     );
   }
@@ -37,44 +41,46 @@ export default function Sidebar() {
   if (user.role === "teacher") {
     return (
       <aside className="sidebar">
-        <div className="list-group sidebar-nav">
-          <Link to="/courses/create" className="btn btn-primary create-course-btn mb-2">
-              <span>+</span>
-              Create new course
-            </Link>
+        <nav className="sidebar-nav">
+          <Link to="/courses/create" className="sidebar-create-btn">
+            <span className="create-icon">+</span>
+            <span className="create-text">Tạo khóa học</span>
+          </Link>
+          <div className="sidebar-section-label">Giảng viên</div>
           <NavLink to="/teacher/dashboard" className={linkClass}>
             <span className="sidebar-link-icon"><BiSolidDashboard /></span>
-            <span className="sidebar-link-text">Dashboard</span>
+            <span className="sidebar-link-text">Bảng điều khiển</span>
           </NavLink>
           <NavLink to="/courses/my-courses" className={linkClass}>
             <span className="sidebar-link-icon"><BiBook /></span>
-            <span className="sidebar-link-text">My Courses</span>
+            <span className="sidebar-link-text">Khóa học của tôi</span>
           </NavLink>
-        </div>
+        </nav>
       </aside>
     );
   }
 
   return (
     <aside className="sidebar">
-      <div className="list-group sidebar-nav">
+      <nav className="sidebar-nav">
+        <div className="sidebar-section-label">Học viên</div>
         <NavLink to="/" className={linkClass}>
           <span className="sidebar-link-icon"><BiHome /></span>
-          <span className="sidebar-link-text">Home</span>
+          <span className="sidebar-link-text">Trang chủ</span>
         </NavLink>
         <NavLink to="/dashboard" className={linkClass}>
           <span className="sidebar-link-icon"><BiSolidDashboard /></span>
-          <span className="sidebar-link-text">Dashboard</span>
+          <span className="sidebar-link-text">Bảng điều khiển</span>
         </NavLink>
         <NavLink to="/courses" className={linkClass}>
           <span className="sidebar-link-icon"><BiBook /></span>
-          <span className="sidebar-link-text">Courses</span>
+          <span className="sidebar-link-text">Khóa học</span>
         </NavLink>
         <NavLink to="/courses/my-courses" className={linkClass}>
           <span className="sidebar-link-icon"><BiUser /></span>
-          <span className="sidebar-link-text">My Courses</span>
+          <span className="sidebar-link-text">Khóa học của tôi</span>
         </NavLink>
-      </div>
+      </nav>
     </aside>
   );
 }
