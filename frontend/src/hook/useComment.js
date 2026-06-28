@@ -33,19 +33,19 @@ export const useComments = (courseId, lessonId) => {
 
   const createComment = async (content) => {
     const comment = await commentService.createComment(courseId, lessonId, content);
-    setComments((prev) => [...prev, comment]);
+    await fetchComments();
     return comment;
   };
 
   const updateComment = async (commentId, content) => {
     const comment = await commentService.updateComment(courseId, lessonId, commentId, content);
-    setComments((prev) => prev.map((item) => (item._id === comment._id ? comment : item)));
+    await fetchComments();
     return comment;
   };
 
   const deleteComment = async (commentId) => {
     await commentService.deleteComment(courseId, lessonId, commentId);
-    setComments((prev) => prev.filter((item) => item._id !== commentId));
+    await fetchComments();
   };
 
   return {

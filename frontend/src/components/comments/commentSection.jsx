@@ -33,7 +33,12 @@ export default function CommentSection({ courseId, lessonId }) {
       setActionMessage("");
       await createComment(trimmed);
       setContent("");
-      setActionMessage("Comment posted successfully");
+      setTimeout(() => {
+        setActionMessage("Đã đăng bình luận");
+        setTimeout(() => {
+          setActionMessage("");
+        }, 3000);
+      }, 2000);
     } catch (err) {
       setActionError(err.message);
     }
@@ -59,7 +64,12 @@ export default function CommentSection({ courseId, lessonId }) {
       await updateComment(commentId, trimmed);
       setEditingCommentId(null);
       setEditingContent("");
-      setActionMessage("Comment updated successfully");
+      setTimeout(() => {
+        setActionMessage("Đã cập nhật bình luận");
+        setTimeout(() => {
+          setActionMessage("");
+        }, 3000);
+      }, 2000);
     } catch (err) {
       setActionError(err.message);
     }
@@ -70,7 +80,12 @@ export default function CommentSection({ courseId, lessonId }) {
       setActionError("");
       setActionMessage("");
       await deleteComment(commentId);
-      setActionMessage("Comment deleted successfully");
+      setTimeout(() => {
+        setActionMessage("Đã xóa bình luận");
+        setTimeout(() => {
+          setActionMessage("");
+        }, 3000);
+      }, 2000);
     } catch (err) {
       setActionError(err.message);
     }
@@ -99,7 +114,7 @@ export default function CommentSection({ courseId, lessonId }) {
               onChange={(e) => setContent(e.target.value)}
               placeholder="Write your thoughts about this lesson..."
             />
-            <button type="submit" className="btn btn-primary mt-3">
+            <button type="submit" className="btn btn-primary mt-3" style={{ marginLeft: "auto", display: "flex" }}>
               Post Comment
             </button>
           </form>

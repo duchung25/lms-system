@@ -76,122 +76,133 @@ export default function LessonDetail() {
   }
 
   return (
-    <div className="container-fluid py-3">
-      <div className="row g-3">
-      <div className="col-12 col-lg-8">
-
-        <div className="card shadow-sm border-0">
-          <div className="ratio ratio-16x9 bg-black">
+    <div className="container-fluid lesson-details-wrapper py-3">
+      <div className="row g-4">
+        {/* Left Column - Video Player, Info, and Comments */}
+        <div className="col-12 col-lg-8">
+          
+          {/* Cinematic Video container */}
+          <div className="lesson-video-container">
             {lesson.videoUrl ? (
-             <iframe
+              <iframe
                 src={lesson.videoUrl.replace(
                   /watch\?v=/,
                   'embed/'
                 )}
                 title="lesson video"
                 allowFullScreen
-                className="w-100 h-100"
+                className="w-100 h-100 border-0"
               />
             ) : (
-              <div className="d-flex align-items-center justify-content-center text-white">
+              <div className="d-flex align-items-center justify-content-center text-white h-100">
                 No video available
               </div>
             )}
           </div>
 
-          <div className="card-body">
-            <h3 className="mb-2">{lesson.title}</h3>
+          {/* Details Content Card */}
+          <div className="lesson-content-card">
+            <div className="d-flex justify-content-between">
+              <div className="lesson-header">
+                <h1 className="lesson-title mb-2">{lesson.title}</h1>
+                <div className="lesson-meta-date mb-3">
+                  Ngày tạo: {new Date(lesson.createdAt).toLocaleDateString("vi-VN")}
+                </div>
+              </div>
 
-            <div className="text-muted small mb-3">
-              Created at:{" "}
-              {new Date(lesson.createdAt).toLocaleDateString("vi-VN")}
+              {user?.role === "student" && (
+                <div className="d-flex flex-column flex-sm-row gap-3 align-items-sm-center mb-3 justify-content-end">
+                  <button
+                    className="btn-complete-lesson btn"
+                    onClick={handleCompleteLesson}
+                    disabled={completing || isLessonCompleted}
+                  >
+                    {isLessonCompleted ? (
+                      <>
+                        <FaCircleCheck /> Đã hoàn thành
+                      </>
+                    ) : completing ? (
+                      "Đang lưu..."
+                    ) : (
+                      "Hoàn thành bài học"
+                    )}
+                  </button>
+                  {currentLessonAction?.message && (
+                    <span className="text-success small fw-semibold">
+                      {currentLessonAction.message}
+                    </span>
+                  )}
+                  {currentLessonAction?.error && (
+                    <span className="text-danger small fw-semibold">
+                      {currentLessonAction.error}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
-            {user?.role === "student" && (
-              <div className="d-flex flex-column flex-sm-row gap-2 align-items-sm-center mb-3">
-                <button
-                  className="btn btn-primary"
-                  onClick={handleCompleteLesson}
-                  disabled={completing || isLessonCompleted}
-                >
-                  {isLessonCompleted ? "Đã hoàn thành" : "Hoàn thành bài học"}
-                </button>
-                {currentLessonAction?.message && <span className="text-success small">{currentLessonAction.message}</span>}
-                {currentLessonAction?.error && <span className="text-danger small">{currentLessonAction.error}</span>}
-              </div>
-            )}
-
-            <hr />
-
-            <div
-              style={{
-                whiteSpace: "pre-line",
-                fontSize: "var(--fs-body)",
-                lineHeight: "1.6",
-              }}
-            >
+            <div className="lesson-text-content border-top pt-3">
               {lesson.content || (
-                <span className="text-muted">No content available</span>
+                <span className="text-muted italic">Không có mô tả chi tiết cho bài học này.</span>
               )}
             </div>
           </div>
 
-          <CommentSection key={`${courseId}-${lessonId}`} courseId={courseId} lessonId={lessonId} />
-        </div>
-      </div>
-
-      <div className="col-12 col-lg-4">
-
-        <div className="card border-0 shadow-sm sticky-top" style={{ top: 16 }}>
-          <div className="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-            <strong>Lessons</strong>
-            <span className="text-muted small">
-              {lessons.filter((l) => l.isCompleted).length}/{lessons.length}
-            </span>
+          {/* Comments Section */}
+          <div className="mt-4">
+            <CommentSection key={`${courseId}-${lessonId}`} courseId={courseId} lessonId={lessonId} />
           </div>
+        </div>
 
-          <div className="list-group list-group-flush overflow-auto" style={{ maxHeight: "80vh" }}>
-            {lessons.map((l) => {
-              const isActive = l._id === lessonId;
-              const icon = l.isCompleted ? (
-                <FaCircleCheck className="text-success" />
-              ) : l.isLocked ? (
-                <FaLock className="text-muted" />
-              ) : (
-                <FaCirclePlay className="text-primary" />
-              );
+        {/* Right Column - Playlist Lessons Sidebar */}
+        <div className="col-12 col-lg-4">
+          <div className="lesson-playlist-card">
+            <div className="playlist-header">
+              <strong>Danh sách bài học</strong>
+              <span className="playlist-header-progress">
+                Đã học {lessons.filter((l) => l.isCompleted).length}/{lessons.length}
+              </span>
+            </div>
 
-              return (
-                <button
-                  key={l._id}
-                  onClick={() => {
-                    if (l.isLocked) return;
-                    navigate(`/courses/${courseId}/lessons/${l._id}`);
-                  }}
-                  disabled={l.isLocked}
-                  className={`list-group-item list-group-item-action border-0 py-3 ${
-                    isActive ? "active" : ""
-                  }`}
-                  style={{
-                    transition: "all var(--transition-base)",
-                  }}
-                >
-                  <div className="d-flex align-items-start gap-2">
-                    <span className="mt-1">{icon}</span>
-                    <div className="d-flex flex-column text-start">
-                      <span className="fw-medium">{l.title}</span>
-                      <small className={isActive ? "text-white-50" : "text-muted"}>
-                        {l.isCompleted ? "Completed" : l.isLocked ? "Locked" : "Unlocked"}
-                      </small>
+            <div className="playlist-list-container">
+              {lessons.map((l) => {
+                const isActive = l._id === lessonId;
+                const isLocked = l.isLocked;
+                const icon = l.isCompleted ? (
+                  <FaCircleCheck className="playlist-item-icon completed" />
+                ) : isLocked ? (
+                  <FaLock className="playlist-item-icon locked" />
+                ) : (
+                  <FaCirclePlay className="playlist-item-icon play" />
+                );
+
+                return (
+                  <button
+                    key={l._id}
+                    onClick={() => {
+                      if (isLocked) return;
+                      navigate(`/courses/${courseId}/lessons/${l._id}`);
+                    }}
+                    disabled={isLocked}
+                    className={`playlist-item ${isActive ? "active" : ""} ${isLocked ? "locked" : ""}`}
+                  >
+                    <div className="playlist-item-content">
+                      <span className="playlist-item-icon">{icon}</span>
+                      <div className="playlist-item-meta">
+                        <span className="playlist-item-title">{l.title}</span>
+                        <span className="playlist-item-status-text">
+                          {l.isCompleted ? "Đã hoàn thành" : isLocked ? "Đang bị khóa" : "Sẵn sàng học"}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </button>
-              );
-            })}
+                    <span className="playlist-item-duration">{l.duration || 0} phút</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   );
 }

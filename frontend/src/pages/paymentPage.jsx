@@ -18,9 +18,17 @@ export default function PaymentPage() {
     const handlePayment = async () => {
         try {
             setProcessing(true);
-            await verifyPayment({ orderId, paymentMethod: selectedMethod, amount: order.amount });
-            setToast({ message: "Payment successful! Redirecting to your courses...", type: "success" });
-            setTimeout(() => navigate(`/courses/${order.courseId._id}`), 2000);
+            const result = await verifyPayment({ orderId, paymentMethod: selectedMethod, amount: order.amount });
+            const courseId = result?.courseId || order.courseId?._id || order.courseId;
+            const firstLessonId = result?.firstLessonId;
+
+            if (firstLessonId) {
+                setToast({ message: "Thanh toán thành công! Đang chuyển đến bài học...", type: "success" });
+                setTimeout(() => navigate(`/courses/${courseId}/lessons/${firstLessonId}`), 1500);
+            } else {
+                setToast({ message: "Thanh toán thành công! Đang chuyển đến khóa học...", type: "success" });
+                setTimeout(() => navigate(`/courses/${courseId}`), 1500);
+            }
         } catch (err) {
             setToast({ message: err.message || "Payment failed", type: "error" });
         } finally {

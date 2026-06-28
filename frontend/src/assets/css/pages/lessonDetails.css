@@ -1,0 +1,265 @@
+/* ==========================================================================
+   LESSON DETAILS PAGE PREMIUM STYLES
+   ========================================================================== */
+
+.lesson-details-wrapper {
+  padding-bottom: var(--space-3xl, 64px);
+}
+
+/* Immersive/Cinematic Video Container */
+.lesson-video-container {
+  aspect-ratio: 16 / 9;
+  background: #000000;
+  border-radius: var(--radius-xl, 16px);
+  overflow: hidden;
+  box-shadow: var(--shadow-level-3, 0 20px 40px rgba(0,0,0,0.15));
+  border: 1px solid rgba(79, 70, 229, 0.1);
+  transition: box-shadow var(--transition-base);
+}
+
+.lesson-video-container:hover {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* Content Body card */
+.lesson-content-card {
+  background: #ffffff;
+  border-radius: var(--radius-xl, 16px);
+  border: 1px solid var(--color-surface-container, #f0ecf9);
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(0,0,0,0.04));
+  padding: var(--space-xl, 32px);
+  margin-top: 24px;
+  overflow: hidden;
+}
+
+.lesson-title {
+  font-size: var(--fs-h2, 30px);
+  font-weight: var(--fw-bold, 700);
+  color: var(--color-on-background, #1b1b24);
+  line-height: var(--lh-tight, 1.25);
+}
+
+.lesson-meta-date {
+  font-size: var(--fs-caption, 12px);
+  color: var(--color-on-surface-variant, #464555);
+}
+
+/* Distraction-free Content Body */
+.lesson-text-content {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--color-on-surface-variant, #464555);
+  font-family: var(--font-primary);
+  padding: 16px 0;
+  white-space: pre-line;
+}
+
+/* Complete button styling */
+.btn-complete-lesson {
+  padding: 10px 24px;
+  border-radius: var(--radius-xl, 16px);
+  font-weight: var(--fw-bold, 700);
+  font-size: var(--fs-body-sm, 14px);
+  transition: all var(--transition-bounce, 0.3s cubic-bezier(0.34, 1.56, 0.64, 1));
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-complete-lesson:not(:disabled) {
+  background: var(--gradient-primary, linear-gradient(135deg, #4f46e5, #7c3aed));
+  color: #ffffff;
+  border: none;
+  box-shadow: var(--shadow-primary);
+}
+
+.btn-complete-lesson:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+}
+
+.btn-complete-lesson:disabled {
+  background: var(--color-success-light, #dcfce7);
+  color: var(--color-success, #16a34a);
+  border: 1px solid var(--color-success);
+  cursor: default;
+  opacity: 1;
+}
+
+/* Sidebar Playlist Container */
+.lesson-playlist-card {
+  background: #ffffff;
+  border-radius: var(--radius-xl, 16px);
+  border: 1px solid rgba(79, 70, 229, 0.08);
+  box-shadow: var(--shadow-level-2, 0 10px 25px rgba(79,70,229,0.1));
+  overflow: hidden;
+  position: sticky;
+  top: 24px;
+  z-index: 10;
+}
+
+.playlist-header {
+  background: var(--color-surface-container-low, #f5f2ff);
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-surface-container-highest, #e4e1ee);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.playlist-header strong {
+  font-size: 16px;
+  color: var(--color-on-background);
+  font-weight: var(--fw-bold, 700);
+}
+
+.playlist-header-progress {
+  font-size: 12px;
+  color: var(--color-primary);
+  font-weight: var(--fw-semibold, 600);
+  background: var(--color-primary-fixed, #e2dfff);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+}
+
+.playlist-list-container {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* Custom scrollbar for playlist */
+.playlist-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.playlist-list-container::-webkit-scrollbar-track {
+  background: var(--color-surface-container-lowest);
+}
+
+.playlist-list-container::-webkit-scrollbar-thumb {
+  background: var(--color-surface-dim, #dcd8e5);
+  border-radius: var(--radius-full);
+}
+
+.playlist-list-container::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline-variant);
+}
+
+/* Playlist Button Item */
+.playlist-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #ffffff;
+  border: none;
+  border-bottom: 1px solid var(--color-surface-container, #f0ecf9);
+  text-align: left;
+  transition: all var(--transition-base, 0.25s ease);
+  cursor: pointer;
+  outline: none;
+}
+
+.playlist-item:last-child {
+  border-bottom: none;
+}
+
+.playlist-item:hover:not(.locked):not(.active) {
+  background: var(--color-surface-container-low, #f5f2ff);
+}
+
+.playlist-item.active {
+  background: var(--gradient-primary, linear-gradient(135deg, #4f46e5, #7c3aed)) !important;
+  color: #ffffff !important;
+}
+
+.playlist-item.locked {
+  opacity: 0.55;
+  background: var(--color-surface-container-lowest, #ffffff);
+  cursor: not-allowed;
+}
+
+.playlist-item-content {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  flex-grow: 1;
+}
+
+.playlist-item-icon {
+  font-size: 16px;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.playlist-item-icon.completed {
+  color: var(--color-success, #16a34a);
+}
+
+.playlist-item-icon.locked {
+  color: var(--color-outline, #777587);
+}
+
+.playlist-item-icon.play {
+  color: var(--color-primary, #3525cd);
+}
+
+/* White icons when playlist item is active */
+.playlist-item.active .playlist-item-icon.completed,
+.playlist-item.active .playlist-item-icon.play {
+  color: #ffffff !important;
+}
+
+.playlist-item-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.playlist-item-title {
+  font-size: 14px;
+  font-weight: var(--fw-semibold, 600);
+  line-height: 1.4;
+  color: inherit;
+}
+
+.playlist-item-status-text {
+  font-size: 11px;
+  font-weight: var(--fw-medium, 500);
+  margin-top: 2px;
+  color: var(--color-on-surface-variant, #464555);
+}
+
+.playlist-item.active .playlist-item-status-text {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.playlist-item-duration {
+  font-size: 12px;
+  color: var(--color-on-surface-variant, #464555);
+  margin-left: 12px;
+  white-space: nowrap;
+}
+
+.playlist-item.active .playlist-item-duration {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 992px) {
+  .lesson-playlist-card {
+    position: relative;
+    top: 0;
+    margin-top: 24px;
+  }
+  .playlist-list-container {
+    max-height: 400px;
+  }
+  .lesson-content-card {
+    padding: var(--space-lg, 24px);
+  }
+  .lesson-title {
+    font-size: var(--fs-h3, 24px);
+  }
+}

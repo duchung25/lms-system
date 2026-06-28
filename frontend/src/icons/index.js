@@ -2,3 +2,4 @@ export {FaCircleUser, FaFacebookF, FaGoogle, FaBoxArchive, FaClipboardCheck, FaA
 export { BiHome, BiBook, BiUser, BiSolidDashboard } from "react-icons/bi";
 export { IoIosSearch } from "react-icons/io";
 export { SlOptionsVertical } from "react-icons/sl";
+export { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";

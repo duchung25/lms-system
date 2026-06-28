@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useMyCourses } from "../hook/useCourse.js";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "../icons";
 
 function CourseSkeleton() {
   return (
@@ -30,6 +31,23 @@ export default function MyCoursesPage() {
       (c.title || "").toLowerCase().includes(q)
     );
   }, [q, courses]);
+   const RatingStars = ({ rating }) => {
+      return (
+        <>
+          {[...Array(5)].map((_, index) => {
+            if (rating >= index + 1) {
+              return <FaStar key={index} color="#ffc107" />;
+            }
+  
+            if (rating >= index + 0.5) {
+              return <FaStarHalfAlt key={index} color="#ffc107" />;
+            }
+  
+            return <FaRegStar key={index} color="#ddd" />;
+          })}
+        </>
+      );
+    };
 
   return (
     <div className="my-courses-container">
@@ -70,26 +88,40 @@ export default function MyCoursesPage() {
             <div key={c._id} className="col-12 col-sm-6 col-lg-3">
               <Link 
                 to={`/courses/${c._id}`} 
-                className="card h-100 text-decoration-none text-dark course-card"
-                style={{ cursor: "pointer" }}
+                className="course-card"
               >
-                <div className="card-thumbnail mb-2" style={{ aspectRatio: "16/9", overflow: "hidden", borderRadius: "var(--radius-lg)" }}>
+                <div className="card-thumbnail">
+                  {/* Floating badges */}
+                  <div className="card-badge-overlay">
+                    <span className="card-badge badge-level">{c.level}</span>
+                    {c.category && (
+                      <span className="card-badge badge-category">{c.category}</span>
+                    )}
+                  </div>
                   <img 
                     src={c.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600"} 
                     alt={c.title} 
-                    style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform var(--transition-base)" }}
+                    className="course-thumbnail-img"
                   />
                 </div>
-                <div className="card-body d-flex flex-column p-3">
-                  <div className="fw-bold fs-body-sm text-dark mb-1 text-truncate-2" style={{ height: "42px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                <div className="card-body">
+                  <h3 className="course-card-title">
                     {c.title}
+                  </h3>
+                  <div className="course-card-level">
+                    <span>Trình độ: {c.level}</span>
                   </div>
-                  <div className="text-muted small mb-2">{c.level}</div>
-                  <div className="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
-                    <span className="text-primary fw-bold">
+                  <div className="course-rating">
+                    <RatingStars rating={c.averageRating} />
+                    <span className="course-rating-count">
+                      ({c.ratingCount})
+                    </span>
+                  </div>
+                  <div className="course-card-footer">
+                    <span className={`course-card-price ${c.price === 0 ? "free" : ""}`}>
                       {c.price === 0 ? "Miễn phí" : `${c.price.toLocaleString()} VNĐ`}
                     </span>
-                    <span className="text-muted small text-truncate" style={{ maxWidth: "120px" }}>
+                    <span className="course-card-teacher" title={c.teacherId?.email}>
                       GV: {c.teacherId?.username || c.teacherId?.email?.split("@")[0] || "Ẩn danh"}
                     </span>
                   </div>

@@ -10,7 +10,9 @@ export const usePayment = () => {
         setIsLoading(true);
         try {
             const response = await paymentService.verifyPayment(paymentData);
-            setPaymentStatus(response.data);
+            const result = response.data?.data ?? response.data ?? null;
+            setPaymentStatus(result);
+            return result;
         } catch (err) {
             throw new Error(getErrorMessage(err) || "Payment verification failed. Please try again.");
         } finally {
@@ -19,4 +21,4 @@ export const usePayment = () => {
     };
 
     return { paymentStatus, isLoading, verifyPayment };
-};
+};

@@ -153,11 +153,10 @@
 
   /* === LAYOUT === */
   --header-height: 64px;
-  --sidebar-width: 260px;
+  --sidebar-width: 200px;
   --sidebar-collapsed-width: 72px;
   --container-max: 1280px;
 
-  /* === Z-INDEX === */
   --z-base: 0;
   --z-above: 1;
   --z-dropdown: 50;
