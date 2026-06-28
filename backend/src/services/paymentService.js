@@ -1,6 +1,7 @@
 import Order from "../models/Order.js";
 import Course from "../models/Course.js";
 import Enrollment from "../models/Enrollment.js";
+import LessonService from "./lessonService.js";
 import AppError from "../utils/AppError.js";
 
 const paymentService = {
@@ -16,6 +17,10 @@ const paymentService = {
         order.paidAt = new Date();
 
         await order.save();
+
+        const firstLesson = await LessonService.getFirstLesson(order.courseId);
+        const firstLessonId = firstLesson?._id || null;
+
         const existedEnrollment = await Enrollment.findOne({
             courseId: order.courseId,
             studentId: order.studentId,
@@ -24,7 +29,9 @@ const paymentService = {
         if (!existedEnrollment) {
             await Enrollment.create({
                 courseId: order.courseId,
-                studentId: order.studentId
+                studentId: order.studentId,
+                currentLessonId: firstLessonId,
+                lastAccessedAt: firstLessonId ? new Date() : null
             });
             await Course.findByIdAndUpdate(order.courseId, {
                 $inc: {
@@ -32,8 +39,12 @@ const paymentService = {
                 }
             });
         }
-        return order;
+        return {
+            order,
+            courseId: order.courseId,
+            firstLessonId
+        };
     }
 };
 
-export default paymentService;
+export default paymentService;

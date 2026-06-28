@@ -20,6 +20,20 @@ const ratingController = {
       next(error);
     }
   },
+  async getRatingByCourse(req, res, next) {
+    try {
+      const { courseId } = req.params;
+      const result = await ratingService.getRatingByCourse(courseId);
+
+      res.status(200).json({
+        success: true,
+        message: "Rating fetched successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },  
 };
 
 export default ratingController;

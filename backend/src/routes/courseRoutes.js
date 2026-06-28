@@ -33,6 +33,11 @@ router.put(
   ratingController.upsertRating
 );
 
+router.get(
+  '/:courseId/ratings',
+  ratingController.getRatingByCourse
+);
+
 router.post('/', authMiddleware, authorizeMiddleware('teacher'), courseValidator.createCourseValidationRules, courseValidator.validate, courseController.createCourse);
 router.get('/', authMiddleware,  courseController.getAllCourse);
 router.get('/:courseId', authMiddleware, courseController.getCourseDetail);

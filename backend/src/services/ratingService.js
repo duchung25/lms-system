@@ -62,6 +62,12 @@ const ratingService = {
       summary,
     };
   },
+
+  async getRatingByCourse(courseId) {
+    const ratings = await CourseRating.find({ courseId }).lean();
+    return ratings;
+  },
+  
 };
 
 export default ratingService;
