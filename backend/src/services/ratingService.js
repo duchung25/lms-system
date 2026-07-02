@@ -3,6 +3,7 @@ import CourseRating from "../models/CourseRating.js";
 import Course from "../models/Course.js";
 import Enrollment from "../models/Enrollment.js";
 import AppError from "../utils/AppError.js";
+import notificationService from "./notificationService.js";
 
 const recalculateCourseRating = async (courseId) => {
   const [stats] = await CourseRating.aggregate([
@@ -49,6 +50,7 @@ const ratingService = {
       throw new AppError("Only enrolled students can rate this course", 403);
     }
 
+    const existingRating = await CourseRating.findOne({ courseId, studentId }).lean();
     const rating = await CourseRating.findOneAndUpdate(
       { courseId, studentId },
       { rating: ratingValue },
@@ -56,6 +58,18 @@ const ratingService = {
     ).lean();
 
     const summary = await recalculateCourseRating(courseId);
+
+    if (!existingRating) {
+      await notificationService.createNotification({
+        userId: course.teacherId,
+        title: "Khóa học có đánh giá mới",
+        message: `Khóa học ${course.title} vừa nhận đánh giá ${ratingValue} sao.`,
+        type: "NEW_COURSE_RATING",
+        referenceId: courseId,
+        referenceType: "Course",
+        link: `/courses/${courseId}`,
+      });
+    }
 
     return {
       rating,

@@ -1,6 +1,7 @@
 import TeacherRequest from "../models/TeacherRequest.js";
 import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
+import notificationService from "./notificationService.js";
 
 const teacherRequestService = {
     async createTeacherRequest(userId, message = "") {
@@ -62,6 +63,15 @@ const teacherRequestService = {
 
                const updatedRequest = await TeacherRequest.findById(requestId)
                     .populate("reviewerId", "username");
+                await notificationService.createNotification({
+                    userId: updatedRequest.userId,
+                    title: "Yêu cầu giảng viên đã được duyệt",
+                    message: "Tài khoản của bạn đã được nâng cấp thành giảng viên.",
+                    type: "TEACHER_REQUEST_APPROVED",
+                    referenceId: updatedRequest._id,
+                    referenceType: "TeacherRequest",
+                    link: "/teacher/dashboard",
+                });
                 return updatedRequest;
             } catch (err) {
                 await session.abortTransaction();
@@ -84,6 +94,15 @@ const teacherRequestService = {
             request.adminMessage = message;
         }
         await request.save();
+        await notificationService.createNotification({
+            userId: request.userId,
+            title: "Yêu cầu giảng viên bị từ chối",
+            message: message || "Yêu cầu trở thành giảng viên của bạn chưa được chấp thuận.",
+            type: "TEACHER_REQUEST_REJECTED",
+            referenceId: request._id,
+            referenceType: "TeacherRequest",
+            link: "/my-profile",
+        });
         return await request.populate("reviewerId", "username");
     }
 };

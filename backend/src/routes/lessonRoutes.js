@@ -18,6 +18,7 @@ router.post('/:courseId/lessons/:lessonId/complete', authMiddleware, authorizeMi
 router.get('/:courseId/progress', authMiddleware, authorizeMiddleware('student'), lessonController.getCourseProgress);
 router.get('/:courseId/unlocked-lessons', authMiddleware, authorizeMiddleware('student'), lessonController.getUnlockedLessons);
 router.get('/:courseId/lessons/:lessonId/comments', authMiddleware, readAccessMiddleware, commentController.getComments);
+router.get('/:courseId/lessons/:lessonId/comments/:commentId/replies', authMiddleware, readAccessMiddleware, commentController.getReplies);
 router.post(
   '/:courseId/lessons/:lessonId/comments',
   authMiddleware,

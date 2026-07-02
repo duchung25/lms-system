@@ -6,7 +6,7 @@ const orderService = {
     async createOrder(courseId, studentId) {
         const course = await Course.findById(courseId);
 
-        if (!course || !course.isPublished) {
+        if (!course || course.status !== "PUBLISHED") {
             throw new AppError("Course not found", 404);
         }
         if (course.price <= 0) {

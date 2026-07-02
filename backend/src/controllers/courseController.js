@@ -19,19 +19,22 @@ const courseController = {
     },
     async getAllCourse(req, res, next) {
         try {
-            const userRole = req.user.role;
+            const userRole = req.user?.role;
             const {
-            q, category, published, level, page, limit, sort, deleted
+            q, category, categoryId, status, published, level, page, limit, sort, deleted
             } = req.query;
             let filterPublished;
-            if(userRole.toLowerCase() === "admin") {
+            let filterStatus;
+            if(userRole?.toLowerCase() === "admin") {
                 filterPublished = typeof published !== 'undefined' ? published === 'true' : undefined;
+                filterStatus = status;
             } else {
                 filterPublished = true;
             }  
             const courses = await courseService.getAllCourse({
             q,
-            category,
+            categoryId: categoryId || category,
+            status: filterStatus,
             level,
             published: filterPublished,
             deleted,
@@ -160,6 +163,34 @@ const courseController = {
             next(error);
         }
     },
+    async submitCourse(req, res, next) {
+        try {
+            const { courseId } = req.params;
+            const course = await courseService.submitCourseForReview(courseId);
+            res.status(200).json({
+                success: true,
+                message: "Course submitted for review successfully",
+                data: { course }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+    async reviewCourse(req, res, next) {
+        try {
+            const { courseId } = req.params;
+            const { status, rejectionReason } = req.body;
+            const adminId = req.user.userId;
+            const course = await courseService.reviewCourse(courseId, { status, rejectionReason, adminId });
+            res.status(200).json({
+                success: true,
+                message: `Course ${status.toLowerCase()} successfully`,
+                data: { course }
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
     async countHandler(req, res, next) {
         try {
             const counts = await courseService.countHandler();
@@ -194,6 +225,21 @@ const courseController = {
                 data: dashboard
             });
         } catch (error) {
+            next(error);
+        }
+    },
+    async getHomePageCourses(req, res, next) {
+        try {
+            const [topSellingCourses, latestCourses] = await Promise.all([
+                courseService.getTopSellingCourses(5),
+                courseService.getLatestCourses(5)
+            ]);
+            res.status(200).json({
+                success: true,
+                message: "Home page courses retrieved successfully",
+                data: { topSellingCourses, latestCourses }
+            });
+        }catch (error) {
             next(error);
         }
     }

@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import Certificate from '../models/Certificate.js';
 import bcryptjs from 'bcryptjs';
 import AppError from '../utils/AppError.js';
 
@@ -127,6 +128,7 @@ const adminService = {
             totalStudents,
             totalTeachers,
             totalAdmins,
+            totalCertificates,
             newUsersToday,
             newUsersThisMonth,
             monthlyGrowth
@@ -156,6 +158,10 @@ const adminService = {
             User.countDocuments({
                 role: "admin",
                 deleted: false
+            }),
+
+            Certificate.countDocuments({
+                status: "VALID"
             }),
 
             User.countDocuments({
@@ -206,6 +212,7 @@ const adminService = {
                 totalStudents,
                 totalTeachers,
                 totalAdmins,
+                totalCertificates,
                 newUsersToday,
                 newUsersThisMonth
             },

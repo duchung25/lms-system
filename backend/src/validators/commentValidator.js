@@ -7,6 +7,10 @@ const createCommentValidationRules = [
     .withMessage("Comment content is required")
     .isLength({ max: 1000 })
     .withMessage("Comment must be less than 1000 characters"),
+  body("parentCommentId")
+    .optional({ nullable: true })
+    .isMongoId()
+    .withMessage("Parent comment id must be a valid comment id"),
 ];
 
 const updateCommentValidationRules = [

@@ -5,6 +5,7 @@ import Enrollment from '../models/Enrollment.js'
 import AppError from '../utils/AppError.js';
 import ratingService from './ratingService.js';
 import lessonProgressService from './lessonProgressService.js';
+import notificationService from './notificationService.js';
 
 
 const courseService = {
@@ -14,7 +15,7 @@ const courseService = {
     },
     async getAllCourse(options = {}) {
         const {
-            q, category, published, level, deleted,
+            q, categoryId, status, published, level, deleted,
             page = 1,
             limit = 10,
             sort
@@ -23,11 +24,12 @@ const courseService = {
         const filter = {};
 
         if (q) filter.title = { $regex: q, $options: 'i' };
-        if (category) filter.category = category;
+        if (categoryId) filter.categoryId = categoryId;
         if (level) filter.level = level;
 
-        if (published === 'true' || published === true) filter.isPublished = true;
-        else if (published === 'false' || published === false) filter.isPublished = false;
+        if (status) filter.status = status;
+        else if (published === 'true' || published === true) filter.status = 'PUBLISHED';
+        else if (published === 'false' || published === false) filter.status = { $ne: 'PUBLISHED' };
 
         if (deleted === 'true' || deleted === true) filter.deleted = true;
         else if (deleted === 'false' || deleted === false) filter.deleted = false;
@@ -40,13 +42,13 @@ const courseService = {
         }
 
         const pendingFilter = { ...filter };
-        delete pendingFilter.isPublished;
-        pendingFilter.isPublished = false;
+        delete pendingFilter.status;
+        pendingFilter.status = 'PENDING_REVIEW';
 
         const skip = (page - 1) * limit;
         if(deleted === 'true'){
             const [list, total, pendingCount] = await Promise.all([
-                Course.findWithDeleted(filter).populate("teacherId", "email").sort(sortOpt).skip(skip).limit(limit),
+                Course.findWithDeleted(filter).populate("teacherId", "email").populate("categoryId", "name slug status").sort(sortOpt).skip(skip).limit(limit),
                 Course.countDocumentsDeleted(filter),
                 Course.countDocumentsDeleted(pendingFilter)
             ]);
@@ -54,7 +56,7 @@ const courseService = {
             return { list, page, limit, total, totalPages, pendingCount};
         }
         const [list, total, pendingCount] = await Promise.all([
-            Course.find(filter).populate("teacherId", "email").sort(sortOpt).skip(skip).limit(limit),
+            Course.find(filter).populate("teacherId", "email").populate("categoryId", "name slug status").sort(sortOpt).skip(skip).limit(limit),
             Course.countDocuments(filter),
             Course.countDocuments(pendingFilter)
         ]);
@@ -65,10 +67,11 @@ const courseService = {
     async getCourseDetail(courseId, user){
         const query = { _id: courseId };
         if(user?.role === "student"){
-            query.isPublished = true;
+            query.status = "PUBLISHED";
         }
         const course = await Course.findOneWithDeleted(query)
             .populate("teacherId", "username email avatar")
+            .populate("categoryId", "name slug")
             .lean();
         if(!course){
             throw new AppError("Course not found", 404);
@@ -91,7 +94,7 @@ const courseService = {
         if (!course) {
             throw new AppError("Course not found", 404);
         }
-        const allowedFields = ["title", "description", "category", "level", "price", "thumbnail"];
+        const allowedFields = ["title", "description", "categoryId", "level", "price", "thumbnail"];
         for (const key of allowedFields) {
             if (key in updateData) {
                 course[key] = updateData[key];
@@ -99,6 +102,7 @@ const courseService = {
         }
         await course.save();
         await course.populate("teacherId", "username email avatar");
+        await course.populate("categoryId", "name slug");
         return course;
     },
     async deleteCourse(courseId){
@@ -125,22 +129,94 @@ const courseService = {
     async getCourseByTeacherId(teacherId){
         return await Course.find({ teacherId })
         .populate("teacherId", "username email avatar")
+        .populate("categoryId", "name slug")
         .lean();
     },
     async setPublishStatus(courseId, status) {
         const course = await Course.findById(courseId);
         if (!course) throw new AppError("Course not found", 404);
-        console.log('==> Status FE gửi lên:', status);
-        if(status === "publish"){
-            course.isPublished = true;
-        } else if(status === "unpublish"){
-            course.isPublished = false;
-        }
-         console.log('==> isPublished sau sửa:', course.isPublished);
+        const wasPublished = course.status === "PUBLISHED";
+        
+        if(status === "publish") course.status = "PUBLISHED";
+        else if(status === "unpublish") course.status = "DRAFT";
+        
         await course.save();
-
+        if (status === "publish" && !wasPublished) {
+            await notificationService.createNotification({
+                userId: course.teacherId,
+                title: "Khóa học đã được xuất bản",
+                message: `Khóa học ${course.title} đã được xuất bản.`,
+                type: "COURSE_PUBLISHED",
+                referenceId: course._id,
+                referenceType: "Course",
+                link: `/courses/${course._id}`,
+            });
+        }
         return Course.findById(courseId)
             .populate("teacherId", "username email avatar")
+            .populate("categoryId", "name slug")
+            .lean();
+    },
+    async submitCourseForReview(courseId) {
+        const course = await Course.findById(courseId);
+        if (!course) throw new AppError("Course not found", 404);
+        
+        if (course.status !== 'DRAFT' && course.status !== 'REJECTED') {
+            throw new AppError("Only Draft or Rejected courses can be submitted", 400);
+        }
+        
+        course.status = 'PENDING_REVIEW';
+        course.submittedAt = new Date();
+        course.rejectionReason = '';
+        await course.save();
+        return Course.findById(courseId)
+            .populate("teacherId", "username email avatar")
+            .populate("categoryId", "name slug")
+            .lean();
+    },
+    async reviewCourse(courseId, { status, rejectionReason, adminId }) {
+        const course = await Course.findById(courseId);
+        if (!course) throw new AppError("Course not found", 404);
+        
+        if (course.status !== 'PENDING_REVIEW') {
+            throw new AppError("Only courses pending review can be reviewed", 400);
+        }
+        
+        if (!['APPROVED', 'REJECTED'].includes(status)) {
+            throw new AppError("Invalid review status. Must be APPROVED or REJECTED", 400);
+        }
+
+        if (status === 'REJECTED' && !rejectionReason?.trim()) {
+            throw new AppError("Rejection reason is required", 400);
+        }
+
+        course.reviewedBy = adminId;
+        course.reviewedAt = new Date();
+        
+        if (status === 'APPROVED') {
+            course.status = 'PUBLISHED';
+            course.rejectionReason = '';
+        } else {
+            course.status = 'REJECTED';
+            course.rejectionReason = rejectionReason.trim();
+        }
+        
+        await course.save();
+        await notificationService.createNotification({
+            userId: course.teacherId,
+            title: status === 'APPROVED' ? "Khóa học đã được duyệt" : "Khóa học bị từ chối",
+            message: status === 'APPROVED'
+                ? `Khóa học ${course.title} đã được duyệt.`
+                : `Khóa học ${course.title} bị từ chối: ${course.rejectionReason}`,
+            type: status === 'APPROVED' ? "COURSE_APPROVED" : "COURSE_REJECTED",
+            referenceId: course._id,
+            referenceType: "Course",
+            link: `/courses/${course._id}`,
+        });
+        return Course.findById(courseId)
+            .populate("teacherId", "username email avatar")
+            .populate("categoryId", "name slug")
+            .populate("reviewedBy", "username email avatar")
             .lean();
     },
     async getAdminCourseDashboard() {
@@ -158,12 +234,12 @@ const courseService = {
         ] = await Promise.all([
             Course.countDocuments(),
 
-            Course.countDocuments({ isPublished: true }),
+            Course.countDocuments({ status: "PUBLISHED" }),
 
-            Course.countDocuments({ isPublished: false }),
+            Course.countDocuments({ status: { $in: ["DRAFT", "PENDING_REVIEW", "REJECTED"] } }),
 
             Course.find()
-                .select("title thumbnail level studentsCount createdAt isPublished")
+                .select("title thumbnail level studentsCount createdAt status")
                 .sort({ createdAt: -1 })
                 .limit(5)
                 .lean(),
@@ -297,16 +373,16 @@ const courseService = {
 
             Course.countDocuments({
                 ...query,
-                isPublished: true
+                status: "PUBLISHED"
             }),
 
             Course.countDocuments({
                 ...query,
-                isPublished: false
+                status: { $in: ["DRAFT", "PENDING_REVIEW", "REJECTED"] }
             }),
 
             Course.find(query)
-                .select("title thumbnail level studentsCount createdAt isPublished")
+                .select("title thumbnail level studentsCount createdAt status")
                 .sort({ createdAt: -1 })
                 .limit(5)
                 .lean(),
@@ -408,6 +484,23 @@ const courseService = {
             topCourses,
             latestCourses
         };
+    },
+    async getTopSellingCourses(limit = 4) {
+        return await Course.find({ status: 'PUBLISHED', deleted: false })
+            .populate("teacherId", "email name avatar") 
+            .populate("categoryId", "name slug")
+            .select("title thumbnail price rating reviews level slug") 
+            .sort({ sales: -1 }) 
+            .limit(limit);
+    },
+
+    async getLatestCourses(limit = 5) {
+        return await Course.find({ status: 'PUBLISHED', deleted: false })
+            .populate("teacherId", "email name avatar")
+            .populate("categoryId", "name slug")
+            .select("title thumbnail price rating reviews level slug createdAt")
+            .sort({ createdAt: -1 }) 
+            .limit(limit);
     }
 }
 

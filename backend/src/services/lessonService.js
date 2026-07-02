@@ -4,6 +4,7 @@ import Enrollment from "../models/Enrollment.js";
 import AppError from "../utils/AppError.js";
 import enrollmentService from "./enrollmentService.js";
 import lessonProgressService from "./lessonProgressService.js";
+import notificationService from "./notificationService.js";
 
 const LessonService = {
     async createLesson(courseid, data, user ){
@@ -26,7 +27,7 @@ const LessonService = {
     async getLessonsByCourse(courseId, user){
         const query = { _id: courseId };
         if(user?.role === "student"){
-            query.isPublished = true;
+            query.status = "PUBLISHED";
         }
         const course = await Course.findOneWithDeleted(query).lean();
         if(!course){
@@ -36,7 +37,9 @@ const LessonService = {
         .select("_id title order duration ")
         .sort({ order: 1 })
         .lean();
-
+        if(!user){
+            return lessons;
+        }
         if(user?.role !== "student"){
             return lessons;
         }
@@ -54,7 +57,7 @@ const LessonService = {
         if(!course){
             throw new AppError("Course not found", 404);
         }
-        if(!course.isPublished){
+        if(course.status !== "PUBLISHED"){
             throw new AppError("Course is not published yet", 400);
         }
         return await Lesson.find({ courseId, isPublished: true })
@@ -74,7 +77,7 @@ const LessonService = {
         if(!lesson.courseId.equals(courseId)){
             throw new AppError("Lesson does not belong to the specified course", 400);
         }
-        if(user?.role === "student" && !course.isPublished){
+        if(user?.role === "student" && course.status !== "PUBLISHED"){
             throw new AppError("Course is not published yet", 403);
         }
         if(user?.role === "student"){
@@ -159,8 +162,32 @@ const LessonService = {
         if(!lesson){
             throw new AppError("Lesson not found", 404);
         }
+        const wasPublished = lesson.isPublished;
         lesson.isPublished = true;
-        return await lesson.save();
+        const savedLesson = await lesson.save();
+
+        if (!wasPublished) {
+            const [course, enrollments] = await Promise.all([
+                Course.findById(lesson.courseId).select("title").lean(),
+                Enrollment.find({ courseId: lesson.courseId, status: "active" })
+                    .select("studentId")
+                    .lean(),
+            ]);
+
+            await notificationService.createManyNotifications(
+                enrollments.map((enrollment) => ({
+                    userId: enrollment.studentId,
+                    title: "Bài học mới đã được xuất bản",
+                    message: `Bài học ${lesson.title} trong khóa ${course?.title || ""} đã sẵn sàng.`.trim(),
+                    type: "NEW_LESSON_PUBLISHED",
+                    referenceId: lesson._id,
+                    referenceType: "Lesson",
+                    link: `/courses/${lesson.courseId}/lessons/${lesson._id}`,
+                }))
+            );
+        }
+
+        return savedLesson;
     },
     async unpublishLesson(lessonId){
         const lesson = await Lesson.findById(lessonId);

@@ -25,6 +25,20 @@ const lessonCommentSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    parentCommentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "LessonComment",
+      default: null,
+      index: true
+    },
+    replyCount: {
+      type: Number,
+      default: 0
+    },
+    editedAt: {
+      type: Date,
+      default: null
+    }
   },
   {
     timestamps: true,

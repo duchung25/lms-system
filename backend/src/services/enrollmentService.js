@@ -4,6 +4,9 @@ import Lesson from "../models/Lesson.js";
 import LessonService from "./lessonService.js";
 import AppError from "../utils/AppError.js";
 import lessonProgressService from "./lessonProgressService.js";
+import certificateService from "./certificateService.js";
+import Certificate from "../models/Certificate.js";
+import notificationService from "./notificationService.js";
 
 const getLessonProgressState = (lessons, completedLessonIds, lessonId) => {
     const completedIds = new Set(completedLessonIds.map(id => id.toString()));
@@ -24,7 +27,7 @@ const getLessonProgressState = (lessons, completedLessonIds, lessonId) => {
 const enrollmentService = {
     async enrollInCourse(courseId, studentId) {
         const course = await Course.findById(courseId);
-        if (!course?.isPublished) {
+        if (course?.status !== "PUBLISHED") {
             throw new AppError("Course not found", 404);
         }
         if (course.price > 0) {
@@ -59,6 +62,15 @@ const enrollmentService = {
                 }
             });
         }
+        await notificationService.createNotification({
+            userId: studentId,
+            title: "Ghi danh thành công",
+            message: `Bạn đã được ghi danh vào khóa học ${course.title}.`,
+            type: "ENROLLMENT_SUCCESSFUL",
+            referenceId: courseId,
+            referenceType: "Course",
+            link: `/courses/${courseId}`,
+        });
         return {
             enrollment,
             firstLessonId,
@@ -105,7 +117,8 @@ const enrollmentService = {
             teacherId: e.courseId?.teacherId,
             enrollmentId: e._id,
             progressPercent: e.progressPercent || 0,
-            lastAccessedAt: e.lastAccessedAt
+            lastAccessedAt: e.lastAccessedAt,
+            currentLessonId: e.currentLessonId
         }));
     },
                                                 
@@ -141,10 +154,17 @@ const enrollmentService = {
         }
 
         const result = await lessonProgressService.markLessonCompleted(courseId, studentId, lessonId);
+        let certificate = null;
+
+        if (result.isCourseCompleted) {
+            certificate = await certificateService.generateCertificate(studentId, courseId);
+        }
+
         return {
             enrollment: await Enrollment.findOne({ courseId, studentId, status: "active" }).lean(),
             nextLessonId: result.nextLessonId,
-            isCourseCompleted: result.isCourseCompleted
+            isCourseCompleted: result.isCourseCompleted,
+            certificate
         };
     },
     async canAccessLesson(courseId, studentId, lessonId){
@@ -154,6 +174,7 @@ const enrollmentService = {
         const [
             activeCourses,
             completedCourses,
+            certificatesEarned,
             averageProgress,
             continueLearning,
             recentCourses,
@@ -168,6 +189,11 @@ const enrollmentService = {
                 studentId,
                 status: "active",
                 progressPercent: 100
+            }),
+
+            Certificate.countDocuments({
+                userId: studentId,
+                status: "VALID"
             }),
 
             Enrollment.aggregate([
@@ -244,6 +270,7 @@ const enrollmentService = {
             overview: {
                 activeCourses,
                 completedCourses,
+                certificatesEarned,
                 averageProgress: avgProgress
             },
 

@@ -26,13 +26,31 @@ const courseSchema = new mongoose.Schema(
             enum: ["Beginner", "Intermediate", "Advanced"],
             required: true
         },
-        isPublished: {
-            type: Boolean,
-            default: false
-        },
-        category: {
+        status: {
             type: String,
-            enum: ["Programming", "Design", "Marketing", "Business", "Other"],
+            enum: ["DRAFT", "PENDING_REVIEW", "APPROVED", "REJECTED", "PUBLISHED", "ARCHIVED"],
+            default: "DRAFT"
+        },
+        reviewedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
+        },
+        reviewedAt: {
+            type: Date,
+            default: null
+        },
+        rejectionReason: {
+            type: String,
+            default: ""
+        },
+        submittedAt: {
+            type: Date,
+            default: null
+        },
+        categoryId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Category",
             required: true
         },
         price: {
@@ -60,7 +78,7 @@ courseSchema.plugin(mongooseDelete, {
     overrideMethods: "all"
 });
 courseSchema.index({ teacherId: 1 });
-courseSchema.index({ isPublished: 1 });
+courseSchema.index({ status: 1 });
 courseSchema.index({ createdAt: -1 });
 
 const Course = mongoose.model("Course", courseSchema);

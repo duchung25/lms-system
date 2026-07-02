@@ -7,6 +7,9 @@ import teacherRequestRoutes from './teacherRequestRoutes.js';
 import enrollmentRoutes from './enrollmentRoutes.js';
 import orderRoutes from './orderRoutes.js';
 import paymentRoutes from './paymentRoutes.js';
+import categoryRoutes from './categoryRoutes.js';
+import certificateRoutes from './certificateRoutes.js';
+import notificationRoutes from './notificationRoutes.js';
 
 const router = express.Router();
 
@@ -19,4 +22,7 @@ router.use('/orders', orderRoutes);
 router.use('/payments', paymentRoutes);
 
 router.use('/navlinks', navLinkRoutes);
+router.use('/categories', categoryRoutes);
+router.use('/certificates', certificateRoutes);
+router.use('/notifications', notificationRoutes);
 export default router;

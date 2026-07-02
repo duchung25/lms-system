@@ -15,7 +15,7 @@ const getPublishedLessons = async (courseId) => {
 const getAccessContext = async (courseId, studentId) => {
   const course = await Course.findOneWithDeleted({
     _id: courseId,
-    isPublished: true,
+    status: "PUBLISHED",
   }).lean();
 
   if (!course) {

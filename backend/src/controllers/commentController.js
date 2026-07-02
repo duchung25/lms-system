@@ -16,6 +16,21 @@ const commentController = {
     }
   },
 
+  async getReplies(req, res, next) {
+    try {
+      const { courseId, lessonId, commentId } = req.params;
+      const replies = await commentService.getReplies(courseId, lessonId, commentId);
+
+      res.status(200).json({
+        success: true,
+        message: "Replies retrieved successfully",
+        data: { replies },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async createComment(req, res, next) {
     try {
       const { courseId, lessonId } = req.params;
@@ -23,7 +38,8 @@ const commentController = {
         courseId,
         lessonId,
         req.user,
-        req.body.content
+        req.body.content,
+        req.body.parentCommentId || null
       );
 
       res.status(201).json({

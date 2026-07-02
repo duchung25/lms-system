@@ -11,10 +11,13 @@ import ratingValidator from '../validators/ratingValidator.js';
 const router = express.Router();
 
 router.use('/', lessonRoutes);
+router.get('/home-board', courseController.getHomePageCourses);
 
 router.get('/by-teacher/:teacherId', authMiddleware, authorizeMiddleware('teacher', 'admin'), courseController.getCoursesByTeacher);
 router.get('/my-courses', authMiddleware, courseController.getMyCourses);
 router.patch('/:courseId/publish-status', authMiddleware, writeAccessMiddleware, courseController.setPublishStatus);
+router.patch('/:courseId/submit', authMiddleware, writeAccessMiddleware, courseController.submitCourse);
+router.patch('/:courseId/review', authMiddleware, authorizeMiddleware('admin'), courseController.reviewCourse);
 router.get('/teacher/dashboard', authMiddleware, authorizeMiddleware('teacher'), courseController.getTeacherDashboard);
 router.post(
   '/:courseId/ratings',
@@ -39,8 +42,8 @@ router.get(
 );
 
 router.post('/', authMiddleware, authorizeMiddleware('teacher'), courseValidator.createCourseValidationRules, courseValidator.validate, courseController.createCourse);
-router.get('/', authMiddleware,  courseController.getAllCourse);
-router.get('/:courseId', authMiddleware, courseController.getCourseDetail);
+router.get('/',  courseController.getAllCourse);
+router.get('/:courseId', courseController.getCourseDetail);
 router.patch('/:courseId', authMiddleware, writeAccessMiddleware, courseValidator.updateCourseValidationRules, courseValidator.validate, courseController.updateCourse);
 router.delete('/:courseId', authMiddleware, writeAccessMiddleware, courseController.deleteCourse);
 router.patch('/:courseId/restore', authMiddleware, writeAccessMiddleware, courseController.restoreCourse);

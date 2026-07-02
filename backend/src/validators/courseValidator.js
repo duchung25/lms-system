@@ -11,12 +11,10 @@ const createCourseValidationRules = [
             .trim()
             .notEmpty()
             .withMessage('Description is required'),
-        body('category')
+        body('categoryId')
             .trim()
-            .notEmpty()
-            .withMessage('Category is required')
-            .isIn(["Programming", "Design", "Marketing", "Business", "Other"])
-            .withMessage('Invalid category'),
+            .notEmpty().withMessage('Category is required')
+            .isMongoId().withMessage('Invalid Category ID'),
         body('level')
             .trim()
             .notEmpty()
@@ -40,10 +38,9 @@ const updateCourseValidationRules = [
         .optional()
         .trim(),
     
-    body('category')
+    body('categoryId')
         .optional()
-        .trim()
-        .isIn(["Programming", "Design", "Marketing", "Business", "Other"]),
+        .isMongoId().withMessage('Invalid Category ID'),
     
     body('level')
         .optional()
