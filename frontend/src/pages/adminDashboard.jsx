@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   AreaChart,
   Area,
@@ -27,6 +28,7 @@ import {
   useGetDashboardStatistics,
   useGetCourseDashboard
 } from "../hook/useAdmin";
+import RecentNotifications from "../components/notifications/recentNotifications";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("users");
@@ -146,7 +148,13 @@ export default function Dashboard() {
             Revenue
           </button>
         </div>
+
+        <Link to="/admin/course-review" className="btn btn-white">
+          Duyệt khóa học
+        </Link>
       </div>
+
+      <RecentNotifications />
 
       {activeTab === "users" && (
         <>
@@ -220,6 +228,22 @@ export default function Dashboard() {
                     }}
                   />
                 </div>
+              </div>
+            </div>
+
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-icon success">
+                <IoCheckmarkDoneOutline />
+              </div>
+
+              <div className="dashboard-stat-content">
+                <span className="dashboard-stat-label">
+                  Total Certificates
+                </span>
+
+                <h3>
+                  {overview.totalCertificates || 0}
+                </h3>
               </div>
             </div>
           </div>

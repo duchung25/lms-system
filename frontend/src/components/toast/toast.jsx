@@ -9,7 +9,7 @@ export default function Toast({ message, type = "error", onClose, duration = 300
     }, duration);
     
     return () => clearTimeout(timer);
-  }, [message, duration, onClose]); // ✅ Giữ dependency nhưng không tạo handleClose
+  }, [message, duration, onClose]); 
 
   if (!message) return null;
 

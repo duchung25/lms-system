@@ -13,6 +13,7 @@ import {
 
 import { useTeacherDashboard } from "../hook/useCourse";
 import { useGetTeacherOrderDashboard } from "../hook/useOrder";
+import RecentNotifications from "../components/notifications/recentNotifications";
 
 export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState("courses");
@@ -65,6 +66,8 @@ export default function TeacherDashboard() {
         </div>
 
       </div>
+
+      <RecentNotifications />
 
       {/* ================= COURSES ================= */}
       {activeTab === "courses" && (

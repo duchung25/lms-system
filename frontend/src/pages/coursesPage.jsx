@@ -45,6 +45,7 @@ export default function CoursesPage() {
   const q = (params.get("q") || "").toLowerCase().trim();
   const category = params.get("category") || "";
   const level = params.get("level") || "";
+  const status = params.get("status") || "";
   const published = params.get("published") || "";
   const deleted = params.get("deleted") || "";
   const [searchInput, setSearchInput] = useState(q);
@@ -57,6 +58,7 @@ export default function CoursesPage() {
     q, 
     category,
     level, 
+    status,
     published, 
     deleted, 
     role: user?.role 
@@ -153,14 +155,14 @@ export default function CoursesPage() {
         {user && user.role === "admin" && (
           <div className="admin-actions">
             <Link
-              to="/courses?deleted=true"
+              to="/admin/courses?deleted=true"
               className="btn-icon-badge"
               title="Khóa học đã ẩn"
             >
               <FaBoxArchive />
             </Link>
             <Link
-              to="/courses?published=false"
+              to="/admin/course-review"
               className="btn-icon-badge"
               title="Khóa học chờ duyệt"
             >
@@ -214,8 +216,11 @@ export default function CoursesPage() {
                 <div className="card-thumbnail">
                   {/* Floating badges */}
                   <div className="card-badge-overlay">
-                    {c.category && (
-                      <span className="card-badge badge-category" style={{ textTransform: "capitalize" }}>{c.category}</span>
+                    {c.categoryId?.name && (
+                      <span className="card-badge badge-category" style={{ textTransform: "capitalize" }}>{c.categoryId.name}</span>
+                    )}
+                    {user?.role === "admin" && c.status && (
+                      <span className="card-badge badge-level">{c.status}</span>
                     )}
                   </div>
                   <img

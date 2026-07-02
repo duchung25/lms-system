@@ -4,6 +4,9 @@ export const commentApi = {
   getComments: (courseId, lessonId) => {
     return apiClient.get(`/courses/${courseId}/lessons/${lessonId}/comments`);
   },
+  getReplies: (courseId, lessonId, commentId) => {
+    return apiClient.get(`/courses/${courseId}/lessons/${lessonId}/comments/${commentId}/replies`);
+  },
   createComment: (courseId, lessonId, payload) => {
     return apiClient.post(`/courses/${courseId}/lessons/${lessonId}/comments`, payload);
   },

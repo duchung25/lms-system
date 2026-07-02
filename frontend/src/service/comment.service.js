@@ -6,9 +6,23 @@ export const commentService = {
     return Array.isArray(res.data?.data?.comments) ? res.data.data.comments : [];
   },
 
-  async createComment(courseId, lessonId, content) {
-    const res = await commentApi.createComment(courseId, lessonId, { content });
+  async getReplies(courseId, lessonId, commentId) {
+    const res = await commentApi.getReplies(courseId, lessonId, commentId);
+    return Array.isArray(res.data?.data?.replies) ? res.data.data.replies : [];
+  },
+
+  async createComment(courseId, lessonId, content, parentCommentId = null) {
+    const payload = { content };
+    if (parentCommentId) {
+      payload.parentCommentId = parentCommentId;
+    }
+
+    const res = await commentApi.createComment(courseId, lessonId, payload);
     return res.data?.data?.comment ?? null;
+  },
+
+  async createReply(courseId, lessonId, commentId, content) {
+    return commentService.createComment(courseId, lessonId, content, commentId);
   },
 
   async updateComment(courseId, lessonId, commentId, content) {

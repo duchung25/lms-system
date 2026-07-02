@@ -3,7 +3,7 @@ import { courseService } from "../service/course.service";
 import { getErrorMessage } from "../helpers/error.helper.js";
 import { lessonService } from "../service/lesson.service";
 
-export const useCourses = ({ q, category, level, published, deleted, role }) => {
+export const useCourses = ({ q, category, level, status, published, deleted, role, refreshKey = 0 }) => {
   const [courses, setCourses] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -19,6 +19,7 @@ export const useCourses = ({ q, category, level, published, deleted, role }) => 
           q,
           category,
           level,
+          ...(role === "admin" && status && { status }),
           ...(role === "admin" && published && { published }),
           ...(role === "admin" && deleted && { deleted }),
         };
@@ -39,7 +40,7 @@ export const useCourses = ({ q, category, level, published, deleted, role }) => 
     };
 
     fetchData();
-  }, [q, category, level, published, deleted, role]);
+  }, [q, category, level, status, published, deleted, role, refreshKey]);
 
   return { courses, pendingCount, loading, error };
 };
@@ -138,7 +139,7 @@ export const useCourseForm = (initialValue = null) => {
     initialValue || {
       title: "",
       description: "",
-      category: "",
+      categoryId: "",
       level: "beginner",
       price: 0,
       thumbnail: "",
@@ -162,7 +163,7 @@ export const useCourseForm = (initialValue = null) => {
     setFormData({
       title: "",
       description: "",
-      category: "",
+      categoryId: "",
       level: "beginner",
       price: 0,
       thumbnail: "",
@@ -286,6 +287,46 @@ export const useSetPublishCourse = () => {
 
   return { setPublishCourse, loading };
 }
+
+export const useSubmitCourseForReview = () => {
+  const [loading, setLoading] = useState(false);
+
+  const submitCourseForReview = async (courseId) => {
+    setLoading(true);
+    try {
+      return await courseService.submitCourseForReview(courseId);
+    } catch (err) {
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { submitCourseForReview, loading };
+};
+
+export const useReviewCourse = () => {
+  const [loading, setLoading] = useState(false);
+
+  const reviewCourse = async (courseId, data) => {
+    setLoading(true);
+    try {
+      return await courseService.reviewCourse(courseId, data);
+    } catch (err) {
+      throw new Error(
+        getErrorMessage(err) ||
+          "Đã có lỗi xảy ra. Vui lòng thử lại."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { reviewCourse, loading };
+};
 
 export const useEnrollCourse = () => {
   const [loading, setLoading] = useState(false);
@@ -425,3 +466,32 @@ export const useTeacherDashboard = () => {
 
   return { dashboardData, loading, error };
 };
+
+
+export const useHomePageCourses = () => {
+  const [topSellingCourses, setTopSellingCourses] = useState([]);
+  const [latestCourses, setLatestCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchHomePageCourses = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const data = await courseService.getHomePageCourses();
+        setTopSellingCourses(data.topSellingCourses);
+        setLatestCourses(data.latestCourses);
+      } catch (err) {
+        setTopSellingCourses([]);
+        setLatestCourses([]);
+        setError(getErrorMessage(err) || "Đã có lỗi xảy ra. Vui lòng thử lại.");
+      } finally {
+        setLoading(false);
+      } 
+    };
+    fetchHomePageCourses();
+  }, []);
+
+  return { topSellingCourses, latestCourses, loading, error };
+}

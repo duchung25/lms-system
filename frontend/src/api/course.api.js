@@ -25,6 +25,12 @@ export const courseApi = {
     setPublistCOurse: (courseId, status) => {
         return apiClient.patch(`/courses/${courseId}/publish-status`, { status });
     },
+    submitCourseForReview: (courseId) => {
+        return apiClient.patch(`/courses/${courseId}/submit`);
+    },
+    reviewCourse: (courseId, data) => {
+        return apiClient.patch(`/courses/${courseId}/review`, data);
+    },
     enrollCourse: (courseId) => {
         return apiClient.post(`/enrollments/${courseId}`);
     },
@@ -45,5 +51,8 @@ export const courseApi = {
     },
     getTeacherDashboard: () => {
         return apiClient.get(`/courses/teacher/dashboard`);
+    },
+    getHomePageCourses: () => {
+        return apiClient.get(`/courses/home-board`);
     }
 }

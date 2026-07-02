@@ -1,0 +1,241 @@
+.lesson-comments-card {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.lesson-comment-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--color-surface-container-lowest), var(--color-surface-container-low));
+  margin-bottom: 20px;
+}
+
+.lesson-comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lesson-comment-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lesson-comment-thread.is-reply .lesson-comment-card {
+  background: var(--color-surface-container-lowest);
+}
+
+.lesson-comment-card {
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.lesson-comment-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.lesson-comment-author {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.lesson-comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--color-primary-container);
+  color: var(--color-primary);
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.lesson-comment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  color: var(--color-on-surface);
+}
+
+.lesson-comment-meta span,
+.lesson-comment-role,
+.lesson-comment-inline-hint {
+  color: var(--color-on-surface-variant);
+  font-size: var(--fs-body-sm);
+}
+
+.lesson-comment-edited {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-surface-container-low);
+}
+
+.lesson-comment-role {
+  margin-top: 2px;
+  text-transform: capitalize;
+}
+
+.lesson-comment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.lesson-comment-action-btn,
+.lesson-comment-reply-link,
+.lesson-comment-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--color-outline-variant);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: var(--fs-body-sm);
+  transition: all var(--transition-fast);
+}
+
+.lesson-comment-action-btn:hover,
+.lesson-comment-reply-link:hover,
+.lesson-comment-expand-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.lesson-comment-reply-link {
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  padding: 0;
+}
+
+.lesson-comment-action-btn.danger {
+  color: var(--color-error);
+}
+
+.lesson-comment-content {
+  margin-top: 12px;
+  white-space: pre-line;
+  color: var(--color-on-surface);
+  line-height: 1.6;
+}
+
+.lesson-comment-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.lesson-comment-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lesson-comment-reply-count {
+  padding-left: 2px;
+  font-weight: 700;
+}
+
+.lesson-comment-inline-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lesson-comment-editor,
+.lesson-comment-reply-form {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lesson-comment-textarea {
+  width: 100%;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  background: #fff;
+  color: var(--color-on-surface);
+  resize: vertical;
+  min-height: 96px;
+  outline: none;
+}
+
+.lesson-comment-textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+}
+
+.lesson-comment-editor-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.lesson-comment-primary-btn,
+.lesson-comment-secondary-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 600;
+}
+
+.lesson-comment-primary-btn {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.lesson-comment-secondary-btn {
+  background: var(--color-surface-container-low);
+  color: var(--color-on-surface);
+}
+
+.lesson-comment-children {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 18px;
+  margin-left: 10px;
+  border-left: 2px solid var(--color-outline-variant);
+}
+
+@media (max-width: 768px) {
+  .lesson-comment-head {
+    flex-direction: column;
+  }
+
+  .lesson-comment-actions,
+  .lesson-comment-footer {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .lesson-comment-children {
+    padding-left: 12px;
+    margin-left: 6px;
+  }
+}

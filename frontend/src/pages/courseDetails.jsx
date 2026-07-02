@@ -10,6 +10,8 @@ import { useLessons, useCourseProgress } from "../hook/useLesson";
 import { useEnrolledCourses } from "../hook/useCourse";
 import RatingWidget from "../components/course/ratingWidget.jsx";
 import { FaCircleCheck, FaLock, FaCirclePlay } from "react-icons/fa6";
+import { FiAward } from "react-icons/fi";
+import { useMyCertificates, useGenerateCertificate } from "../hook/useCertificate";
 
 export default function CourseDetail() {
   const { user } = useAuth();
@@ -32,6 +34,12 @@ export default function CourseDetail() {
   const continueLessonId = enrolledCourse?.currentLessonId || firstLessonId;
   const { progress: lessonProgress } = useCourseProgress(courseId, user?.role === "student" && isEnrolled);
   const pageLoading = courseLoading || lessonsLoading || (user?.role === "student" && enrolledLoading);
+  const { certificates: studentCertificates, refetch: refetchStudentCerts } = useMyCertificates();
+  const { generateCertificate, loading: generatingCert } = useGenerateCertificate();
+  const existingCert = studentCertificates?.find(cert => {
+    const certCourseId = cert.courseId?._id || cert.courseId;
+    return certCourseId?.toString() === courseId?.toString();
+  });
   const loading =  deleting || publishing || enrolling || restoring || creatingOrder;
   const progress = lessonProgress || course?.progress || null;
 
@@ -167,6 +175,38 @@ export default function CourseDetail() {
                   <span className="progress-percentage">{progress.progressPercent || 0}% Hoàn thành</span>
                   {progress.isCourseCompleted && <span className="badge bg-success px-3 py-2 rounded-pill">Hoàn thành khóa học</span>}
                 </div>
+                {progress.isCourseCompleted && (
+                  <div className="mt-3 p-3 bg-light rounded d-flex justify-content-between align-items-center border" style={{ borderRadius: "8px" }}>
+                    <div>
+                      <strong className="d-block text-dark" style={{ fontSize: "0.95rem", fontWeight: "bold" }}>Chứng chỉ khóa học</strong>
+                      <span className="text-muted small" style={{ fontSize: "0.85rem" }}>Bạn đã hoàn thành khóa học và đủ điều kiện nhận chứng chỉ.</span>
+                    </div>
+                    {existingCert ? (
+                      <Link
+                        to={existingCert.pdfUrl || `/certificates/${existingCert._id}/print`}
+                        className="btn btn-primary btn-sm d-inline-flex align-items-center gap-1"
+                      >
+                        <FiAward /> Xem chứng chỉ
+                      </Link>
+                    ) : (
+                      <button
+                        className="btn btn-success btn-sm text-white d-inline-flex align-items-center gap-1"
+                        disabled={generatingCert}
+                        onClick={async () => {
+                          try {
+                            await generateCertificate(courseId);
+                            setToast({ message: "Nhận chứng chỉ thành công!", type: "success" });
+                            if (refetchStudentCerts) refetchStudentCerts();
+                          } catch (err) {
+                            setToast({ message: err?.message || "Lỗi khi nhận chứng chỉ", type: "error" });
+                          }
+                        }}
+                      >
+                        {generatingCert ? "Đang xử lý..." : "Nhận chứng chỉ"}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 

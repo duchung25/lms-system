@@ -13,7 +13,7 @@ export const teacherRequestApi = {
     approveTeacherRequest: (requestId) => {
         return apiClient.patch(`/teacher-requests/${requestId}/approve`);   
     },
-    rejectTeacherRequest: (requestId) => {
-        return apiClient.patch(`/teacher-requests/${requestId}/reject`);
+    rejectTeacherRequest: (requestId, payload = {}) => {
+        return apiClient.patch(`/teacher-requests/${requestId}/reject`, payload);
     }
 }

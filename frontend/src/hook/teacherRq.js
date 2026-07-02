@@ -1,4 +1,4 @@
-import teacherRequestService from "../services/teacherRequestService";
+import { teacherRequestService } from "../service/teacherRequest.service";
 import { useState, useEffect, useCallback } from "react";
 import { getErrorMessage } from "../helpers/error.helper";
 

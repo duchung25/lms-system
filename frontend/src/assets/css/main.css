@@ -46,3 +46,10 @@
 @import "./pages/detailCourse.css";
 @import "./pages/coursesPage.css";
 @import "./pages/lessonDetails.css";
+@import "./pages/categoryManagement.css";
+@import "./pages/adminCourseReview.css";
+@import "./pages/commentSection.css";
+@import "./pages/certificates.css";
+@import "./pages/notifications.css";
+@import "./pages/navFeature.css";
+@import "./pages/learningProgress.css";

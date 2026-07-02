@@ -32,7 +32,7 @@ export default function LoginPage() {
       navigate(
         data.user.role === 'admin'
           ? '/admin/dashboard'
-          : '/'
+          : '/courses'
       );
     } catch (err) {
       console.error(err);

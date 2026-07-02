@@ -126,6 +126,22 @@
   overflow: hidden;
 }
 
+.sidebar-unread-badge {
+  margin-left: auto;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 /* ============================
    SECTION LABEL
 ============================ */
@@ -156,6 +172,7 @@
 
   .sidebar-link-text,
   .sidebar-section-label,
+  .sidebar-unread-badge,
   .create-course-btn span:not(svg) {
     display: none;
   }

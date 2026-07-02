@@ -1,4 +1,4 @@
-import teacherRequestApi from "../api/teacherRequest.api";
+import {teacherRequestApi} from "../api/teacherRequest.api.js";
 
 export const teacherRequestService = {
     createTeacherRequest: async (requestData) => {
@@ -11,18 +11,19 @@ export const teacherRequestService = {
     },
     getAllTeacherRequests: async (params) => {
         const res = await teacherRequestApi.getAllTeacherRequests(params);
-        const payload = res.data?.data?.teacherRequests || {};  
+        const payload = res.data?.data?.teacherRequests || {};
+        const list = Array.isArray(payload) ? payload : payload.list;
         return {
-            list: Array.isArray(payload.list) ? payload.list : [],
-            pendingCount: payload.pendingCount ?? 0,
+            list: Array.isArray(list) ? list : [],
+            pendingCount: payload.pendingCount ?? (Array.isArray(list) ? list.filter((item) => item.status === "Pending").length : 0),
         };
     },
     approveTeacherRequest: async (requestId) => {
         const res = await teacherRequestApi.approveTeacherRequest(requestId);
         return res.data?.data?.teacherRequest ?? null;
     },
-    rejectTeacherRequest: async (requestId) => {
-        const res = await teacherRequestApi.rejectTeacherRequest(requestId);
+    rejectTeacherRequest: async (requestId, message = "") => {
+        const res = await teacherRequestApi.rejectTeacherRequest(requestId, { message });
         return res.data?.data?.teacherRequest ?? null;
     }
 }   

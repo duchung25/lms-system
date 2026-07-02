@@ -47,6 +47,17 @@ export const courseService = {
     const res = await courseApi.setPublistCOurse(courseId, status);
     return res.data?.data?.course ?? null;
   },
+
+  async submitCourseForReview(courseId) {
+    const res = await courseApi.submitCourseForReview(courseId);
+    return res.data?.data?.course ?? null;
+  },
+
+  async reviewCourse(courseId, data) {
+    const res = await courseApi.reviewCourse(courseId, data);
+    return res.data?.data?.course ?? null;
+  },
+
   async enrollCourse(courseId) {
     const res = await courseApi.enrollCourse(courseId);
     return res.data?.data ?? null;
@@ -83,5 +94,16 @@ export const courseService = {
   async getTeacherDashboard() {
     const res = await courseApi.getTeacherDashboard();
     return res.data?.data ?? null;
+  },
+  async getHomePageCourses() {
+    const res = await courseApi.getHomePageCourses();
+    return {
+      topSellingCourses: Array.isArray(res.data?.data?.topSellingCourses)
+        ? res.data.data.topSellingCourses
+        : [],
+      latestCourses: Array.isArray(res.data?.data?.latestCourses)
+        ? res.data.data.latestCourses
+        : [],
+    }
   }
 };

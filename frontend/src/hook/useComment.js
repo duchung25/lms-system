@@ -37,6 +37,12 @@ export const useComments = (courseId, lessonId) => {
     return comment;
   };
 
+  const createReply = async (commentId, content) => {
+    const comment = await commentService.createReply(courseId, lessonId, commentId, content);
+    await fetchComments();
+    return comment;
+  };
+
   const updateComment = async (commentId, content) => {
     const comment = await commentService.updateComment(courseId, lessonId, commentId, content);
     await fetchComments();
@@ -53,6 +59,7 @@ export const useComments = (courseId, lessonId) => {
     loading,
     error,
     createComment,
+    createReply,
     updateComment,
     deleteComment,
     refreshComments: fetchComments,

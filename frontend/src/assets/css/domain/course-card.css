@@ -120,7 +120,6 @@
   font-weight: var(--fw-bold, 700);
   color: var(--color-on-background, #1b1b24);
   line-height: 1.4;
-  margin-bottom: 8px;
   height: 40px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
