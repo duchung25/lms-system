@@ -44,6 +44,7 @@ export default function AdminCourseReview() {
     role: "admin",
     refreshKey,
   });
+  console.log(courses)
 
   const { reviewCourse, loading: reviewing } = useReviewCourse();
 

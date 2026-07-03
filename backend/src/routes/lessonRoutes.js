@@ -6,11 +6,12 @@ import readAccessMiddleware from '../middlewares/readAccessMiddleware.js';
 import authorizeMiddleware from '../middlewares/authorizeMiddleware.js';
 import commentController from '../controllers/commentController.js';
 import commentValidator from '../validators/commentValidator.js';
+import optionalAuthMiddleware from '../middlewares/optionalAuthMiddleware.js';
 
 const router = express.Router();
 
 router.post('/:courseId/lessons', authMiddleware, writeAccessMiddleware, lessonController.createLesson);
-router.get('/:courseId/lessons', authMiddleware, lessonController.getLessonsByCourse);
+router.get('/:courseId/lessons', optionalAuthMiddleware, lessonController.getLessonsByCourse);
 router.get('/:courseId/lessons/:lessonId', authMiddleware, readAccessMiddleware, lessonController.getLessonDetail);
 router.patch('/:courseId/lessons/:lessonId', authMiddleware, writeAccessMiddleware, lessonController.updateLesson);
 router.delete('/:courseId/lessons/:lessonId', authMiddleware, writeAccessMiddleware, lessonController.deleteLesson);

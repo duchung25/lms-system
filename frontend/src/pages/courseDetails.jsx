@@ -23,7 +23,7 @@ export default function CourseDetail() {
   const { lessons, loading: lessonsLoading, error: lessonsError } = useLessons(courseId);
   const { deleteCourse, loading: deleting } = useDeleteCourse();
   const { setPublishCourse, loading: publishing } = useSetPublishCourse();
-  
+
   const { enrollCourse, loading: enrolling } = useEnrollCourse();
   const { createOrder, loading: creatingOrder } = useCreateOrder();
   const { restoreCourse, loading: restoring } = useRestoreCourse();
@@ -43,10 +43,13 @@ export default function CourseDetail() {
   const loading =  deleting || publishing || enrolling || restoring || creatingOrder;
   const progress = lessonProgress || course?.progress || null;
 
+  // BE trả về field `status` ("PUBLISHED" | "DRAFT" | "PENDING_REVIEW" ...), không có field isPublished
+  const isPublished = course?.status === "PUBLISHED";
+
   const handlePublishToggle = async () => {
     let publishedCourse;
     try{
-      const action = course.isPublished ? "unpublish" : "publish";
+      const action = isPublished ? "unpublish" : "publish";
       publishedCourse = await setPublishCourse(courseId, action);
       setCourse(publishedCourse);
       setToast({ message: `Course ${action}ed successfully`, type: "success" });
@@ -117,17 +120,16 @@ export default function CourseDetail() {
         <Toast message={toast.message} type={toast.type} onClose={setToast.bind(null, null)} />
       )}
 
-      {/* Hero Banner Section */}
       <div className="course-detail-hero">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-12 col-lg-8">
               <div className="d-flex flex-wrap gap-2 align-items-center mb-3">
                 <span className="course-detail-badge level">{course.level}</span>
-                <span className="course-detail-badge category">{course.category}</span>
+                <span className="course-detail-badge category">{course.categoryId?.name}</span>
                 {user && user.role === "admin" && (
-                  <span className={`course-detail-badge ${course.isPublished ? "published-status" : "unpublished-status"}`}>
-                    {course.isPublished ? "Công khai" : "Chờ duyệt"}
+                  <span className={`course-detail-badge ${isPublished ? "published-status" : "unpublished-status"}`}>
+                    {isPublished ? "Công khai" : "Chờ duyệt"}
                   </span>
                 )}
               </div>
@@ -313,7 +315,7 @@ export default function CourseDetail() {
                     >
                       Vào học ngay
                     </Link>
-                  ) : course.isPublished ? (
+                  ) : isPublished ? (
                     <button
                       className="sidebar-btn-cta primary w-100"
                       onClick={handleEnrollCourse}
@@ -364,7 +366,7 @@ export default function CourseDetail() {
                           onClick={handlePublishToggle}
                           disabled={loading}
                         >
-                          {course.isPublished ? "Hủy công khai" : "Công khai"}
+                          {isPublished ? "Hủy công khai" : "Công khai"}
                         </button>
                         {course.deleted && (
                           <button

@@ -1,4 +1,5 @@
 import commentService from "../services/commentService.js";
+import { getIo } from "../socketManager.js";
 
 const commentController = {
   async getComments(req, res, next) {
@@ -47,6 +48,17 @@ const commentController = {
         message: "Comment created successfully",
         data: { comment },
       });
+
+      // emit realtime event after successful DB save
+      try {
+        const io = getIo();
+        if (io) {
+          io.to(String(lessonId)).emit("comment:created", comment);
+        }
+      } catch (e) {
+        // swallow socket errors to not affect REST response
+        console.error("Socket emit error (createComment):", e.message || e);
+      }
     } catch (error) {
       next(error);
     }
@@ -68,6 +80,16 @@ const commentController = {
         message: "Comment updated successfully",
         data: { comment },
       });
+
+      // emit realtime event after successful DB save
+      try {
+        const io = getIo();
+        if (io) {
+          io.to(String(lessonId)).emit("comment:updated", comment);
+        }
+      } catch (e) {
+        console.error("Socket emit error (updateComment):", e.message || e);
+      }
     } catch (error) {
       next(error);
     }
@@ -87,6 +109,19 @@ const commentController = {
         success: true,
         message: result.message,
       });
+
+      // emit realtime event after successful DB delete
+      try {
+        const io = getIo();
+        if (io) {
+          io.to(String(lessonId)).emit("comment:deleted", {
+            commentId,
+            lessonId,
+          });
+        }
+      } catch (e) {
+        console.error("Socket emit error (deleteComment):", e.message || e);
+      }
     } catch (error) {
       next(error);
     }

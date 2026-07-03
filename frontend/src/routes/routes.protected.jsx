@@ -24,7 +24,6 @@ import NotificationsPage from "../pages/notificationsPage.jsx";
 import AdminTeacherRequestsPage from "../pages/adminTeacherRequests.jsx";
 import AdminOrdersPage from "../pages/adminOrders.jsx";
 import NavFeaturePlaceholder from "../pages/navFeaturePlaceholder.jsx";
-import CourseDetails from "../pages/courseDetails.jsx";
 import LearningProgressPage from "../pages/learningProgress.jsx";
 
 export default [
@@ -34,7 +33,6 @@ export default [
       {
         element: <ProtectedRoute />,
         children: [
-          { path: "/courses/:courseId", element: <CourseDetails /> },
           { path: "/my-profile", element: <MyProfile /> },
           { path: "/certificates/:certificateId/print", element: <CertificatePrintPage /> },
           { path: "/notifications", element: <NotificationsPage /> },

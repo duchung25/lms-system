@@ -7,6 +7,7 @@ import lessonRoutes from './lessonRoutes.js';
 import authorizeMiddleware from '../middlewares/authorizeMiddleware.js';
 import ratingController from '../controllers/ratingController.js';
 import ratingValidator from '../validators/ratingValidator.js';
+import optionalAuthMiddleware from '../middlewares/optionalAuthMiddleware.js';
 
 const router = express.Router();
 
@@ -42,8 +43,8 @@ router.get(
 );
 
 router.post('/', authMiddleware, authorizeMiddleware('teacher'), courseValidator.createCourseValidationRules, courseValidator.validate, courseController.createCourse);
-router.get('/',  courseController.getAllCourse);
-router.get('/:courseId', courseController.getCourseDetail);
+router.get('/', optionalAuthMiddleware, courseController.getAllCourse);
+router.get('/:courseId', optionalAuthMiddleware, courseController.getCourseDetail);
 router.patch('/:courseId', authMiddleware, writeAccessMiddleware, courseValidator.updateCourseValidationRules, courseValidator.validate, courseController.updateCourse);
 router.delete('/:courseId', authMiddleware, writeAccessMiddleware, courseController.deleteCourse);
 router.patch('/:courseId/restore', authMiddleware, writeAccessMiddleware, courseController.restoreCourse);
