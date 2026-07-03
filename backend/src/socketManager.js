@@ -8,7 +8,7 @@ export function initSocket(server) {
 
   io = new Server(server, {
     cors: {
-      origin: true,
+      origin: process.env.CLIENT_URL.split(","),
       methods: ["GET", "POST"],
       credentials: true,
     },

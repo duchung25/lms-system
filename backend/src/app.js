@@ -13,12 +13,10 @@ connectDB();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173",
-      "http://192.168.111.18:5173", 
-      "http://localhost:4173",],
+    origin: process.env.CLIENT_URL.split(","),
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, 
+    credentials: true,
   })
 );
 
