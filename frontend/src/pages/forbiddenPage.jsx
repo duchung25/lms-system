@@ -1,13 +1,29 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 
-export default function NotFoundPage() {
+export default function ForbiddenPage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/auth/login");
+  };
+
+  const getDashboardLink = () => {
+    if (!user) return "/";
+    switch (user.role) {
+      case "admin":
+        return "/admin/dashboard";
+      case "teacher":
+        return "/teacher/dashboard";
+      default:
+        return "/dashboard";
+    }
+  };
 
   return (
     <div className="error-page-wrapper d-flex align-items-center justify-content-center">
-      {/* 🔴 NHÚNG CSS TRỰC TIẾP VÀO FILE JSX */}
       <style>{`
         .error-page-wrapper {
           min-height: 100vh;
@@ -21,7 +37,7 @@ export default function NotFoundPage() {
           position: absolute;
           width: 400px;
           height: 400px;
-          background: radial-gradient(circle, rgba(79, 70, 229, 0.2) 0%, rgba(0,0,0,0) 70%);
+          background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, rgba(0,0,0,0) 70%);
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
@@ -45,7 +61,7 @@ export default function NotFoundPage() {
           line-height: 1;
           margin-bottom: 10px;
           letter-spacing: -2px;
-          color: var(--color-primary, #6366f1);
+          color: #f87171;
         }
 
         .error-title {
@@ -61,7 +77,6 @@ export default function NotFoundPage() {
           color: #a0aec0 !important;
         }
 
-        /* Responsive mượt mà cho Mobile */
         @media (max-width: 576px) {
           .error-code {
             font-size: 5rem;
@@ -79,42 +94,35 @@ export default function NotFoundPage() {
         }
       `}</style>
 
-      {/* GIAO DIỆN HTML */}
       <div className="error-bg-glow"></div>
 
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-8 col-lg-6 text-center">
-            <div className="glass-card error-card p-5 animate-fade-in-up">
-              
-              <h1 className="error-code text-gradient animate-float">404</h1>
-
-              <h2 className="error-title mb-3">Không tìm thấy trang</h2>
-              
+            <div className="glass-card error-card p-5">
+              <h1 className="error-code">403</h1>
+              <h2 className="error-title mb-3">Không có quyền truy cập</h2>
               <p className="error-desc mb-4">
-                Trang bạn đang tìm kiếm không tồn tại, đã bị di chuyển hoặc đường dẫn không chính xác.
+                Tài khoản của bạn (vai trò: <strong style={{ color: "#c3c0ff" }}>{user?.role || "học viên"}</strong>) không có quyền xem trang này. Vui lòng quay về trang chủ hoặc chuyển đổi tài khoản.
               </p>
 
               <div className="error-actions d-flex justify-content-center gap-3">
                 <button
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate(getDashboardLink())}
                   className="btn btn-outline-light px-4 py-2"
                   style={{ borderRadius: "8px", border: "1px solid rgba(255,255,255,0.2)" }}
                 >
-                  ← Về trang chủ
+                  Về trang chính của tôi
                 </button>
 
-                {!isAuthenticated && (
-                  <button
-                    onClick={() => navigate("/auth/login")}
-                    className="btn btn-primary px-4 py-2"
-                    style={{ borderRadius: "8px", backgroundColor: "#3525cd", border: "none" }}
-                  >
-                    Đăng nhập
-                  </button>
-                )}
+                <button
+                  onClick={handleLogout}
+                  className="btn btn-danger px-4 py-2"
+                  style={{ borderRadius: "8px", backgroundColor: "#ef4444", border: "none" }}
+                >
+                  Đăng xuất & chuyển tài khoản
+                </button>
               </div>
-
             </div>
           </div>
         </div>

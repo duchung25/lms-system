@@ -48,7 +48,7 @@ export const useGetMyTeacherRequest = () => {
     return { teacherRequest, loading, error, refetch: fetchMyRequest };
 }
 
-export const useGetAllTeacherRequests = (params) => {
+export const useGetAllTeacherRequests = (status) => {
     const [loading, setLoading] = useState(false);
     const [teacherRequests, setTeacherRequests] = useState([]);
     const [pendingCount, setPendingCount] = useState(0);
@@ -59,7 +59,7 @@ export const useGetAllTeacherRequests = (params) => {
         setError("");
 
         try {
-            const data = await teacherRequestService.getAllTeacherRequests(params);
+            const data = await teacherRequestService.getAllTeacherRequests(status ? { status } : {});
 
             setTeacherRequests(data.list);
             setPendingCount(data.pendingCount);
@@ -69,7 +69,7 @@ export const useGetAllTeacherRequests = (params) => {
         } finally {
             setLoading(false);
         }
-    }, [params]);
+    }, [status]);
 
     useEffect(() => {
         fetchData();
@@ -105,10 +105,10 @@ export const useApproveTeacherRequest = () => {
 export const useRejectTeacherRequest = () => {
     const [loading, setLoading] = useState(false);  
 
-    const rejectRequest = async (requestId) => {
+    const rejectRequest = async (requestId, message) => {
         setLoading(true);
         try {
-            await teacherRequestService.rejectTeacherRequest(requestId);
+            await teacherRequestService.rejectTeacherRequest(requestId, message);
         } catch (error) {
             const message = getErrorMessage(error) || "Đã có lỗi xảy ra.";
             throw new Error(message);

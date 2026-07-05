@@ -14,6 +14,6 @@ export const authApi = {
     return apiClient.put("/auth/profile", data);
   },
   changePassword: (payLoad) => {
-    return apiClient.post("/auth/change-password", payLoad);
+    return apiClient.put("/auth/change-password", payLoad);
   }
 };

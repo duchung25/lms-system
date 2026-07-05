@@ -306,7 +306,14 @@ export default function CourseDetail() {
                   <span className="sidebar-rating-stars">★ {Number(course.averageRating || 0).toFixed(1)}</span>
                   <span>({course.ratingCount || 0} đánh giá)</span>
                 </div>
-
+                 {!user && (
+                  <Link
+                    to={`/auth/login?returnUrl=${encodeURIComponent(`/courses/${courseId}`)}`}
+                    className="sidebar-btn-cta primary w-100"
+                  >
+                    Đăng nhập để đăng ký học
+                  </Link>
+                )}
                 {user && user.role === "student" ? (
                   enrolledLoading ? null : isEnrolled ? (
                     <Link

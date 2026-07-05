@@ -2,7 +2,9 @@ import AppLayout from "../layouts/AppLayout.jsx";
 import AuthLayout from "../layouts/AuthLayout.jsx";
 // import AdminLayout from "../layouts/AdminLayout.jsx";
 // import TeacherLayout from "../layouts/TeacherLayout.jsx";
+import NoSidebarLayout from "../layouts/NoSidebarLayout.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
+import SettingsPage from "../pages/settingsPage.jsx";
 import CoursesPage from "../pages/coursesPage.jsx";
 import MyProfile from "../pages/myProfile.jsx";
 import UserManagement from "../pages/userManagement.jsx";
@@ -75,19 +77,6 @@ export default [
               />
             ),
           },
-          {
-            path: "/admin/settings",
-            element: (
-              <NavFeaturePlaceholder
-                roleLabel="Admin"
-                title="Settings"
-                description="Khu vực cấu hình hệ thống, giữ route ổn định để triển khai sau."
-                bullets={["Ưu tiên cấu hình dựa trên collection sẵn có như NavLink.", "Chỉ thêm collection mới khi có cấu hình động thật sự cần lưu."]}
-                primaryLink="/admin/dashboard"
-                primaryLabel="Về Dashboard"
-              />
-            ),
-          },
           { path: "/admin/dashboard", element: <AdminDashboard /> },
           { path: "/admin/navlinks", element: <AdminNavLink /> },
           { path: "/admin/categories", element: <CategoryManagementPage /> }
@@ -113,18 +102,6 @@ export default [
               />
             ),
           },
-          {
-            path: "/teacher/settings",
-            element: (
-              <NavFeaturePlaceholder
-                roleLabel="Teacher"
-                title="Settings"
-                description="Cấu hình hồ sơ giảng dạy và trải nghiệm khóa học."
-                primaryLink="/teacher/dashboard"
-                primaryLabel="Về Dashboard"
-              />
-            ),
-          },
         ],
       },
       {
@@ -141,18 +118,6 @@ export default [
                 bullets={["Dùng LessonComment hiện có.", "Có thể mở rộng thành inbox thảo luận theo khóa học."]}
                 primaryLink="/courses/my-courses"
                 primaryLabel="Khóa học của tôi"
-              />
-            ),
-          },
-          {
-            path: "/settings",
-            element: (
-              <NavFeaturePlaceholder
-                roleLabel="Account"
-                title="Settings"
-                description="Cấu hình tài khoản và tùy chọn cá nhân."
-                primaryLink="/my-profile"
-                primaryLabel="Hồ sơ"
               />
             ),
           },
@@ -179,5 +144,18 @@ export default [
         ],
       },
     ],
+  },
+  {
+    element: <NoSidebarLayout />,
+    children: [
+      {
+        element: <ProtectedRoute allowedRoles={["admin", "teacher", "student"]} />,
+        children: [
+          { path: "/settings", element: <SettingsPage /> },
+          { path: "/admin/settings", element: <SettingsPage /> },
+          { path: "/teacher/settings", element: <SettingsPage /> }
+        ]
+      }
+    ]
   }
 ];

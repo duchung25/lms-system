@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLogin } from '../hook/useAuth';
 import { FaGoogle, FaFacebookF } from '../icons';
 import loginImg from '../assets/img/login_image.jpg';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, loading, error } = useLogin();
   const [validationError, setValidationError] = useState("");
   const [form, setForm] = useState({
@@ -29,11 +30,20 @@ export default function LoginPage() {
     }
     try {
       const data = await login({ email, password });
-      navigate(
-        data.user.role === 'admin'
-          ? '/admin/dashboard'
-          : '/courses'
-      );
+      
+      // Parse returnUrl from query string
+      const searchParams = new URLSearchParams(location.search);
+      const returnUrl = searchParams.get("returnUrl");
+
+      if (returnUrl) {
+        navigate(returnUrl, { replace: true });
+      } else {
+        navigate(
+          data.user.role === 'admin'
+            ? '/admin/dashboard'
+            : '/courses'
+        );
+      }
     } catch (err) {
       console.error(err);
     }

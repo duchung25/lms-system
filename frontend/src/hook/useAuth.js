@@ -117,3 +117,19 @@ export const useProfile = () => {
     };
     return { getProfile, editProfile, loading, error };
 };
+
+export const useChangePassword = () => {
+    const [loading, setLoading] = useState(false);
+    const changePassword = async (payload) => {
+        setLoading(true);
+        try {
+            return await authService.changePassword(payload);
+        } catch (err) {
+            const message = getErrorMessage(err) || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+            throw new Error(message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    return { changePassword, loading };
+};

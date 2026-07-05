@@ -32,7 +32,7 @@ export default function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate("/auth/login");
+    navigate("/");
   };
 
   useEffect(() => {

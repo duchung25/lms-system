@@ -20,10 +20,7 @@ const teacherRequestService = {
         return await teacherRequest.populate("userId", "username email");
     },
     async getMyRequest(userId) {
-        const teacherRequest = await TeacherRequest.findOne({userId}).populate("userId", "username email");
-        if(!teacherRequest){
-            throw new AppError("No teacher request found for this user", 404);
-        }
+        const teacherRequest = await TeacherRequest.findOne({userId}).sort({createdAt: -1}).populate("userId", "username email");
         return teacherRequest;
     },
     async getAllTeacherRequests({status} = {}) {

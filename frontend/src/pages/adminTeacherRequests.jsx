@@ -17,7 +17,7 @@ const formatDate = (value) =>
 export default function AdminTeacherRequestsPage() {
   const [status, setStatus] = useState("");
   const { teacherRequests, pendingCount, loading, error, refetch } =
-    useGetAllTeacherRequests(status ? { status } : {});
+    useGetAllTeacherRequests(status);
   const { approveRequest } = useApproveTeacherRequest();
   const { rejectRequest } = useRejectTeacherRequest();
 

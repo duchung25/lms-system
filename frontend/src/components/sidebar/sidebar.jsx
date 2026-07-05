@@ -52,6 +52,10 @@ export default function Sidebar() {
               <span className="sidebar-link-icon"><BiSolidDashboard /></span>
               <span className="sidebar-link-text">Bảng điều khiển</span>
             </NavLink>
+            <NavLink to="/courses" className={linkClass}>
+              <span className="sidebar-link-icon"><FiBarChart2 /></span>
+              <span className="sidebar-link-text">Khóa học</span>
+            </NavLink>
             <NavLink to="/courses/my-courses" className={linkClass}>
               <span className="sidebar-link-icon"><BiBook /></span>
               <span className="sidebar-link-text">Khóa học của tôi</span>
@@ -72,10 +76,6 @@ export default function Sidebar() {
             <NavLink to="/settings" className={linkClass}>
               <span className="sidebar-link-icon"><FiSettings /></span>
               <span className="sidebar-link-text">Cài đặt</span>
-            </NavLink>
-            <NavLink to="/courses" className={linkClass}>
-              <span className="sidebar-link-icon"><FiBarChart2 /></span>
-              <span className="sidebar-link-text">Khóa học</span>
             </NavLink>
           </nav>
         </aside>
