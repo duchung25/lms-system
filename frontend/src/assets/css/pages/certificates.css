@@ -3,9 +3,13 @@
 .certificate-print-page,
 .certificate-verify-page,
 .admin-certificates-page {
+  font-family: var(--font-primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
   padding: var(--space-xl);
   min-height: 100vh;
-  background: linear-gradient(180deg, var(--color-background), var(--color-surface-container-lowest));
+  background: var(--color-background);
 }
 
 .student-dashboard-header,
@@ -16,35 +20,40 @@
   gap: var(--space-lg);
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-outline-variant);
+  margin-bottom: var(--space-md);
 }
 
 .student-dashboard-eyebrow,
 .certificates-eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  font-size: 14px;
+  font-size: var(--fs-caption);
   color: var(--color-primary);
-  font-weight: 700;
-  margin-bottom: 6px;
+  font-weight: var(--fw-semibold);
+  margin-bottom: var(--space-xs);
 }
 
 .student-dashboard-title,
 .certificates-title {
-  font-size: clamp(28px, 4vw, 44px);
-  margin: 0 0 8px;
-  color: var(--color-on-background);
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  margin: 0;
+  color: var(--color-primary-container);
 }
 
 .student-dashboard-subtitle,
 .certificates-subtitle {
-  margin: 0;
+  margin: var(--space-xs) 0 0;
   color: var(--color-on-surface-variant);
+  font-size: var(--fs-body-sm);
 }
 
 .student-dashboard-actions {
   display: flex;
-  gap: 12px;
+  gap: var(--space-sm);
   flex-wrap: wrap;
 }
 
@@ -63,15 +72,15 @@
 .certificate-print-sheet {
   background: var(--color-surface-container-lowest);
   border: 1px solid var(--color-outline-variant);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-level-1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
 
 .student-kpi-card {
   padding: var(--space-lg);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-xs);
 }
 
 .student-kpi-card svg,
@@ -84,12 +93,14 @@
 .student-kpi-card span,
 .certificate-kpi span {
   color: var(--color-on-surface-variant);
-  font-size: var(--fs-body-sm);
+  font-size: var(--fs-caption);
 }
 
 .student-kpi-card strong,
 .certificate-kpi strong {
-  font-size: 30px;
+  display: block;
+  margin-top: var(--space-xs);
+  font-size: var(--fs-h2);
   line-height: 1;
   color: var(--color-on-surface);
 }
@@ -97,7 +108,7 @@
 .certificate-kpi {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-md);
   padding: var(--space-md) var(--space-lg);
 }
 
@@ -117,8 +128,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
 }
 
 .student-dashboard-card-head h2 {
@@ -127,14 +138,14 @@
 
 .student-cert-list {
   display: grid;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .student-cert-item,
 .certificate-card {
   display: grid;
   grid-template-columns: 160px 1fr;
-  gap: 16px;
+  gap: var(--space-md);
   overflow: hidden;
 }
 
@@ -149,27 +160,29 @@
 
 .student-cert-content,
 .certificate-card-body {
-  padding: 16px 16px 16px 0;
+  padding: var(--space-md) var(--space-md) var(--space-md) 0;
 }
 
 .student-cert-content h3,
 .certificate-card-body h3 {
-  margin: 0 0 8px;
+  margin: 0 0 var(--space-xs);
   color: var(--color-on-surface);
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
 }
 
 .student-cert-actions,
 .certificate-card-actions {
   display: flex;
-  gap: 10px;
+  gap: var(--space-sm);
   flex-wrap: wrap;
-  margin-top: 14px;
+  margin-top: var(--space-md);
 }
 
 .student-next-step {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .certificate-empty {
@@ -177,10 +190,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 56px 24px;
+  gap: var(--space-md);
+  padding: var(--space-2xl) var(--space-lg);
   text-align: center;
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   background: var(--color-surface-container-lowest);
   border: 1px dashed var(--color-outline-variant);
 }
@@ -194,17 +207,18 @@
 .certificate-card-topline {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-md);
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-sm);
   color: var(--color-on-surface-variant);
+  font-size: var(--fs-caption);
 }
 
 .certificate-status {
   padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
+  border-radius: var(--radius-md);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
   letter-spacing: 0.04em;
 }
 
@@ -225,7 +239,7 @@
 .admin-pagination,
 .certificate-verify-form {
   display: flex;
-  gap: 12px;
+  gap: var(--space-sm);
   align-items: center;
   flex-wrap: wrap;
 }
@@ -238,13 +252,14 @@
 .admin-certificates-search {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
   flex: 1;
   min-width: 260px;
   background: var(--color-surface-container-lowest);
   border: 1px solid var(--color-outline-variant);
   border-radius: var(--radius-full);
-  padding: 12px 16px;
+  padding: 10px 18px;
+  color: var(--color-on-surface-variant);
 }
 
 .admin-certificates-search input,
@@ -253,6 +268,9 @@
   outline: none;
   background: transparent;
   width: 100%;
+  font-family: var(--font-primary);
+  font-size: var(--fs-body-sm);
+  color: var(--color-on-surface);
 }
 
 .admin-grid {
@@ -405,11 +423,11 @@
 
   .student-cert-content,
   .certificate-card-body {
-    padding: 0 16px 16px;
+    padding: 0 var(--space-md) var(--space-md);
   }
 
   .certificate-print-sheet {
-    padding: 24px;
+    padding: var(--space-lg);
   }
 
   .certificate-print-toolbar,

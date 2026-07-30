@@ -1,3 +1,4 @@
+
 import User from "../models/User.js";
 import bcryptjs from 'bcryptjs';
 import jwt from "jsonwebtoken";
@@ -58,14 +59,12 @@ const authService = {
     async updateUserProfile(userId, updateData) {
         const allowedFields = ["username", "avatar"];
         const fieldsToUpdate = {};
-        for (let key of allowedFields) {
-            if (updateData[key] !== undefined) {
-                fieldsToUpdate[key] = updateData[key];
+            for (let key of allowedFields) {
+                if (updateData[key] !== undefined) {
+                    fieldsToUpdate[key] = updateData[key];
+                }
             }
-        }
-        const user = await User.findById(
-            userId
-        );
+        const user = await User.findById( userId );
         if(!user){
             throw new AppError("Người dùng không tồn tại", 404);
         }

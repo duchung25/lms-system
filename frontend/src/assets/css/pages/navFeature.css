@@ -1,54 +1,71 @@
 .nav-feature-page {
+  font-family: var(--font-primary);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  background: var(--color-background);
+  min-height: 100vh;
 }
 
 .nav-feature-header {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
-  padding: 24px;
-  background: var(--color-surface-container-lowest);
-  border: 1px solid var(--color-outline-variant);
-  border-radius: 8px;
-  box-shadow: var(--shadow-level-1);
+  align-items: center;
+  gap: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-outline-variant);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
 }
 
 .nav-feature-header p {
-  margin: 0 0 6px;
+  margin: 0 0 var(--space-xs) 0;
   color: var(--color-primary);
-  font-size: 12px;
+  font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);
   text-transform: uppercase;
 }
 
 .nav-feature-header h1 {
   margin: 0;
-  color: var(--color-on-surface);
-  font-size: 28px;
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  color: var(--color-primary-container);
 }
 
 .nav-feature-header span {
   display: block;
-  margin-top: 8px;
+  margin-top: var(--space-xs);
+  font-size: var(--fs-body-sm);
   color: var(--color-on-surface-variant);
 }
 
 .nav-feature-header select {
-  min-width: 190px;
-  padding: 10px 12px;
+  min-width: 200px;
+  padding: 10px 14px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--color-outline-variant);
-  border-radius: 8px;
-  background: #fff;
+  background: var(--color-surface-container-lowest);
   color: var(--color-on-surface);
+  font-family: var(--font-primary);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
 }
 
+.nav-feature-header select:focus {
+  outline: none;
+  border-color: var(--color-primary-container);
+}
+
+/* KPI GRID & PANELS (if used elsewhere) */
 .nav-feature-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
 }
 
 .nav-feature-kpi-grid > div,
@@ -57,52 +74,53 @@
 .nav-feature-table {
   background: var(--color-surface-container-lowest);
   border: 1px solid var(--color-outline-variant);
-  border-radius: 8px;
-  box-shadow: var(--shadow-level-1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
 
 .nav-feature-kpi-grid > div {
-  padding: 18px;
+  padding: var(--space-lg);
 }
 
 .nav-feature-kpi-grid span {
   color: var(--color-on-surface-variant);
-  font-size: 13px;
+  font-size: var(--fs-caption);
 }
 
 .nav-feature-kpi-grid strong {
   display: block;
-  margin-top: 8px;
+  margin-top: var(--space-xs);
   color: var(--color-on-surface);
-  font-size: 24px;
+  font-size: var(--fs-h2);
 }
 
 .nav-feature-panel {
-  padding: 24px;
+  padding: var(--space-lg);
 }
 
 .nav-feature-panel h2 {
-  margin: 0 0 8px;
+  margin: 0 0 var(--space-sm);
   color: var(--color-on-surface);
-  font-size: 20px;
+  font-size: var(--fs-h3);
 }
 
 .nav-feature-panel p,
 .nav-feature-list p {
   margin: 0;
   color: var(--color-on-surface-variant);
-  line-height: 1.55;
+  line-height: var(--lh-loose);
+  font-size: var(--fs-body-sm);
 }
 
 .nav-feature-list {
   display: grid;
-  gap: 10px;
-  margin-top: 18px;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
 }
 
 .nav-feature-list div {
   display: flex;
-  gap: 10px;
+  gap: var(--space-sm);
   align-items: flex-start;
 }
 
@@ -110,23 +128,27 @@
   width: 8px;
   height: 8px;
   margin-top: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background: var(--color-primary);
   flex-shrink: 0;
 }
 
+/* STATE CONTAINER */
 .nav-feature-state {
-  padding: 28px;
+  padding: var(--space-2xl) var(--space-lg);
   color: var(--color-on-surface-variant);
   text-align: center;
+  font-size: var(--fs-body);
 }
 
 .nav-feature-state.error {
   color: var(--color-error);
 }
 
+/* TABLE */
 .nav-feature-table {
   overflow-x: auto;
+  padding: var(--space-md);
 }
 
 .nav-feature-table table {
@@ -136,26 +158,37 @@
 
 .nav-feature-table th,
 .nav-feature-table td {
-  padding: 14px;
-  border-bottom: 1px solid var(--color-outline-variant);
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-surface-container);
   color: var(--color-on-surface);
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
+  font-size: var(--fs-body-sm);
 }
 
 .nav-feature-table th {
   color: var(--color-on-surface-variant);
-  font-size: 12px;
-  text-transform: uppercase;
+  font-weight: var(--fw-semibold);
+  background: var(--color-surface-container-low);
+  border-bottom: 2px solid var(--color-outline-variant);
 }
 
+.nav-feature-table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.nav-feature-table tbody tr:hover {
+  background-color: var(--color-surface-container-low);
+}
+
+/* STATUS BADGES */
 .nav-status {
   display: inline-flex;
-  padding: 4px 9px;
-  border-radius: 999px;
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
   background: var(--color-info-light);
   color: var(--color-info);
-  font-size: 12px;
+  font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);
 }
 
@@ -169,32 +202,45 @@
   color: var(--color-error);
 }
 
+.nav-status.pending {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+/* ACTION BUTTONS */
 .nav-row-actions {
   display: inline-flex;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .nav-row-actions button {
-  padding: 7px 10px;
+  padding: 8px 14px;
   border: 1px solid var(--color-outline-variant);
-  border-radius: 8px;
-  background: #fff;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-lowest);
   color: var(--color-on-surface);
+  font-family: var(--font-primary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
 .nav-row-actions button:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
+  background: var(--color-surface-container-low);
 }
 
 @media (max-width: 900px) {
   .nav-feature-header {
     flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
   }
 
   .nav-feature-kpi-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -203,3 +249,4 @@
     grid-template-columns: 1fr;
   }
 }
+

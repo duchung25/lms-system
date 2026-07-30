@@ -12,12 +12,10 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef(null);
-  
-  // SỬA Ở ĐÂY: Lấy trực tiếp state navLinks từ custom hook
+
   const { navLinks, fetchAllNavLinks } = useNavLink();
 
   useEffect(() => {
-    // SỬA Ở ĐÂY: Chỉ cần gọi hàm fetch, hook sẽ tự cập nhật mảng navLinks
     fetchAllNavLinks().catch(err => {
       console.error('Failed to fetch nav links', err);
     });

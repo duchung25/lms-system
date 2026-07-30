@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import useNavLink from '../hook/useNavLink';
 import { FiEdit2, FiTrash2, FiPlus, FiX } from 'react-icons/fi';
+import '../assets/css/pages/adminNavLink.css';
 
 export default function AdminNavLink() {
   const { 
@@ -75,17 +76,13 @@ export default function AdminNavLink() {
   };
 
   return (
-    <div className="admin-navlink-container animate-fade-in" style={{ padding: 'var(--space-xl)', maxWidth: 'var(--container-max)', margin: '0 auto' }}>
+    <div className="admin-navlink-container animate-fade-in">
       
       {/* Header Section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-lg)' }}>
-        <div>
-          <h1 style={{ fontSize: 'var(--fs-h2)', color: 'var(--color-on-background)', marginBottom: 'var(--space-xs)' }}>
-            Quản lý Menu (NavLinks)
-          </h1>
-          <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 'var(--fs-body-sm)' }}>
-            Thêm, sửa, xóa các liên kết trên thanh điều hướng chính.
-          </p>
+      <div className="admin-navlink-header">
+        <div className="admin-navlink-title">
+          <h1>Quản lý Menu (NavLinks)</h1>
+          <p>Thêm, sửa, xóa các liên kết trên thanh điều hướng chính.</p>
         </div>
         {!showForm && (
           <button className="btn btn-primary" onClick={handleAddNew}>
@@ -96,39 +93,24 @@ export default function AdminNavLink() {
 
       {/* Hiển thị lỗi nếu có */}
       {error && (
-        <div style={{ padding: 'var(--space-md)', backgroundColor: 'var(--color-error-container)', color: 'var(--color-on-error-container)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-lg)' }}>
+        <div className="alert alert-danger" style={{ padding: 'var(--space-md)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-lg)' }}>
           ⚠️ {error}
         </div>
       )}
 
       {/* Form Thêm/Sửa */}
       {showForm && (
-        <form 
-          onSubmit={handleSubmit} 
-          className="animate-slide-in-right"
-          style={{ 
-            backgroundColor: 'var(--color-surface)', 
-            padding: 'var(--space-lg)', 
-            borderRadius: 'var(--radius-lg)', 
-            boxShadow: 'var(--shadow-level-1)',
-            marginBottom: 'var(--space-xl)',
-            border: '1px solid var(--color-outline-variant)'
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
-            <h3 style={{ fontSize: 'var(--fs-h4)', color: 'var(--color-primary)' }}>
-              {formData.id ? 'Chỉnh sửa liên kết' : 'Thêm liên kết mới'}
-            </h3>
+        <form onSubmit={handleSubmit} className="admin-navlink-form animate-slide-in-right">
+          <div className="admin-navlink-form-header">
+            <h3>{formData.id ? 'Chỉnh sửa liên kết' : 'Thêm liên kết mới'}</h3>
             <button type="button" className="btn-icon" onClick={handleCancel}>
               <FiX />
             </button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--fs-label)', marginBottom: 'var(--space-xs)', fontWeight: 'var(--fw-medium)' }}>
-                Tên hiển thị (Title) *
-              </label>
+          <div className="admin-navlink-form-grid">
+            <div className="admin-navlink-form-group">
+              <label>Tên hiển thị (Title) *</label>
               <input
                 className="input"
                 name="title"
@@ -138,10 +120,8 @@ export default function AdminNavLink() {
                 required
               />
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--fs-label)', marginBottom: 'var(--space-xs)', fontWeight: 'var(--fw-medium)' }}>
-                Đường dẫn (URL) *
-              </label>
+            <div className="admin-navlink-form-group">
+              <label>Đường dẫn (URL) *</label>
               <input
                 className="input"
                 name="url"
@@ -153,7 +133,7 @@ export default function AdminNavLink() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'flex-end' }}>
+          <div className="admin-navlink-form-actions">
             <button type="button" className="btn btn-white" onClick={handleCancel} disabled={loading}>
               Hủy
             </button>
@@ -165,15 +145,7 @@ export default function AdminNavLink() {
       )}
 
       {/* Danh sách NavLinks */}
-      <div 
-        className="animate-fade-in-up--delay-1"
-        style={{ 
-          backgroundColor: 'var(--color-surface-container-lowest)', 
-          borderRadius: 'var(--radius-lg)', 
-          boxShadow: 'var(--shadow-card)',
-          overflow: 'hidden'
-        }}
-      >
+      <div className="admin-navlink-table-wrap animate-fade-in-up--delay-1">
         {loading && navLinks.length === 0 ? (
           // Khung xương (Skeleton Loading) khi đang tải dữ liệu lần đầu
           <div style={{ padding: 'var(--space-lg)' }}>
@@ -194,22 +166,22 @@ export default function AdminNavLink() {
           </div>
         ) : (
           // Bảng dữ liệu
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead style={{ backgroundColor: 'var(--color-surface-container)' }}>
+          <table className="admin-navlink-table">
+            <thead>
               <tr>
-                <th style={{ padding: 'var(--space-md)', fontWeight: 'var(--fw-semibold)', color: 'var(--color-on-surface-variant)', borderBottom: '1px solid var(--color-outline-variant)' }}>Tên hiển thị</th>
-                <th style={{ padding: 'var(--space-md)', fontWeight: 'var(--fw-semibold)', color: 'var(--color-on-surface-variant)', borderBottom: '1px solid var(--color-outline-variant)' }}>Đường dẫn (URL)</th>
-                <th style={{ padding: 'var(--space-md)', fontWeight: 'var(--fw-semibold)', color: 'var(--color-on-surface-variant)', borderBottom: '1px solid var(--color-outline-variant)', textAlign: 'right' }}>Thao tác</th>
+                <th>Tên hiển thị</th>
+                <th>Đường dẫn (URL)</th>
+                <th style={{ textAlign: 'right' }}>Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {navLinks.map((link, index) => {
                 const id = link._id || link.id;
                 return (
-                  <tr key={id} className="animate-fade-in" style={{ animationDelay: `${index * 0.05}s`, borderBottom: '1px solid var(--color-outline-variant)', transition: 'background-color var(--transition-fast)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-surface)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                    <td style={{ padding: 'var(--space-md)', fontWeight: 'var(--fw-medium)' }}>{link.title}</td>
-                    <td style={{ padding: 'var(--space-md)', color: 'var(--color-primary)' }}>{link.url}</td>
-                    <td style={{ padding: 'var(--space-md)', textAlign: 'right' }}>
+                  <tr key={id} className="admin-navlink-row animate-fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
+                    <td className="admin-navlink-row-title">{link.title}</td>
+                    <td className="admin-navlink-row-url">{link.url}</td>
+                    <td style={{ textAlign: 'right' }}>
                       <div className="btn-group" style={{ justifyContent: 'flex-end' }}>
                         <button 
                           className="btn btn-icon btn-white btn-sm" 

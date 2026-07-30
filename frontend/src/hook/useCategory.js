@@ -2,10 +2,6 @@ import { useState, useEffect } from "react";
 import { categoryService } from "../service/category.service.js";
 import { getErrorMessage } from "../helpers/error.helper.js";
 
-//
-// Query Hooks
-//
-
 export const useCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);

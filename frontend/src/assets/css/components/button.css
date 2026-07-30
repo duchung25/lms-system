@@ -98,6 +98,17 @@ a:focus-visible {
 .btn-glass-light:hover {
   background-color: rgba(255,255,255,0.25);
 }
+.btn.btn-danger{
+  background-color: var(--color-error-container);
+  color: var(--color-error);
+  border-color: var(--color-error-container);
+}
+.btn.btn-danger:hover{
+  background-color: var(--color-error);
+  color: white;
+  border-color: var(--color-error);
+  box-shadow: var(--shadow-hover);
+}
 
 .btn-icon {
   width: 40px;

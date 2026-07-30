@@ -1,16 +1,6 @@
 import { useState } from "react";
-import {
-  AreaChart, Area,
-  XAxis, YAxis,
-  CartesianGrid, Tooltip, ResponsiveContainer
-} from "recharts";
-
-import {
-  IoBookOutline,
-  IoPeopleOutline,
-  IoStatsChartOutline
-} from "react-icons/io5";
-
+import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { IoBookOutline, IoPeopleOutline, IoStatsChartOutline} from "react-icons/io5";
 import { useTeacherDashboard } from "../hook/useCourse";
 import { useGetTeacherOrderDashboard } from "../hook/useOrder";
 import RecentNotifications from "../components/notifications/recentNotifications";
@@ -20,8 +10,6 @@ export default function TeacherDashboard() {
 
   const { dashboardData: courseData, loading: courseLoading, error: courseError } = useTeacherDashboard();
   const { dashboardData: orderData, loading: orderLoading, error: orderError } = useGetTeacherOrderDashboard();
-  console.log ("Course Dashboard Data:", courseData);
-  console.log ("Order Dashboard Data:", orderData);
 
   const courseOverview = courseData?.overview || {};
   const learningStats = courseData?.learningStats || {};
@@ -48,12 +36,9 @@ export default function TeacherDashboard() {
   return (
     <div className="teacher-dashboard-v2">
 
-      {/* ================= HEADER ================= */}
       <div className="td-header">
-
         <div>
-          <h1>Teacher Studio</h1>
-          <p>Performance & revenue insights</p>
+          <h1 className="td-page-title">Teacher Dashboard</h1>
         </div>
 
         <div className="td-tabs">
@@ -64,15 +49,12 @@ export default function TeacherDashboard() {
             Revenue
           </button>
         </div>
-
       </div>
-
-      <RecentNotifications />
 
       {/* ================= COURSES ================= */}
       {activeTab === "courses" && (
         <>
-          {courseLoading ? <div>Loading...</div> : courseError ? <div>{courseError}</div> : (
+          {courseLoading ? <div className="td-state-container">Loading...</div> : courseError ? <div className="td-state-container">{courseError}</div> : (
 
             <>
               {/* HERO SNAPSHOT */}
@@ -101,27 +83,32 @@ export default function TeacherDashboard() {
 
               </div>
 
-              {/* CHART */}
-              <div className="card glass chart-focus">
-                <h3>Enrollment Growth</h3>
+              {/* SPLIT 4-6 NOTIFICATIONS & CHART */}
+              <div className="td-section-split">
+                <div className="td-split-notifications">
+                  <RecentNotifications />
+                </div>
+                <div className="td-split-chart card glass">
+                  <h3>Enrollment Growth</h3>
 
-                <ResponsiveContainer width="100%" height={320}>
-                  <AreaChart data={enrollmentGrowth}>
-                    <defs>
-                      <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#6366f1" stopOpacity={0.4} />
-                        <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
+                  <ResponsiveContainer width="100%" height={320}>
+                    <AreaChart data={enrollmentGrowth}>
+                      <defs>
+                        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#6366f1" stopOpacity={0.4} />
+                          <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
 
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
 
-                    <Area dataKey="value" stroke="#6366f1" fill="url(#g1)" />
-                  </AreaChart>
-                </ResponsiveContainer>
+                      <Area dataKey="value" stroke="#6366f1" fill="url(#g1)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
 
               {/* LIST STYLE (timeline feel) */}
@@ -164,7 +151,7 @@ export default function TeacherDashboard() {
       {/* ================= REVENUE ================= */}
       {activeTab === "orders" && (
         <>
-          {orderLoading ? <div>Loading...</div> : orderError ? <div>{orderError}</div> : (
+          {orderLoading ? <div className="td-state-container">Loading...</div> : orderError ? <div className="td-state-container">{orderError}</div> : (
 
             <>
               {/* FINANCE HERO (gradient strip) */}
@@ -183,20 +170,25 @@ export default function TeacherDashboard() {
 
               </div>
 
-              {/* BIG CHART FOCUS */}
-              <div className="card glass chart-focus">
-                <h3>Revenue Growth</h3>
+              {/* SPLIT 4-6 NOTIFICATIONS & CHART */}
+              <div className="td-section-split">
+                <div className="td-split-notifications">
+                  <RecentNotifications />
+                </div>
+                <div className="td-split-chart card glass">
+                  <h3>Revenue Growth</h3>
 
-                <ResponsiveContainer width="100%" height={340}>
-                  <AreaChart data={revenueGrowth}>
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
+                  <ResponsiveContainer width="100%" height={340}>
+                    <AreaChart data={revenueGrowth}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
 
-                    <Area dataKey="value" stroke="#10b981" fill="#10b981" fillOpacity={0.2} />
-                  </AreaChart>
-                </ResponsiveContainer>
+                      <Area dataKey="value" stroke="#10b981" fill="#10b981" fillOpacity={0.2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
 
               {/* LEDGER STYLE */}

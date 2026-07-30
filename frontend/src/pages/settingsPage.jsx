@@ -16,14 +16,12 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("password");
   const [toast, setToast] = useState(null);
 
-  // Form states for password change
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  // Form state for teacher request
   const [requestMessage, setRequestMessage] = useState("");
 
   const handlePasswordChange = (e) => {
@@ -93,7 +91,6 @@ export default function SettingsPage() {
     }
   };
 
-  // Check if role is student or if there is a request in history
   const showTeacherRequestTab = user && user.role === "student";
 
   return (
@@ -107,15 +104,15 @@ export default function SettingsPage() {
       )}
 
       {/* Header section with back button */}
-      <div className="settings-header">
-        <button className="settings-back-btn" onClick={() => navigate(-1)} title="Quay lại">
-          <FiArrowLeft />
-          <span>Quay lại</span>
-        </button>
+      <div className="settings-header d-flex flex-row">
         <div className="settings-title-group">
           <h1>Cài đặt tài khoản</h1>
           <p>Quản lý mật khẩu và các thiết lập tài khoản của bạn</p>
         </div>
+        <button className="settings-back-btn" onClick={() => navigate(-1)} title="Quay lại">
+          <FiArrowLeft />
+          <span>Quay lại</span>
+        </button>
       </div>
 
       <div className="settings-layout">

@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { debounce } from "lodash";
 import { useAuth } from "../auth/useAuth";
 import { useCourses } from "../hook/useCourse";
+import { useCategories } from "../hook/useCategory";
 import { FaBoxArchive, FaClipboardCheck, IoIosSearch, FaStar, FaStarHalfAlt, FaRegStar } from "../icons";
 
 
@@ -11,15 +12,6 @@ const LEVEL_OPTIONS = [
   { value: "Beginner", label: "Cơ bản (Beginner)" },
   { value: "Intermediate", label: "Trung cấp (Intermediate)" },
   { value: "Advanced", label: "Nâng cao (Advanced)" },
-];
-
-const CATEGORY_OPTIONS = [
-  { value: "", label: "Tất cả danh mục" },
-  { value: "Programming", label: "Lập trình" },
-  { value: "Design", label: "Thiết kế" },
-  { value: "Marketing", label: "Marketing" },
-  { value: "Business", label: "Kinh doanh" },
-  { value: "Other", label: "Khác" },
 ];
 
 function CourseSkeleton() {
@@ -54,7 +46,8 @@ export default function CoursesPage() {
     setSearchInput(q);
   }, [q]);
 
-  const { courses, pendingCount, loading, error } = useCourses({ 
+  const { categories, categoryLoading: categoryloading, categoryErr: categoryError } = useCategories();
+  const { courses, pendingCount, courseLoading: courseloading, courseErr: courseError } = useCourses({ 
     q, 
     category,
     level, 
@@ -63,6 +56,9 @@ export default function CoursesPage() {
     deleted, 
     role: user?.role 
   });
+  console.log(courses)
+  console.log(categories)
+
 
   const filterCourse = useMemo(() => {
     if(!q) return courses;
@@ -101,7 +97,6 @@ export default function CoursesPage() {
       </>
     );
   };
-
   return (
     <div className="courses-page-container">
       {/* Page Header */}
@@ -133,9 +128,9 @@ export default function CoursesPage() {
           value={category}
           onChange={(e) => updateFilter("category", e.target.value)}
         >
-          {CATEGORY_OPTIONS.map((opt) => (
-            <option value={opt.value} key={opt.value}>
-              {opt.label}
+          {categories.map((c) => (
+            <option value={c._id} key={c._id}>
+              {c.name}
             </option>
           ))}
         </select>
@@ -178,15 +173,15 @@ export default function CoursesPage() {
       </div>
 
       {/* Content Area */}
-      {loading ? (
+      {(categoryloading || courseloading) ? (
         <div className="row g-4">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <CourseSkeleton key={i} />
           ))}
         </div>
-      ) : error ? (
+      ) : (categoryError || courseError) ? (
         <div className="alert alert-danger rounded-3" role="alert">
-          Có lỗi xảy ra: {error}
+          Có lỗi xảy ra: {(categoryError || courseError)}
         </div>
       ) : filterCourse.length === 0 ? (
         <div className="empty-state">

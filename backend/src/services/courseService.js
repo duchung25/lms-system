@@ -33,7 +33,6 @@ const courseService = {
 
         if (deleted === 'true' || deleted === true) filter.deleted = true;
         else if (deleted === 'false' || deleted === false) filter.deleted = false;
-        if (level) filter.level = level;
 
         const sortOpt = {};
         if (sort) {
@@ -46,7 +45,7 @@ const courseService = {
         pendingFilter.status = 'PENDING_REVIEW';
 
         const skip = (page - 1) * limit;
-        if(deleted === 'true'){
+        if(deleted === 'true' || deleted === true){
             const [list, total, pendingCount] = await Promise.all([
                 Course.findWithDeleted(filter).populate("teacherId", "email").populate("categoryId", "name slug status").sort(sortOpt).skip(skip).limit(limit),
                 Course.countDocumentsDeleted(filter),

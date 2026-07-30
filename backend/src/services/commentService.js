@@ -107,10 +107,6 @@ const commentService = {
       throw new AppError("Only students can post top-level comments", 403);
     }
 
-    if (user.role === "student") {
-        await enrollmentService.canAccessLesson(courseId, user.userId, lessonId);
-    }
-
     let parent = null;
     if (parentCommentId) {
         parent = await LessonComment.findOne({ _id: parentCommentId, courseId, lessonId });

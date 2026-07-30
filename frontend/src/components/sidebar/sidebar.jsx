@@ -110,7 +110,7 @@ export default function Sidebar() {
             <span className="sidebar-link-icon"><FiUserCheck /></span>
             <span className="sidebar-link-text">Yêu cầu giảng viên</span>
           </NavLink>
-          <NavLink to="/admin/orders" className={linkClass}>
+          {/* <NavLink to="/admin/orders" className={linkClass}>
             <span className="sidebar-link-icon"><FiDollarSign /></span>
             <span className="sidebar-link-text">Đơn hàng</span>
           </NavLink>
@@ -121,12 +121,7 @@ export default function Sidebar() {
           <NavLink to="/admin/comments" className={linkClass}>
             <span className="sidebar-link-icon"><FiMessageSquare /></span>
             <span className="sidebar-link-text">Bình luận</span>
-          </NavLink>
-          {notificationLink}
-          <NavLink to="/admin/settings" className={linkClass}>
-            <span className="sidebar-link-icon"><FiSettings /></span>
-            <span className="sidebar-link-text">Cài đặt</span>
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/admin/course-review" className={linkClass}>
             <span className="sidebar-link-icon"><FiClipboard /></span>
             <span className="sidebar-link-text">Duyệt khóa học</span>
@@ -136,8 +131,14 @@ export default function Sidebar() {
             <span className="sidebar-link-text">Chứng chỉ</span>
           </NavLink>
           <NavLink to="/admin/navlinks" className={linkClass}>
+            <span className="sidebar-link-icon"><FiMessageSquare /></span>
             <span className="sidebar-link-text">Quản lý Menu</span>
-          </NavLink>  
+          </NavLink> 
+          {notificationLink}
+          <NavLink to="/admin/settings" className={linkClass}>
+            <span className="sidebar-link-icon"><FiSettings /></span>
+            <span className="sidebar-link-text">Cài đặt</span>
+          </NavLink> 
         </nav>
       </aside>
     );

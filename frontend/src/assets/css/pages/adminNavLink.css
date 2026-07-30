@@ -1,0 +1,186 @@
+/* ============================
+   PAGE CONTAINER
+============================ */
+.admin-navlink-container {
+  font-family: var(--font-primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  background: var(--color-background);
+  min-height: 100vh;
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+/* ============================
+   HEADER SECTION
+============================ */
+.admin-navlink-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.admin-navlink-title h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-bold);
+  color: var(--color-primary-container);
+  margin: 0;
+}
+
+.admin-navlink-title p {
+  color: var(--color-on-surface-variant);
+  font-size: var(--fs-body-sm);
+  margin: var(--space-xs) 0 0;
+}
+
+/* ============================
+   FORM ADD / EDIT
+============================ */
+.admin-navlink-form {
+  background-color: var(--color-surface-container-lowest);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--color-outline-variant);
+}
+
+.admin-navlink-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.admin-navlink-form-header h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h4);
+  font-weight: var(--fw-bold);
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.admin-navlink-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.admin-navlink-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.admin-navlink-form-group label {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+  color: var(--color-on-surface-variant);
+}
+
+.admin-navlink-form-group .input {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-outline-variant);
+  background: var(--color-surface-container-low);
+  color: var(--color-on-surface);
+  font-family: var(--font-primary);
+  font-size: var(--fs-body-sm);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.admin-navlink-form-group .input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.admin-navlink-form-actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+}
+
+/* ============================
+   TABLE / LIST
+============================ */
+.admin-navlink-table-wrap {
+  background: var(--color-surface-container-lowest);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-outline-variant);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.admin-navlink-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-navlink-table th,
+.admin-navlink-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-outline-variant);
+  font-size: var(--fs-body-sm);
+}
+
+.admin-navlink-table th {
+  background: var(--color-surface-container-low);
+  font-weight: var(--fw-semibold);
+  color: var(--color-on-surface-variant);
+  border-bottom: 2px solid var(--color-outline-variant);
+}
+
+.admin-navlink-table td {
+  color: var(--color-on-surface);
+}
+
+.admin-navlink-row {
+  transition: background-color var(--transition-fast);
+}
+
+.admin-navlink-row:hover {
+  background-color: var(--color-surface-container-low);
+}
+
+.admin-navlink-row-title {
+  font-weight: var(--fw-medium);
+}
+
+.admin-navlink-row-url {
+  color: var(--color-primary);
+}
+
+/* ============================
+   RESPONSIVE
+============================ */
+@media (max-width: 768px) {
+  .admin-navlink-container {
+    padding: var(--space-lg);
+  }
+
+  .admin-navlink-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  .admin-navlink-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-navlink-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

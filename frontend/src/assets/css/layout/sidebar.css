@@ -12,7 +12,6 @@
   position: fixed;
   top: var(--header-height);
   left: 0;
-  z-index: var(--z-sticky);
   box-shadow: var(--shadow-level-1);
   padding: var(--space-md) 0;
   overflow-y: auto;
