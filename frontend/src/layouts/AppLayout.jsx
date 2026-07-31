@@ -17,8 +17,6 @@ export default function AppLayout() {
         </div>
       </main>
     </div>
-
-      <Footer />
     </div>
   );
-}
+}

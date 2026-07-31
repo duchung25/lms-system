@@ -3,7 +3,7 @@ import { courseService } from "../service/course.service";
 import { getErrorMessage } from "../helpers/error.helper.js";
 import { lessonService } from "../service/lesson.service";
 
-export const useCourses = ({ q, category, level, status, published, deleted, role, refreshKey = 0 }) => {
+export const useCourses = ({ q, category, level, status, published, deleted, role, refreshKey = 0 } = {}) => {
   const [courses, setCourses] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
