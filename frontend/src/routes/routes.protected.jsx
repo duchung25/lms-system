@@ -47,7 +47,6 @@ export default [
           { path: "/admin/course-review", element: <AdminCourseReview /> },
           { path: "/admin/courses/review", element: <AdminCourseReview /> },
           { path: "/admin/certificates", element: <AdminCertificatesPage /> },
-          { path: "/courses/:courseId/lessons/new", element: <LessonForm /> },
           { path: "/admin/users", element: <UserManagement /> },
           { path: "/admin/teacher-requests", element: <AdminTeacherRequestsPage /> },
           { path: "/admin/orders", element: <AdminOrdersPage /> },

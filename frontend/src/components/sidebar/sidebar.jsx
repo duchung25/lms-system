@@ -135,6 +135,10 @@ export default function Sidebar() {
             <span className="sidebar-link-text">Quản lý Menu</span>
           </NavLink> 
           {notificationLink}
+          <NavLink to="/my-profile" className={linkClass}>
+            <span className="sidebar-link-icon"><BiUser /></span>
+            <span className="sidebar-link-text">Hồ sơ</span>
+          </NavLink>
           <NavLink to="/admin/settings" className={linkClass}>
             <span className="sidebar-link-icon"><FiSettings /></span>
             <span className="sidebar-link-text">Cài đặt</span>
@@ -148,11 +152,17 @@ export default function Sidebar() {
     return (
       <aside className="sidebar">
         <nav className="sidebar-nav">
+          
           <Link to="/courses/create" className="sidebar-create-btn">
             <span className="create-icon">+</span>
             <span className="create-text">Tạo khóa học</span>
           </Link>
+          
           <div className="sidebar-section-label">Giảng viên</div>
+          <NavLink to="/" className={linkClass}>
+              <span className="sidebar-link-icon"><BiHome /></span>
+              <span className="sidebar-link-text">Trang chủ</span>
+            </NavLink>
           <NavLink to="/teacher/dashboard" className={linkClass}>
             <span className="sidebar-link-icon"><BiSolidDashboard /></span>
             <span className="sidebar-link-text">Bảng điều khiển</span>
@@ -164,10 +174,6 @@ export default function Sidebar() {
           <NavLink to="/courses/create" className={linkClass}>
             <span className="sidebar-link-icon"><FiPlusCircle /></span>
             <span className="sidebar-link-text">Tạo khóa học</span>
-          </NavLink>
-          <NavLink to="/teacher/discussions" className={linkClass}>
-            <span className="sidebar-link-icon"><FiMessageSquare /></span>
-            <span className="sidebar-link-text">Thảo luận</span>
           </NavLink>
           {notificationLink}
           <NavLink to="/my-profile" className={linkClass}>
